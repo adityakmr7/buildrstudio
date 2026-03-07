@@ -1,0 +1,32 @@
+/* ═══════════════════════════════════════════════
+   INK DESIGN SYSTEM — Inputs
+═══════════════════════════════════════════════ */
+
+.input-field {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  font-size: 15px;
+  font-family: var(--font);
+  color: var(--text-1);
+  width: 100%;
+  outline: none;
+  transition: border .15s;
+}
+.input-field:focus { border-color: var(--text-1); }
+.input-field::placeholder { color: var(--text-3); }
+
+.input-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.input-hint {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 5px;
+}

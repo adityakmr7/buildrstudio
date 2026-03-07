@@ -1,0 +1,46 @@
+/* ═══════════════════════════════════════════════
+   INK DESIGN SYSTEM — Typography
+═══════════════════════════════════════════════ */
+
+.ink-display {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text-1);
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+}
+
+.ink-headline {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-1);
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+}
+
+.ink-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-1);
+  letter-spacing: -0.3px;
+}
+
+.ink-body {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+
+.ink-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.ink-caption {
+  font-size: 12px;
+  color: var(--text-3);
+}

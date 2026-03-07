@@ -1,0 +1,91 @@
+/* ═══════════════════════════════════════════════
+   INK DESIGN SYSTEM — Feedback & Callouts
+═══════════════════════════════════════════════ */
+
+/* Callout / tooltip */
+.callout {
+  background: var(--fill);
+  color: var(--fill-text);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  display: inline-block;
+}
+.callout-date { font-size: 11px; opacity: .6; margin-bottom: 2px; }
+.callout-value { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+.callout-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 12px;
+  opacity: .75;
+}
+
+/* Toast */
+.toast-example {
+  background: var(--fill);
+  color: var(--fill-text);
+  border-radius: var(--r-full);
+  padding: 12px 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Code block */
+.code-block {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px 24px;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+  color: var(--text-2);
+  line-height: 1.8;
+  overflow-x: auto;
+  white-space: pre;
+}
+.code-token { color: var(--text-3); }
+.copy-btn {
+  background: var(--fill-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+  font-family: var(--font);
+}
+.copy-btn:hover { background: var(--border); }
+
+/* Philosophy block */
+.philosophy {
+  background: var(--fill);
+  border-radius: var(--r-2xl);
+  padding: 36px 40px;
+  margin-bottom: 48px;
+}
+.phil-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fill-text);
+  opacity: .5;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 14px;
+}
+.phil-body {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--fill-text);
+  line-height: 1.5;
+  letter-spacing: -0.3px;
+}
+.phil-footer {
+  font-size: 13px;
+  color: var(--fill-text);
+  opacity: .4;
+  margin-top: 20px;
+}

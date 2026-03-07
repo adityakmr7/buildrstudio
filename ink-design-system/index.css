@@ -1,0 +1,18 @@
+/* ═══════════════════════════════════════════════
+   INK DESIGN SYSTEM — Entry Point
+   Import this single file to get the full system.
+   by Aditya Kumar · v1.0 · 2026
+═══════════════════════════════════════════════ */
+
+@import './tokens.css';
+@import './base.css';
+@import './typography.css';
+@import './buttons.css';
+@import './cards.css';
+@import './inputs.css';
+@import './chips.css';
+@import './list.css';
+@import './selection.css';
+@import './progress.css';
+@import './navigation.css';
+@import './feedback.css';

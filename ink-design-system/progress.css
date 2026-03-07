@@ -1,0 +1,69 @@
+/* ═══════════════════════════════════════════════
+   INK DESIGN SYSTEM — Progress, Stats & Grids
+═══════════════════════════════════════════════ */
+
+/* Progress bar */
+.pb-track {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+}
+.pb-fill {
+  height: 100%;
+  background: var(--fill);
+  border-radius: 3px;
+}
+.pb-thin .pb-track { height: 3px; }
+.pb-label-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+/* Stat cards */
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 18px 16px;
+  text-align: center;
+  transition: all .3s;
+}
+.stat-card.inv { background: var(--fill); border: none; }
+
+.sc-val {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--text-1);
+}
+.stat-card.inv .sc-val { color: var(--fill-text); }
+
+.sc-lbl {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 3px;
+}
+.stat-card.inv .sc-lbl { color: rgba(255,255,255,0.5); }
+[data-theme="dark"] .stat-card.inv .sc-lbl { color: rgba(0,0,0,0.4); }
+
+/* Habit grid */
+.hgrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  max-width: 300px;
+}
+.hcell {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--text-3);
+}
+.hcell.done { background: var(--fill); color: var(--fill-text); }
+.hcell.mid  { background: var(--border-strong); color: var(--fill-text); }
+.hcell.miss { color: var(--text-3); }

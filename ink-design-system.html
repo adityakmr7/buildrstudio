@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<title>Ink — Design System by AK</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   INK DESIGN SYSTEM — by Aditya Kumar
+   Version 1.0 · 2026
+═══════════════════════════════════════════════ */
+
+:root {
+  /* ── COLOR TOKENS ── */
+  --bg:             #F7F7F7;
+  --bg-page:        #EDEDEC;
+  --surface:        #FFFFFF;
+  --surface-2:      #F0F0F0;
+  --surface-3:      #E8E8E8;
+  --border:         #E8E8E8;
+  --border-strong:  #C0C0C0;
+  --text-1:         #0A0A0A;
+  --text-2:         #4A4A4A;
+  --text-3:         #9A9A9A;
+  --text-4:         #C8C8C8;
+  --fill:           #0A0A0A;
+  --fill-text:      #FFFFFF;
+  --fill-subtle:    #F0F0F0;
+  /* ── SPACING ── */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px;
+  --space-4: 16px; --space-5: 20px; --space-6: 24px;
+  --space-8: 32px; --space-10: 40px; --space-12: 48px;
+  /* ── RADIUS ── */
+  --r-xs: 4px; --r-sm: 8px; --r-md: 12px;
+  --r-lg: 16px; --r-xl: 20px; --r-2xl: 28px; --r-full: 9999px;
+  /* ── SHADOWS ── */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.10), 0 4px 8px rgba(0,0,0,0.04);
+  /* ── FONT ── */
+  --font: 'DM Sans', -apple-system, sans-serif;
+}
+[data-theme="dark"] {
+  --bg:             #111111;
+  --bg-page:        #0A0A0A;
+  --surface:        #1C1C1C;
+  --surface-2:      #252525;
+  --surface-3:      #2E2E2E;
+  --border:         #2E2E2E;
+  --border-strong:  #404040;
+  --text-1:         #F5F5F5;
+  --text-2:         #A0A0A0;
+  --text-3:         #555555;
+  --text-4:         #333333;
+  --fill:           #F5F5F5;
+  --fill-text:      #111111;
+  --fill-subtle:    #252525;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+}
+
+/* ─── BASE ─────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg-page);font-family:var(--font);color:var(--text-1);line-height:1.5;transition:background .3s,color .3s;}
+a{color:inherit;text-decoration:none;}
+
+/* ─── LAYOUT ───────────────────────────────── */
+.page{max-width:1100px;margin:0 auto;padding:48px 40px 80px;}
+.section{margin-bottom:64px;}
+.section-header{display:flex;align-items:baseline;gap:16px;margin-bottom:28px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-title{font-size:22px;font-weight:700;color:var(--text-1);letter-spacing:-0.4px;}
+.section-sub{font-size:13px;color:var(--text-3);}
+.row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;}
+.col{display:flex;flex-direction:column;gap:12px;}
+
+/* ─── HEADER ───────────────────────────────── */
+.ds-header{padding:56px 40px 48px;border-bottom:1px solid var(--border);margin-bottom:56px;display:flex;align-items:flex-end;justify-content:space-between;}
+.ds-brand{display:flex;align-items:center;gap:16px;}
+.ds-logo{width:56px;height:56px;border-radius:16px;background:var(--fill);display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--fill-text);}
+.ds-name{font-size:36px;font-weight:800;color:var(--text-1);letter-spacing:-1.5px;}
+.ds-tagline{font-size:15px;color:var(--text-3);margin-top:4px;}
+.ds-meta{text-align:right;}
+.ds-version{font-size:12px;color:var(--text-3);margin-bottom:4px;}
+.ds-by{font-size:13px;font-weight:600;color:var(--text-2);}
+.theme-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-full);padding:8px 18px;font-size:13px;font-weight:600;color:var(--text-1);cursor:pointer;font-family:var(--font);transition:all .15s;margin-top:10px;}
+.theme-btn:hover{border-color:var(--border-strong);}
+
+/* ─── TOKEN CARDS ──────────────────────────── */
+.token-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;}
+.swatch{border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border);}
+.swatch-color{height:64px;}
+.swatch-info{background:var(--surface);padding:10px 12px;}
+.swatch-name{font-size:12px;font-weight:600;color:var(--text-1);}
+.swatch-hex{font-size:11px;color:var(--text-3);font-family:monospace;}
+.swatch-desc{font-size:10px;color:var(--text-3);margin-top:2px;}
+
+/* ─── TYPE SPECIMENS ───────────────────────── */
+.type-row{display:flex;align-items:baseline;gap:20px;padding:16px 0;border-bottom:1px solid var(--border);}
+.type-row:last-child{border-bottom:none;}
+.type-meta{width:120px;flex-shrink:0;}
+.type-name{font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:1px;}
+.type-spec{font-size:10px;color:var(--text-4);margin-top:3px;font-family:monospace;}
+.type-sample{flex:1;}
+
+/* ─── SPACING VIZ ──────────────────────────── */
+.space-row{display:flex;align-items:center;gap:16px;padding:8px 0;}
+.space-bar{background:var(--fill);height:20px;border-radius:3px;opacity:0.85;}
+.space-label{font-size:12px;color:var(--text-3);min-width:80px;}
+.space-value{font-size:11px;color:var(--text-3);font-family:monospace;}
+
+/* ─── RADIUS VIZ ────────────────────────────── */
+.radius-grid{display:flex;flex-wrap:wrap;gap:16px;}
+.radius-box{width:80px;height:80px;background:var(--fill);opacity:0.85;display:flex;align-items:center;justify-content:center;}
+.radius-label{font-size:11px;color:var(--text-3);text-align:center;margin-top:6px;font-family:monospace;}
+
+/* ─── COMPONENT BLOCKS ─────────────────────── */
+.comp-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;transition:background .3s,border .3s;}
+.comp-label{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;}
+.comp-name{font-size:14px;font-weight:600;color:var(--text-1);margin-bottom:4px;}
+.comp-desc{font-size:12px;color:var(--text-3);}
+
+/* ─── COMPONENTS ────────────────────────────── */
+
+/* Buttons */
+.btn-fill{background:var(--fill);color:var(--fill-text);border:none;padding:14px 24px;border-radius:var(--r-md);font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity .15s;letter-spacing:-0.2px;display:inline-flex;align-items:center;gap:8px;}
+.btn-fill:hover{opacity:.85;}
+.btn-outline{background:transparent;color:var(--text-1);border:1.5px solid var(--border-strong);padding:13px 22px;border-radius:var(--r-md);font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;display:inline-flex;align-items:center;gap:8px;}
+.btn-outline:hover{border-color:var(--text-1);}
+.btn-ghost{background:transparent;color:var(--text-2);border:none;padding:13px 22px;border-radius:var(--r-md);font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s;display:inline-flex;align-items:center;gap:8px;}
+.btn-ghost:hover{background:var(--fill-subtle);}
+.btn-sm{padding:9px 16px;font-size:13px;border-radius:var(--r-sm);}
+.btn-lg{padding:18px 28px;font-size:17px;border-radius:var(--r-lg);}
+.btn-icon-circle{width:48px;height:48px;border-radius:50%;background:var(--fill-subtle);border:1.5px solid var(--border);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;transition:all .15s;color:var(--text-1);}
+.btn-icon-circle:hover{background:var(--border);}
+.btn-icon-circle.solid{background:var(--fill);color:var(--fill-text);border:none;}
+.btn-icon-circle.solid:hover{opacity:.85;}
+
+/* Cards */
+.card-default{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-2xl);padding:20px;transition:background .3s,border .3s;box-shadow:var(--shadow-sm);}
+.card-subtle{background:var(--surface-2);border-radius:var(--r-2xl);padding:20px;transition:background .3s;}
+.card-fill{background:var(--fill);border-radius:var(--r-2xl);padding:20px;}
+.card-fill *{color:var(--fill-text)!important;}
+
+/* Input */
+.input-field{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-md);padding:14px 16px;font-size:15px;font-family:var(--font);color:var(--text-1);width:100%;outline:none;transition:border .15s;}
+.input-field:focus{border-color:var(--text-1);}
+.input-field::placeholder{color:var(--text-3);}
+.input-label{font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:6px;display:block;}
+.input-hint{font-size:12px;color:var(--text-3);margin-top:5px;}
+
+/* Chips / Badges */
+.chip-default{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-full);padding:7px 15px;font-size:13px;font-weight:500;color:var(--text-1);display:inline-block;cursor:pointer;transition:all .15s;}
+.chip-default:hover{border-color:var(--border-strong);}
+.chip-filled{background:var(--fill);color:var(--fill-text);border-radius:var(--r-full);padding:7px 15px;font-size:13px;font-weight:500;display:inline-block;}
+.chip-subtle{background:var(--surface-2);color:var(--text-2);border-radius:var(--r-full);padding:6px 13px;font-size:12px;font-weight:500;display:inline-block;}
+
+/* List item */
+.list-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);}
+.list-item:last-child{border-bottom:none;}
+.li-icon{width:40px;height:40px;border-radius:12px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.li-info{flex:1;}
+.li-title{font-size:14px;font-weight:600;color:var(--text-1);}
+.li-sub{font-size:12px;color:var(--text-3);margin-top:2px;}
+.li-meta{font-size:12px;color:var(--text-3);}
+.li-check{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;}
+.li-check.checked{background:var(--fill);border-color:var(--fill);color:var(--fill-text);}
+
+/* Progress bar */
+.pb-track{height:6px;background:var(--border);border-radius:3px;}
+.pb-fill{height:100%;background:var(--fill);border-radius:3px;}
+.pb-thin .pb-track{height:3px;}
+.pb-label-row{display:flex;justify-content:space-between;margin-bottom:6px;}
+
+/* Stat cards */
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:18px 16px;text-align:center;transition:all .3s;}
+.stat-card.inv{background:var(--fill);border:none;}
+.sc-val{font-size:28px;font-weight:800;letter-spacing:-1px;color:var(--text-1);}
+.stat-card.inv .sc-val{color:var(--fill-text);}
+.sc-lbl{font-size:12px;color:var(--text-3);margin-top:3px;}
+.stat-card.inv .sc-lbl{color:rgba(255,255,255,0.5);}
+[data-theme="dark"] .stat-card.inv .sc-lbl{color:rgba(0,0,0,0.4);}
+
+/* Selection row */
+.sel-row{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-md);padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .15s;}
+.sel-row:hover{border-color:var(--border-strong);}
+.sel-row.active{border-color:var(--text-1);background:var(--fill-subtle);}
+.sel-check{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;margin-left:auto;font-size:11px;}
+.sel-row.active .sel-check{background:var(--fill);border-color:var(--fill);color:var(--fill-text);}
+
+/* Bottom nav */
+.bottom-nav{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-2xl);padding:12px 24px;display:flex;justify-content:space-around;transition:all .3s;}
+.bn-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px 14px;border-radius:12px;}
+.bn-item:hover{background:var(--fill-subtle);}
+.bn-icon{font-size:20px;color:var(--text-3);}
+.bn-label{font-size:11px;color:var(--text-3);font-weight:500;}
+.bn-item.active .bn-icon{color:var(--text-1);}
+.bn-item.active .bn-label{color:var(--text-1);font-weight:700;}
+
+/* Toggle */
+.toggle-pill{display:inline-flex;background:var(--surface-2);border-radius:var(--r-full);padding:4px;gap:2px;}
+.tp-option{padding:8px 18px;border-radius:var(--r-full);font-size:13px;font-weight:600;color:var(--text-3);cursor:pointer;transition:all .15s;}
+.tp-option.active{background:var(--surface);color:var(--text-1);box-shadow:var(--shadow-sm);}
+
+/* Tooltip/callout (chart tooltip style) */
+.callout{background:var(--fill);color:var(--fill-text);border-radius:var(--r-md);padding:10px 14px;display:inline-block;}
+.callout-date{font-size:11px;opacity:.6;margin-bottom:2px;}
+.callout-value{font-size:22px;font-weight:800;margin-bottom:4px;}
+.callout-row{display:flex;justify-content:space-between;gap:16px;font-size:12px;opacity:.75;}
+
+/* Step dots */
+.step-dots{display:flex;gap:6px;align-items:center;}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--border);}
+.sdot.active{width:22px;border-radius:4px;background:var(--fill);}
+.sdot.done{background:var(--text-1);}
+
+/* Grid cell (habit tracker) */
+.hgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:300px;}
+.hcell{aspect-ratio:1;border-radius:8px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-3);}
+.hcell.done{background:var(--fill);color:var(--fill-text);}
+.hcell.mid{background:var(--border-strong);color:var(--fill-text);}
+.hcell.miss{color:var(--text-3);}
+
+/* Toast / notification */
+.toast-example{background:var(--fill);color:var(--fill-text);border-radius:var(--r-full);padding:12px 20px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;}
+
+/* ─── CODE BLOCKS ────────────────────────────── */
+.code-block{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 24px;font-size:12px;font-family:'Courier New',monospace;color:var(--text-2);line-height:1.8;overflow-x:auto;white-space:pre;}
+.code-token{color:var(--text-3);}
+.copy-btn{background:var(--fill-subtle);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 12px;font-size:11px;font-weight:600;color:var(--text-2);cursor:pointer;font-family:var(--font);}
+.copy-btn:hover{background:var(--border);}
+
+/* ─── UTILITIES ─────────────────────────────── */
+.divider{height:1px;background:var(--border);margin:8px 0;}
+.badge-pill{background:var(--fill-subtle);border-radius:var(--r-full);padding:3px 10px;font-size:11px;font-weight:600;color:var(--text-2);}
+.badge-dark{background:var(--fill);border-radius:var(--r-full);padding:3px 10px;font-size:11px;font-weight:600;color:var(--fill-text);}
+
+/* ─── DO / DONT ─────────────────────────────── */
+.do-dont{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.do-box{border:1.5px solid #16A34A;border-radius:var(--r-xl);padding:18px;}
+.dont-box{border:1.5px solid #DC2626;border-radius:var(--r-xl);padding:18px;}
+.do-label{font-size:11px;font-weight:700;color:#16A34A;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.dont-label{font-size:11px;font-weight:700;color:#DC2626;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.do-item,.dont-item{font-size:13px;color:var(--text-2);margin-bottom:6px;display:flex;gap:8px;}
+
+/* ─── PHILOSOPHY BLOCK ────────────────────────── */
+.philosophy{background:var(--fill);border-radius:var(--r-2xl);padding:36px 40px;margin-bottom:48px;}
+.phil-title{font-size:14px;font-weight:600;color:var(--fill-text);opacity:.5;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;}
+.phil-body{font-size:22px;font-weight:700;color:var(--fill-text);line-height:1.5;letter-spacing:-0.3px;}
+.phil-footer{font-size:13px;color:var(--fill-text);opacity:.4;margin-top:20px;}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ─── HEADER ──────────────────────────────── -->
+  <div class="ds-header">
+    <div class="ds-brand">
+      <div class="ds-logo">◉</div>
+      <div>
+        <div class="ds-name">Ink</div>
+        <div class="ds-tagline">A personal design system by Aditya Kumar</div>
+      </div>
+    </div>
+    <div class="ds-meta">
+      <div class="ds-version">Version 1.0 · March 2026</div>
+      <div class="ds-by">AK Design Language</div>
+      <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">🌙 Dark mode</button>
+    </div>
+  </div>
+
+  <!-- ─── PHILOSOPHY ─────────────────────────── -->
+  <div class="philosophy">
+    <div class="phil-title">Design Philosophy</div>
+    <div class="phil-body">Mono. Timeless. Content-first.<br>No color to lean on — only type, space, and structure.<br>Works for any app. Recognisable across every product.</div>
+    <div class="phil-footer">Inspired by editorial design, Swiss typography, and the idea that constraints breed creativity.</div>
+  </div>
+
+  <!-- ─── COLORS ─────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Color Tokens</div>
+      <div class="section-sub">Semantic tokens — never use raw hex values in your code</div>
+    </div>
+
+    <div style="margin-bottom:20px">
+      <div style="font-size:13px;font-weight:700;color:var(--text-2);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.8px;font-size:11px">Light Mode</div>
+      <div class="token-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#F7F7F7;border-bottom:1px solid #E8E8E8"></div><div class="swatch-info"><div class="swatch-name">--bg</div><div class="swatch-hex">#F7F7F7</div><div class="swatch-desc">Page background</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#FFFFFF;border-bottom:1px solid #E8E8E8"></div><div class="swatch-info"><div class="swatch-name">--surface</div><div class="swatch-hex">#FFFFFF</div><div class="swatch-desc">Card background</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#F0F0F0;border-bottom:1px solid #E8E8E8"></div><div class="swatch-info"><div class="swatch-name">--surface-2</div><div class="swatch-hex">#F0F0F0</div><div class="swatch-desc">Subtle fill</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#E8E8E8;border-bottom:1px solid #D0D0D0"></div><div class="swatch-info"><div class="swatch-name">--border</div><div class="swatch-hex">#E8E8E8</div><div class="swatch-desc">Default border</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#0A0A0A"></div><div class="swatch-info"><div class="swatch-name">--text-1</div><div class="swatch-hex">#0A0A0A</div><div class="swatch-desc">Primary text</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#4A4A4A"></div><div class="swatch-info"><div class="swatch-name">--text-2</div><div class="swatch-hex">#4A4A4A</div><div class="swatch-desc">Secondary text</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#9A9A9A"></div><div class="swatch-info"><div class="swatch-name">--text-3</div><div class="swatch-hex">#9A9A9A</div><div class="swatch-desc">Muted / labels</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#0A0A0A"></div><div class="swatch-info"><div class="swatch-name">--fill</div><div class="swatch-hex">#0A0A0A</div><div class="swatch-desc">CTAs, active</div></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.8px">Dark Mode</div>
+      <div class="token-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#111111"></div><div class="swatch-info"><div class="swatch-name">--bg</div><div class="swatch-hex">#111111</div><div class="swatch-desc">Page background</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#1C1C1C"></div><div class="swatch-info"><div class="swatch-name">--surface</div><div class="swatch-hex">#1C1C1C</div><div class="swatch-desc">Card background</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#252525"></div><div class="swatch-info"><div class="swatch-name">--surface-2</div><div class="swatch-hex">#252525</div><div class="swatch-desc">Subtle fill</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#2E2E2E"></div><div class="swatch-info"><div class="swatch-name">--border</div><div class="swatch-hex">#2E2E2E</div><div class="swatch-desc">Default border</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#F5F5F5"></div><div class="swatch-info"><div class="swatch-name">--text-1</div><div class="swatch-hex">#F5F5F5</div><div class="swatch-desc">Primary text</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#A0A0A0"></div><div class="swatch-info"><div class="swatch-name">--text-2</div><div class="swatch-hex">#A0A0A0</div><div class="swatch-desc">Secondary text</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#555555"></div><div class="swatch-info"><div class="swatch-name">--text-3</div><div class="swatch-hex">#555555</div><div class="swatch-desc">Muted / labels</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#F5F5F5"></div><div class="swatch-info"><div class="swatch-name">--fill</div><div class="swatch-hex">#F5F5F5</div><div class="swatch-desc">CTAs, active</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TYPOGRAPHY ─────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Typography</div>
+      <div class="section-sub">DM Sans · Font family</div>
+    </div>
+    <div class="comp-block">
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">Display</div><div class="type-spec">36px / 800<br>letter: -1.5px</div></div>
+        <div class="type-sample" style="font-size:36px;font-weight:800;color:var(--text-1);letter-spacing:-1.5px;line-height:1.1">Build better habits</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">Headline</div><div class="type-spec">28px / 700<br>letter: -0.8px</div></div>
+        <div class="type-sample" style="font-size:28px;font-weight:700;color:var(--text-1);letter-spacing:-0.8px;line-height:1.2">Good morning, Aditya</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">Title</div><div class="type-spec">20px / 700<br>letter: -0.3px</div></div>
+        <div class="type-sample" style="font-size:20px;font-weight:700;color:var(--text-1);letter-spacing:-0.3px">Today's Habits</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">Body</div><div class="type-spec">15px / 400<br>leading: 1.6</div></div>
+        <div class="type-sample" style="font-size:15px;font-weight:400;color:var(--text-2);line-height:1.6">A habit tracker is a simple way to measure whether you did a habit. Science-backed design to help habits stick.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">Label</div><div class="type-spec">11px / 700<br>caps + tracking</div></div>
+        <div class="type-sample" style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:1.5px">HABIT DESIGN · STEP 1</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><div class="type-name">Caption</div><div class="type-spec">12px / 400</div></div>
+        <div class="type-sample" style="font-size:12px;color:var(--text-3)">Activity · 10 min · Updated today</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SPACING ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Spacing Scale</div>
+      <div class="section-sub">4px base unit · multiply for consistent rhythm</div>
+    </div>
+    <div class="comp-block">
+      <div class="space-row"><div class="space-label">space-1</div><div class="space-bar" style="width:4px"></div><div class="space-value">4px</div></div>
+      <div class="space-row"><div class="space-label">space-2</div><div class="space-bar" style="width:8px"></div><div class="space-value">8px</div></div>
+      <div class="space-row"><div class="space-label">space-3</div><div class="space-bar" style="width:12px"></div><div class="space-value">12px</div></div>
+      <div class="space-row"><div class="space-label">space-4</div><div class="space-bar" style="width:16px"></div><div class="space-value">16px · default padding</div></div>
+      <div class="space-row"><div class="space-label">space-5</div><div class="space-bar" style="width:20px"></div><div class="space-value">20px</div></div>
+      <div class="space-row"><div class="space-label">space-6</div><div class="space-bar" style="width:24px"></div><div class="space-value">24px · section gap</div></div>
+      <div class="space-row"><div class="space-label">space-8</div><div class="space-bar" style="width:32px"></div><div class="space-value">32px · screen padding</div></div>
+      <div class="space-row"><div class="space-label">space-10</div><div class="space-bar" style="width:40px"></div><div class="space-value">40px</div></div>
+      <div class="space-row"><div class="space-label">space-12</div><div class="space-bar" style="width:48px"></div><div class="space-value">48px · large gaps</div></div>
+    </div>
+  </div>
+
+  <!-- ─── BORDER RADIUS ──────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Border Radius</div>
+      <div class="section-sub">Rounded everywhere — softness is part of the language</div>
+    </div>
+    <div class="comp-block">
+      <div class="radius-grid">
+        <div><div class="radius-box" style="border-radius:4px"></div><div class="radius-label">r-xs<br>4px<br>subtle</div></div>
+        <div><div class="radius-box" style="border-radius:8px"></div><div class="radius-label">r-sm<br>8px<br>inputs</div></div>
+        <div><div class="radius-box" style="border-radius:12px"></div><div class="radius-label">r-md<br>12px<br>buttons</div></div>
+        <div><div class="radius-box" style="border-radius:16px"></div><div class="radius-label">r-lg<br>16px<br>chips</div></div>
+        <div><div class="radius-box" style="border-radius:20px"></div><div class="radius-label">r-xl<br>20px<br>cards</div></div>
+        <div><div class="radius-box" style="border-radius:28px"></div><div class="radius-label">r-2xl<br>28px<br>hero cards</div></div>
+        <div><div class="radius-box" style="border-radius:9999px"></div><div class="radius-label">r-full<br>pill<br>tags</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── BUTTONS ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Buttons</div>
+      <div class="section-sub">3 variants × 3 sizes · icon variants</div>
+    </div>
+    <div class="row" style="margin-bottom:24px">
+      <div class="comp-block" style="flex:1;min-width:280px">
+        <div class="comp-label">Variants</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn-fill">Primary action</button>
+          <button class="btn-outline">Secondary action</button>
+          <button class="btn-ghost">Ghost / text action</button>
+        </div>
+      </div>
+      <div class="comp-block" style="flex:1;min-width:280px">
+        <div class="comp-label">Sizes</div>
+        <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+          <button class="btn-fill btn-sm">Small</button>
+          <button class="btn-fill">Default</button>
+          <button class="btn-fill btn-lg">Large</button>
+        </div>
+      </div>
+      <div class="comp-block" style="flex:1;min-width:200px">
+        <div class="comp-label">Icon buttons</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <div class="btn-icon-circle">←</div>
+          <div class="btn-icon-circle">+</div>
+          <div class="btn-icon-circle">✕</div>
+          <div class="btn-icon-circle solid">→</div>
+          <div class="btn-icon-circle solid">✓</div>
+        </div>
+      </div>
+    </div>
+    <div class="comp-block">
+      <div class="comp-label">With icons · full width CTA</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn-fill btn-lg" style="width:100%;justify-content:center">▶ Play lesson</button>
+        <button class="btn-outline" style="width:100%;justify-content:center">+ Add new habit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CARDS ──────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Cards</div>
+      <div class="section-sub">3 surface variants — default, subtle, filled</div>
+    </div>
+    <div class="row">
+      <div class="card-default" style="flex:1;min-width:240px">
+        <div class="comp-label">Default card</div>
+        <div style="font-size:17px;font-weight:700;color:var(--text-1);margin-bottom:4px">Step outside</div>
+        <div style="font-size:13px;color:var(--text-3)">Activity · 2 min · After tea</div>
+        <div style="margin-top:14px">
+          <button class="btn-fill" style="width:100%;padding:12px">Mark done</button>
+        </div>
+      </div>
+      <div class="card-subtle" style="flex:1;min-width:240px">
+        <div class="comp-label">Subtle card</div>
+        <div style="font-size:17px;font-weight:700;color:var(--text-1);margin-bottom:4px">Read 1 page</div>
+        <div style="font-size:13px;color:var(--text-3)">After lunch · 🔥 8 streak</div>
+      </div>
+      <div class="card-fill" style="flex:1;min-width:240px">
+        <div class="comp-label" style="opacity:.5">Filled card</div>
+        <div style="font-size:28px;font-weight:800;margin-bottom:2px">🔥 21</div>
+        <div style="font-size:13px;opacity:.6">Day streak</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── INPUTS ─────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Form Inputs</div>
+      <div class="section-sub">Text fields, labels, hints</div>
+    </div>
+    <div class="row">
+      <div class="comp-block" style="flex:1;min-width:280px">
+        <div class="comp-label">Text input</div>
+        <label class="input-label">Habit Title</label>
+        <input class="input-field" placeholder="e.g. Exercise, Meditate..." value="Morning walk"/>
+        <div class="input-hint">Keep it short and specific</div>
+      </div>
+      <div class="comp-block" style="flex:1;min-width:280px">
+        <div class="comp-label">States</div>
+        <input class="input-field" placeholder="Default state" style="margin-bottom:10px"/>
+        <input class="input-field" placeholder="Focus state" style="border-color:var(--text-1);margin-bottom:10px"/>
+        <input class="input-field" value="With value" style="margin-bottom:0"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CHIPS & BADGES ─────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Chips & Badges</div>
+      <div class="section-sub">Pills for tags, categories, filters, status</div>
+    </div>
+    <div class="comp-block">
+      <div class="comp-label">Chip variants</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+        <div class="chip-default">Gratitude</div>
+        <div class="chip-default">Stress</div>
+        <div class="chip-filled">Active</div>
+        <div class="chip-subtle">Upcoming</div>
+        <div class="chip-default">Sleep</div>
+        <div class="chip-default">Anxiety</div>
+      </div>
+      <div class="comp-label">Badge variants</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <span class="badge-pill">2 min</span>
+        <span class="badge-pill">Completed</span>
+        <span class="badge-dark">Today</span>
+        <span class="badge-dark">🔥 21 streak</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── LIST ITEMS ─────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">List Items</div>
+      <div class="section-sub">Used in settings, lessons, habits, selections</div>
+    </div>
+    <div class="comp-block" style="max-width:480px">
+      <div class="comp-label">Default list</div>
+      <div class="list-item">
+        <div class="li-icon">🏃</div>
+        <div class="li-info"><div class="li-title">Morning Walk</div><div class="li-sub">After tea · 2 min</div></div>
+        <div class="li-meta">07:00 AM</div>
+      </div>
+      <div class="list-item">
+        <div class="li-icon">📖</div>
+        <div class="li-info"><div class="li-title">Read 1 page</div><div class="li-sub">After lunch</div></div>
+        <div class="li-check checked">✓</div>
+      </div>
+      <div class="list-item">
+        <div class="li-icon">🧘</div>
+        <div class="li-info"><div class="li-title">Breathe 2 min</div><div class="li-sub">Before bed</div></div>
+        <div class="li-check"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SELECTION ROW ──────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Selection Row</div>
+      <div class="section-sub">Onboarding choices, settings, pickers</div>
+    </div>
+    <div class="comp-block" style="max-width:480px">
+      <div class="comp-label">Single select</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="sel-row active"><span style="font-size:18px">🌅</span><div style="flex:1"><div style="font-size:14px;font-weight:600;color:var(--text-1)">Morning</div><div style="font-size:12px;color:var(--text-3)">6am – 10am</div></div><div class="sel-check">✓</div></div>
+        <div class="sel-row"><span style="font-size:18px">☀️</span><div style="flex:1"><div style="font-size:14px;font-weight:600;color:var(--text-1)">Afternoon</div><div style="font-size:12px;color:var(--text-3)">12pm – 4pm</div></div><div class="sel-check"></div></div>
+        <div class="sel-row"><span style="font-size:18px">🌙</span><div style="flex:1"><div style="font-size:14px;font-weight:600;color:var(--text-1)">Evening</div><div style="font-size:12px;color:var(--text-3)">7pm – 10pm</div></div><div class="sel-check"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── PROGRESS & STATS ───────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Progress & Stats</div>
+      <div class="section-sub">Progress bars, stat cards, habit grid</div>
+    </div>
+    <div class="row">
+      <div class="comp-block" style="flex:1;min-width:260px">
+        <div class="comp-label">Progress bars</div>
+        <div style="margin-bottom:14px">
+          <div class="pb-label-row"><span style="font-size:13px;font-weight:600;color:var(--text-1)">Step outside</span><span style="font-size:12px;color:var(--text-3)">86%</span></div>
+          <div class="pb-track"><div class="pb-fill" style="width:86%"></div></div>
+        </div>
+        <div style="margin-bottom:14px">
+          <div class="pb-label-row"><span style="font-size:13px;font-weight:600;color:var(--text-1)">Read daily</span><span style="font-size:12px;color:var(--text-3)">62%</span></div>
+          <div class="pb-track"><div class="pb-fill" style="width:62%"></div></div>
+        </div>
+        <div>
+          <div class="pb-label-row"><span style="font-size:13px;font-weight:600;color:var(--text-1)">Meditate</span><span style="font-size:12px;color:var(--text-3)">38%</span></div>
+          <div class="pb-track"><div class="pb-fill" style="width:38%"></div></div>
+        </div>
+      </div>
+      <div class="comp-block" style="flex:1;min-width:260px">
+        <div class="comp-label">Stat cards</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="stat-card inv"><div class="sc-val">🔥 21</div><div class="sc-lbl">Streak</div></div>
+          <div class="stat-card"><div class="sc-val">86%</div><div class="sc-lbl">Completion</div></div>
+          <div class="stat-card"><div class="sc-val">25</div><div class="sc-lbl">Total Days</div></div>
+          <div class="stat-card"><div class="sc-val">3</div><div class="sc-lbl">Active</div></div>
+        </div>
+      </div>
+      <div class="comp-block" style="flex:1;min-width:260px">
+        <div class="comp-label">Habit completion grid</div>
+        <div style="font-size:11px;color:var(--text-3);margin-bottom:8px">● filled = done · ✕ = missed · empty = upcoming</div>
+        <div class="hgrid">
+          <div class="hcell done"></div><div class="hcell done"></div><div class="hcell mid"></div><div class="hcell done"></div><div class="hcell miss">✕</div><div class="hcell done"></div><div class="hcell mid"></div>
+          <div class="hcell done"></div><div class="hcell mid"></div><div class="hcell done"></div><div class="hcell miss">✕</div><div class="hcell done"></div><div class="hcell done"></div><div class="hcell"></div>
+          <div class="hcell mid"></div><div class="hcell done"></div><div class="hcell done"></div><div class="hcell mid"></div><div class="hcell done"></div><div class="hcell"></div><div class="hcell"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── BOTTOM NAV ─────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Bottom Navigation</div>
+      <div class="section-sub">4 items max · icon + label · active = bold</div>
+    </div>
+    <div class="comp-block" style="max-width:400px">
+      <div class="comp-label">Nav bar</div>
+      <div class="bottom-nav">
+        <div class="bn-item active"><div class="bn-icon">⌂</div><div class="bn-label">Home</div></div>
+        <div class="bn-item"><div class="bn-icon">☑</div><div class="bn-label">Habits</div></div>
+        <div class="bn-item"><div class="bn-icon">▐▌</div><div class="bn-label">Dashboard</div></div>
+        <div class="bn-item"><div class="bn-icon">◯</div><div class="bn-label">Profile</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TOGGLE & CALLOUT ───────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Controls & Callouts</div>
+      <div class="section-sub">Toggles, step dots, chart callouts, toasts</div>
+    </div>
+    <div class="row">
+      <div class="comp-block" style="flex:1;min-width:220px">
+        <div class="comp-label">Segmented toggle</div>
+        <div class="toggle-pill">
+          <div class="tp-option active">Weekly</div>
+          <div class="tp-option">Monthly</div>
+        </div>
+      </div>
+      <div class="comp-block" style="flex:1;min-width:220px">
+        <div class="comp-label">Step indicator</div>
+        <div class="step-dots">
+          <div class="sdot done"></div>
+          <div class="sdot done"></div>
+          <div class="sdot active"></div>
+          <div class="sdot"></div>
+        </div>
+      </div>
+      <div class="comp-block" style="flex:1;min-width:220px">
+        <div class="comp-label">Chart callout</div>
+        <div class="callout">
+          <div class="callout-date">Wed, Oct 23</div>
+          <div class="callout-value">6.5</div>
+          <div class="callout-row"><span>Morning</span><strong>8</strong></div>
+          <div class="callout-row"><span>Evening</span><strong>5</strong></div>
+        </div>
+      </div>
+      <div class="comp-block" style="flex:1;min-width:220px">
+        <div class="comp-label">Toast notification</div>
+        <div class="toast-example">✓ Habit marked done!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── DO / DON'T ─────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Do & Don't</div>
+      <div class="section-sub">Principles to keep the system consistent</div>
+    </div>
+    <div class="do-dont">
+      <div class="do-box">
+        <div class="do-label">✓ Do</div>
+        <div class="do-item"><span>✓</span><span>Use <strong>semantic tokens</strong> (--text-1, --fill), never raw hex</span></div>
+        <div class="do-item"><span>✓</span><span>Use <strong>bold type weight</strong> (700–800) for all headings</span></div>
+        <div class="do-item"><span>✓</span><span>Keep illustrations <strong>monochrome</strong> — black stroke, no fill colors</span></div>
+        <div class="do-item"><span>✓</span><span>Use <strong>negative space</strong> generously — let content breathe</span></div>
+        <div class="do-item"><span>✓</span><span>Buttons should always be <strong>full width</strong> on mobile CTAs</span></div>
+        <div class="do-item"><span>✓</span><span>Use <strong>DM Sans</strong> across all products in this system</span></div>
+        <div class="do-item"><span>✓</span><span>Transition color/background with <strong>.3s ease</strong> for theme switch</span></div>
+      </div>
+      <div class="dont-box">
+        <div class="dont-label">✕ Don't</div>
+        <div class="dont-item"><span>✕</span><span>Add <strong>color accents</strong> (blue, green, red) unless for status only</span></div>
+        <div class="dont-item"><span>✕</span><span>Use <strong>gradients</strong> — they break the monochrome identity</span></div>
+        <div class="dont-item"><span>✕</span><span>Mix <strong>multiple font sizes</strong> on one card — pick one heading level</span></div>
+        <div class="dont-item"><span>✕</span><span>Use <strong>shadows</strong> as primary separation — use borders instead</span></div>
+        <div class="dont-item"><span>✕</span><span>Use <strong>rounded corners below r-sm (8px)</strong> — looks sharp/harsh</span></div>
+        <div class="dont-item"><span>✕</span><span>Place <strong>more than 4 items</strong> in the bottom navigation</span></div>
+        <div class="dont-item"><span>✕</span><span>Add <strong>decorative icons</strong> just for visual fill — every element earns its place</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CSS VARIABLES ──────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Copy-Paste CSS</div>
+      <div class="section-sub">Drop this into any new project to start with Ink immediately</div>
+    </div>
+    <div style="position:relative">
+      <div class="code-block" id="css-code">:root {
+  /* Colors */
+  --bg:             #F7F7F7;
+  --surface:        #FFFFFF;
+  --surface-2:      #F0F0F0;
+  --border:         #E8E8E8;
+  --border-strong:  #C0C0C0;
+  --text-1:         #0A0A0A;
+  --text-2:         #4A4A4A;
+  --text-3:         #9A9A9A;
+  --fill:           #0A0A0A;
+  --fill-text:      #FFFFFF;
+  --fill-subtle:    #F0F0F0;
+
+  /* Spacing */
+  --space-1: 4px;  --space-2: 8px;   --space-3: 12px;
+  --space-4: 16px; --space-5: 20px;  --space-6: 24px;
+  --space-8: 32px; --space-10: 40px; --space-12: 48px;
+
+  /* Border radius */
+  --r-xs: 4px;  --r-sm: 8px;   --r-md: 12px;
+  --r-lg: 16px; --r-xl: 20px;  --r-2xl: 28px; --r-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.10), 0 4px 8px rgba(0,0,0,0.04);
+
+  /* Font */
+  --font: 'DM Sans', -apple-system, sans-serif;
+}
+
+[data-theme="dark"] {
+  --bg:             #111111;
+  --surface:        #1C1C1C;
+  --surface-2:      #252525;
+  --border:         #2E2E2E;
+  --border-strong:  #404040;
+  --text-1:         #F5F5F5;
+  --text-2:         #A0A0A0;
+  --text-3:         #555555;
+  --fill:           #F5F5F5;
+  --fill-text:      #111111;
+  --fill-subtle:    #252525;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+}</div>
+      <button class="copy-btn" style="position:absolute;top:12px;right:12px" onclick="copyCSS()">Copy</button>
+    </div>
+  </div>
+
+  <!-- ─── FOOTER ──────────────────────────────── -->
+  <div style="padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+    <div style="font-size:13px;color:var(--text-3)"><strong style="color:var(--text-1)">Ink Design System</strong> by Aditya Kumar · v1.0 · 2026</div>
+    <div style="font-size:12px;color:var(--text-4)">Mono · Timeless · Content-first</div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+let dark = false;
+function toggleTheme() {
+  dark = !dark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  document.getElementById('theme-btn').textContent = dark ? '☀️ Light mode' : '🌙 Dark mode';
+}
+function copyCSS() {
+  const text = document.getElementById('css-code').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 1800);
+  });
+}
+</script>
+</body>
+</html>
