@@ -22,7 +22,7 @@ export default function ThemeToggle() {
   };
 
   return (
-    <button className="btn-ghost btn-sm" onClick={toggle} aria-label="Toggle theme">
+    <button className="btn-ghost btn-sm" onClick={toggle} aria-label="Toggle theme" suppressHydrationWarning>
       {dark ? "☀️ Light" : "🌙 Dark"}
     </button>
   );
