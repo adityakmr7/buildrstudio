@@ -346,7 +346,7 @@ export default function AnchorPrivacy() {
             <div className="pp-hero-meta-item"><strong>Effective</strong>March 9, 2026</div>
             <div className="pp-hero-meta-item"><strong>Updated</strong>March 9, 2026</div>
             <div className="pp-hero-meta-item"><strong>Developer</strong>Buildr Studio</div>
-            <div className="pp-hero-meta-item"><strong>Contact</strong>dev.adityakmr@gmail.com</div>
+            <div className="pp-hero-meta-item"><strong>Contact</strong>adityakmr9672@gmail.com</div>
           </div>
         </div>
 
@@ -399,7 +399,7 @@ export default function AnchorPrivacy() {
           </p>
           <p>
             Questions? Email us at{" "}
-            <a href="mailto:dev.adityakmr@gmail.com">dev.adityakmr@gmail.com</a> — we respond
+            <a href="mailto:adityakmr9672@gmail.com">adityakmr9672@gmail.com</a> — we respond
             within 30 days.
           </p>
         </div>
@@ -634,7 +634,7 @@ export default function AnchorPrivacy() {
           </table>
           <p>
             To exercise any right, email{" "}
-            <a href="mailto:dev.adityakmr@gmail.com">dev.adityakmr@gmail.com</a>. We respond
+            <a href="mailto:adityakmr9672@gmail.com">adityakmr9672@gmail.com</a>. We respond
             within 30 days.
           </p>
         </div>
@@ -654,7 +654,7 @@ export default function AnchorPrivacy() {
           </p>
           <p>
             If you believe a child has provided personal information to us, contact{" "}
-            <a href="mailto:dev.adityakmr@gmail.com">dev.adityakmr@gmail.com</a> and we will take
+            <a href="mailto:adityakmr9672@gmail.com">adityakmr9672@gmail.com</a> and we will take
             appropriate action.
           </p>
         </div>
@@ -723,7 +723,7 @@ export default function AnchorPrivacy() {
           <p>Questions, requests, or concerns — reach out anytime:</p>
           <div className="contact-card">
             <div className="contact-row"><span className="contact-lbl">Developer</span><span>Buildr Studio · Aditya Kumar</span></div>
-            <div className="contact-row"><span className="contact-lbl">Email</span><a href="mailto:dev.adityakmr@gmail.com">dev.adityakmr@gmail.com</a></div>
+            <div className="contact-row"><span className="contact-lbl">Email</span><a href="mailto:adityakmr9672@gmail.com">adityakmr9672@gmail.com</a></div>
             <div className="contact-row"><span className="contact-lbl">App</span><span>Anchor – Tiny Habits (in.buildrstudio.anchor)</span></div>
             <div className="contact-row"><span className="contact-lbl">Response</span><span>Within 30 days</span></div>
           </div>

@@ -31,7 +31,7 @@ const FAQS = [
   },
   {
     q: "The app crashed — how do I report it?",
-    a: "We automatically receive crash reports via Firebase Crashlytics (anonymously). If you'd like to give us more context, email us at dev.adityakmr@gmail.com with your device model and what you were doing when it crashed.",
+    a: "We automatically receive crash reports via Firebase Crashlytics (anonymously). If you'd like to give us more context, email us at adityakmr9672@gmail.com with your device model and what you were doing when it crashed.",
   },
   {
     q: "Is Anchor free?",
@@ -285,7 +285,7 @@ export default function AnchorSupport() {
           <p className="sp-hero-sub">
             Browse common questions below, or reach out directly — we&apos;re happy to help.
           </p>
-          <a href="mailto:dev.adityakmr@gmail.com" className="sp-hero-cta">
+          <a href="mailto:adityakmr9672@gmail.com" className="sp-hero-cta">
             ✉️ &nbsp;Email us
           </a>
         </div>
@@ -304,8 +304,8 @@ export default function AnchorSupport() {
                 <div className="contact-item-desc">
                   Send us a message and we&apos;ll get back to you within 48 hours.
                 </div>
-                <a href="mailto:dev.adityakmr@gmail.com?subject=Anchor%20Support" className="contact-item-action">
-                  dev.adityakmr@gmail.com →
+                <a href="mailto:adityakmr9672@gmail.com?subject=Anchor%20Support" className="contact-item-action">
+                  adityakmr9672@gmail.com →
                 </a>
               </div>
             </div>
@@ -316,7 +316,7 @@ export default function AnchorSupport() {
                 <div className="contact-item-desc">
                   Found something broken? Tell us your device model, OS version, and what happened.
                 </div>
-                <a href="mailto:dev.adityakmr@gmail.com?subject=Anchor%20Bug%20Report" className="contact-item-action">
+                <a href="mailto:adityakmr9672@gmail.com?subject=Anchor%20Bug%20Report" className="contact-item-action">
                   Send bug report →
                 </a>
               </div>
@@ -328,7 +328,7 @@ export default function AnchorSupport() {
                 <div className="contact-item-desc">
                   Have an idea that would improve Anchor? We read every suggestion.
                 </div>
-                <a href="mailto:dev.adityakmr@gmail.com?subject=Anchor%20Feature%20Request" className="contact-item-action">
+                <a href="mailto:adityakmr9672@gmail.com?subject=Anchor%20Feature%20Request" className="contact-item-action">
                   Share your idea →
                 </a>
               </div>

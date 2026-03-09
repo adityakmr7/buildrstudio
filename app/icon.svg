@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A1A1A"/>
+      <stop offset="100%" stop-color="#0A0A0A"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="108" ry="108" fill="url(#bg)"/>
+  <text
+    x="256"
+    y="256"
+    dominant-baseline="central"
+    text-anchor="middle"
+    font-family="'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif"
+    font-size="340"
+    font-weight="800"
+    fill="#FFFFFF"
+    letter-spacing="-10"
+  >B</text>
+</svg>

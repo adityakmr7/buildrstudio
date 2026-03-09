@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   title: "BuildrStudio — Apps by Aditya Kumar",
   description:
     "A collection of thoughtfully crafted apps designed and built by Aditya Kumar. Powered by the Ink Design System.",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/apple-icon.svg",
+  },
 };
 
 export default function RootLayout({
