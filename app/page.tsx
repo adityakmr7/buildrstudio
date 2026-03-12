@@ -306,7 +306,8 @@ export default function Home() {
           <span className="site-logo-text">BuildrStudio</span>
         </div>
         <div className="nav-links">
-          <a href="#anchor" className="nav-link">Apps</a>
+          <a href="#anchor" className="nav-link">Anchor</a>
+          <a href="#flowzy" className="nav-link">Flowzy</a>
           <ThemeToggle />
         </div>
       </header>
@@ -506,6 +507,218 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── SPACER ─── */}
+      <div className="spacing-xl" />
+
+      {/* ─── SECTION: FLOWZY ─── */}
+      <div className="section-label">
+        <span className="ink-label">Focus & Productivity</span>
+      </div>
+
+      <div className="app-card" id="flowzy">
+        <div className="app-card-inner">
+          {/* Top: Icon + Info + Download */}
+          <div className="app-card-top">
+            <div className="app-icon" style={{ position: "relative", overflow: "hidden" }}>
+              {/* Flowzy logo mark: arc + dot */}
+              <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+                <path
+                  d="M22 6 A16 16 0 1 1 21.9 6"
+                  stroke="var(--fill-text)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  fill="none"
+                  strokeDasharray="84"
+                  strokeDashoffset="21"
+                />
+                <circle cx="22" cy="22" r="4" fill="var(--fill-text)" />
+              </svg>
+            </div>
+            <div className="app-info">
+              <h2 className="app-name">Flowzy</h2>
+              <p className="app-tagline">
+                The focus timer that respects how your brain works. Deep work, built on the Pomodoro Technique.
+              </p>
+              <div className="app-tags">
+                <span className="chip-filled">Focus Timer</span>
+                <span className="chip-subtle">iOS</span>
+                <span className="chip-subtle">Pomodoro</span>
+              </div>
+              <p className="app-desc">
+                25 minutes of focus, 5-minute breaks — Flowzy turns intention into rhythm.
+                Link tasks to sessions, watch your streak grow, and see your focus patterns with weekly analytics.
+                Local-first, no account required.
+              </p>
+              <div className="download-row">
+                <a href="https://apps.apple.com/app/id6748275526" target="_blank" rel="noopener noreferrer" className="store-btn">
+                  <span className="store-btn-icon"></span>
+                  <span className="store-btn-text">
+                    <span className="store-btn-label">Download on the</span>
+                    <span className="store-btn-name">App Store</span>
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature strip */}
+          <div className="feature-strip">
+            <div className="feature-cell">
+              <div className="feature-cell-icon">⏱</div>
+              <div className="feature-cell-title">Timer Arc</div>
+              <div className="feature-cell-desc">Visual progress ring shows your session completing in real time.</div>
+            </div>
+            <div className="feature-cell">
+              <div className="feature-cell-icon">🔗</div>
+              <div className="feature-cell-title">Task Linking</div>
+              <div className="feature-cell-desc">Attach a task to your session and stay locked in on what matters.</div>
+            </div>
+            <div className="feature-cell">
+              <div className="feature-cell-icon">🔥</div>
+              <div className="feature-cell-title">Streak Counter</div>
+              <div className="feature-cell-desc">Daily focus streak rewards consistency. Don&apos;t break the chain.</div>
+            </div>
+            <div className="feature-cell">
+              <div className="feature-cell-icon">📊</div>
+              <div className="feature-cell-title">Analytics</div>
+              <div className="feature-cell-desc">Weekly and monthly focus hours so you know when you&apos;re at your best.</div>
+            </div>
+          </div>
+
+          {/* Phone previews */}
+          <div className="preview-area">
+
+            {/* Screen 1: Pomodoro timer */}
+            <div className="phone-frame">
+              <div className="phone-status-bar">
+                <span>9:41</span>
+                <span>●●●</span>
+              </div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase" as const, letterSpacing: "1.5px", marginBottom: 10 }}>
+                Focus
+              </div>
+              {/* Timer ring mockup */}
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "12px 0" }}>
+                <div style={{ position: "relative", width: 90, height: 90 }}>
+                  <svg width="90" height="90" viewBox="0 0 90 90">
+                    <circle cx="45" cy="45" r="38" fill="none" stroke="var(--border)" strokeWidth="4" />
+                    <circle
+                      cx="45" cy="45" r="38"
+                      fill="none" stroke="var(--fill)" strokeWidth="4"
+                      strokeLinecap="round"
+                      strokeDasharray="238"
+                      strokeDashoffset="71"
+                      transform="rotate(-90 45 45)"
+                    />
+                  </svg>
+                  <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column" as const, alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: "var(--text-1)", letterSpacing: "-0.5px" }}>18:32</div>
+                    <div style={{ fontSize: 9, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.5px" }}>Deep Focus</div>
+                  </div>
+                </div>
+              </div>
+              {/* Linked task pill */}
+              <div style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 99, padding: "6px 12px", marginBottom: 8 }}>
+                <div style={{ width: 6, height: 6, borderRadius: 99, background: "var(--fill)", flexShrink: 0 }} />
+                <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-1)" }}>Design system tokens</div>
+              </div>
+              {/* Controls row */}
+              <div style={{ display: "flex", justifyContent: "center", gap: 14, marginTop: 4 }}>
+                <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--surface-2)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>↺</div>
+                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--fill)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "var(--fill-text)" }}>⏸</div>
+                <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--surface-2)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>⏭</div>
+              </div>
+            </div>
+
+            {/* Screen 2: Home / Todos */}
+            <div className="phone-frame">
+              <div className="phone-status-bar">
+                <span>9:41</span>
+                <span>●●●</span>
+              </div>
+              <div style={{ fontSize: 10, color: "var(--text-3)", marginBottom: 1 }}>Good morning</div>
+              <div className="phone-screen-title">Today</div>
+              <div className="phone-subtitle" style={{ marginBottom: 8 }}>March 12 · 🔥 7 day streak</div>
+              {/* Progress bar */}
+              <div style={{ marginBottom: 10 }}>
+                <div className="pb-label-row">
+                  <span style={{ fontSize: 11, fontWeight: 600, color: "var(--text-1)" }}>2 / 5 tasks</span>
+                  <span style={{ fontSize: 10, color: "var(--text-3)" }}>40%</span>
+                </div>
+                <div className="pb-track"><div className="pb-fill" style={{ width: "40%" }} /></div>
+              </div>
+              {/* Task list */}
+              <div className="list-item" style={{ padding: "8px 0" }}>
+                <div className="li-icon" style={{ width: 28, height: 28, borderRadius: 8, fontSize: 12 }}>✦</div>
+                <div className="li-info">
+                  <div className="li-title" style={{ fontSize: 12 }}>Design system tokens</div>
+                  <div className="li-sub">6 focus sessions</div>
+                </div>
+                <div className="li-check checked" style={{ fontSize: 9 }}>✓</div>
+              </div>
+              <div className="list-item" style={{ padding: "8px 0" }}>
+                <div className="li-icon" style={{ width: 28, height: 28, borderRadius: 8, fontSize: 12 }}>📝</div>
+                <div className="li-info">
+                  <div className="li-title" style={{ fontSize: 12 }}>Write release notes</div>
+                  <div className="li-sub">In progress · 1 session</div>
+                </div>
+                <div className="li-check checked" style={{ fontSize: 9 }}>✓</div>
+              </div>
+              <div className="list-item" style={{ padding: "8px 0" }}>
+                <div className="li-icon" style={{ width: 28, height: 28, borderRadius: 8, fontSize: 12 }}>🛠</div>
+                <div className="li-info">
+                  <div className="li-title" style={{ fontSize: 12 }}>Fix iOS prebuild</div>
+                  <div className="li-sub">3 pomodoros est.</div>
+                </div>
+                <div className="li-check" />
+              </div>
+            </div>
+
+            {/* Screen 3: Analytics */}
+            <div className="phone-frame">
+              <div className="phone-status-bar">
+                <span>9:41</span>
+                <span>●●●</span>
+              </div>
+              <div className="phone-screen-title">Analytics</div>
+              <div className="phone-subtitle" style={{ marginBottom: 10 }}>This week · 6h 20m total</div>
+              {/* Stats row */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 10 }}>
+                <div className="stat-card inv" style={{ padding: "10px 12px" }}>
+                  <div className="sc-val" style={{ fontSize: 20 }}>6h 20m</div>
+                  <div className="sc-lbl">Focus time</div>
+                </div>
+                <div className="stat-card" style={{ padding: "10px 12px" }}>
+                  <div className="sc-val" style={{ fontSize: 20 }}>14</div>
+                  <div className="sc-lbl">Sessions</div>
+                </div>
+              </div>
+              {/* Mini bar chart */}
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase" as const, letterSpacing: "1.5px", marginBottom: 8 }}>Daily Breakdown</div>
+              <div style={{ display: "flex", gap: 5, alignItems: "flex-end", height: 52, paddingBottom: 0 }}>
+                {[
+                  { h: 32, today: false },
+                  { h: 44, today: false },
+                  { h: 20, today: false },
+                  { h: 52, today: false },
+                  { h: 36, today: false },
+                  { h: 48, today: true },
+                  { h: 16, today: false },
+                ].map((bar, i) => (
+                  <div key={i} style={{ flex: 1, height: bar.h, borderRadius: 6, background: bar.today ? "var(--fill)" : "var(--surface-3)" }} />
+                ))}
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-around", marginTop: 5 }}>
+                {["M","T","W","T","F","S","S"].map((d, i) => (
+                  <div key={i} style={{ fontSize: 9, color: i === 5 ? "var(--text-1)" : "var(--text-3)", fontWeight: i === 5 ? 700 : 400, flex: 1, textAlign: "center" as const }}>{d}</div>
+                ))}
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
