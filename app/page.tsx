@@ -308,6 +308,7 @@ export default function Home() {
         <div className="nav-links">
           <a href="#anchor" className="nav-link">Anchor</a>
           <a href="#flowzy" className="nav-link">Flowzy</a>
+          <a href="/blog" className="nav-link">Blog</a>
           <ThemeToggle />
         </div>
       </header>
