@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -31,6 +32,11 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         {children}
+        <Script
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id="3105d253-bd7c-430d-9271-4515c7f31a8e"
+        />
       </body>
     </html>
   );

@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* ═══════════════════════════════════════════════
    INK DESIGN SYSTEM — All-in-One
    by Aditya Kumar · v1.0 · 2026
@@ -200,3 +202,10 @@ a { color: inherit; text-decoration: none; }
 .phil-title { font-size: 14px; font-weight: 600; color: var(--fill-text); opacity: .5; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
 .phil-body { font-size: 22px; font-weight: 700; color: var(--fill-text); line-height: 1.5; letter-spacing: -0.3px; }
 .phil-footer { font-size: 13px; color: var(--fill-text); opacity: .4; margin-top: 20px; }
+
+/* ─── SCREENSHOT OPTIMIZER OVERRIDES ─── */
+.canvas-capture-wrapper,
+.canvas-capture-wrapper * {
+  transition: none !important;
+  animation: none !important;
+}
