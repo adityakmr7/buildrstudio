@@ -11,6 +11,7 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   // Check if they already subscribed in this browser session
   useEffect(() => {
@@ -24,6 +25,7 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
           setIsSubmitted(false);
           setEmail("");
         }
+        setSubmitError("");
       }, 0);
       return () => clearTimeout(timer);
     }
@@ -36,12 +38,35 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
     if (!email) return;
 
     setIsLoading(true);
-    // Simulate API request
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    
-    localStorage.setItem("premium_interest_email", email);
-    setIsLoading(false);
-    setIsSubmitted(true);
+    setSubmitError("");
+
+    try {
+      const response = await fetch("/api/interest", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          source: "premium_modal",
+          featureKey: "premium-branding-4k-export",
+          pathname: window.location.pathname,
+        }),
+      });
+
+      const payload = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Unable to save your request right now.");
+      }
+
+      localStorage.setItem("premium_interest_email", email);
+      setIsSubmitted(true);
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "Unable to save your request right now.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -107,7 +132,7 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
         {!isSubmitted ? (
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <p className="ink-body" style={{ fontSize: "14px", textAlign: "center", color: "var(--text-2)" }}>
-              Premium features are coming soon! Drop your email below to request early access and get **50% off** when we launch.
+              Premium features are coming soon. Drop your email below to request early access and get <strong>50% off</strong> when we launch.
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -153,6 +178,20 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
               />
+              {submitError && (
+                <div
+                  style={{
+                    background: "var(--fill-subtle)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "var(--r-sm)",
+                    color: "var(--text-2)",
+                    fontSize: "12px",
+                    padding: "10px 12px",
+                  }}
+                >
+                  {submitError}
+                </div>
+              )}
               <button
                 type="submit"
                 className="btn-fill"
@@ -161,6 +200,9 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
               >
                 {isLoading ? "Saving..." : "Get 50% Off At Launch"}
               </button>
+              <span style={{ fontSize: "11px", color: "var(--text-3)", textAlign: "center" }}>
+                Get BuildrStudio launch updates. No spam.
+              </span>
             </div>
           </form>
         ) : (
@@ -186,7 +228,7 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
                 You&apos;re on the list!
               </span>
               <p className="ink-body" style={{ fontSize: "13px", color: "var(--text-2)" }}>
-                We have saved your email (<strong>{email}</strong>). We will send your **50% discount code** as soon as these features launch!
+                We have saved your email (<strong>{email}</strong>). We will send your <strong>50% discount code</strong> as soon as these features launch.
               </p>
             </div>
             <button

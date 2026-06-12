@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "modern-screenshot": "^4.7.0",
     "next": "16.1.6",
     "postcss-import": "^16.1.1",

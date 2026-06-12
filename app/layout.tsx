@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -32,6 +34,8 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         {children}
+        <SpeedInsights />
+        <Analytics />
         <Script
           defer
           src="https://cloud.umami.is/script.js"
@@ -41,3 +45,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+

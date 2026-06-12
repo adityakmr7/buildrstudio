@@ -195,6 +195,7 @@ export default function WorkspaceHub() {
           <div className="nav-links" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <Link href="/showcase" className="nav-link" id="showcase-nav-link">Showcase</Link>
             <Link href="/blog" className="nav-link" id="blog-nav-link">Blog</Link>
+            <Link href="/roadmap" className="nav-link" id="roadmap-nav-link">Roadmap</Link>
             <button
               id="header-go-pro-btn"
               onClick={handleOpenPremium}
