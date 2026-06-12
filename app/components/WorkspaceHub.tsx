@@ -114,18 +114,74 @@ export default function WorkspaceHub() {
           align-items: flex-start;
         }
 
+        /* ─── RESPONSIVE SIDEBAR & CANVAS ORDERING ─── */
         @media (max-width: 992px) {
           .workspace-grid {
-            grid-template-columns: 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 24px;
+          }
+          .workspace-sidebar {
+            order: 2;
+            width: 100%;
+          }
+          .workspace-canvas {
+            order: 1;
+            width: 100%;
+            margin-bottom: 12px;
           }
           .site-header-inner {
             max-width: 100%;
           }
         }
 
-        @media (max-width: 768px) {
-          .site-header { padding: 16px 20px; }
+        /* ─── MOBILE HEADER RESPONSIVENESS ─── */
+        @media (max-width: 640px) {
+          .site-header {
+            padding: 16px 20px;
+          }
+          .site-header-inner {
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+          }
+          .nav-links {
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+          }
+        }
+
+        /* ─── RESPONSIVE PRESETS & BUTTONS ─── */
+        .presets-list {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+        @media (min-width: 600px) and (max-width: 992px) {
+          .presets-list {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        @media (max-width: 600px) {
+          .canvas-action-buttons {
+            flex-direction: column !important;
+            width: 100%;
+          }
+          .canvas-action-buttons button {
+            width: 100% !important;
+            min-width: 0 !important;
+            justify-content: center;
+          }
+          .share-buttons-container {
+            flex-direction: column !important;
+            width: 100%;
+          }
+          .share-buttons-container button {
+            width: 100% !important;
+            justify-content: center;
+          }
         }
       `}</style>
 
@@ -178,7 +234,7 @@ export default function WorkspaceHub() {
 
         <div className="workspace-grid" style={{ width: "100%", margin: "0 auto" }}>
           {/* Left Column: Presets & Controls */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
+          <div className="workspace-sidebar" style={{ display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
             <QuickPresets setConfig={setConfig} />
             <ControlSidebar
               config={config}
@@ -188,7 +244,7 @@ export default function WorkspaceHub() {
           </div>
 
           {/* Right Column: Main Preview stage */}
-          <div style={{ minWidth: 0, width: "100%" }}>
+          <div className="workspace-canvas" style={{ minWidth: 0, width: "100%" }}>
             <LivePreviewCanvas
               config={config}
               imageSource={imageSource}

@@ -38,6 +38,9 @@ export default function LivePreviewCanvas({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
+  const [shareToast, setShareToast] = useState<{ show: boolean; platform: string } | null>(null);
 
   // Handle image file capture
   const handleFileCapture = useCallback((file: File) => {
@@ -135,6 +138,100 @@ export default function LivePreviewCanvas({
     setImageSource(null);
   };
 
+  // Copy PNG to Clipboard
+  const handleCopyToClipboard = async () => {
+    if (!canvasRef.current) return;
+    setIsCopying(true);
+    setCopyStatus("idle");
+    try {
+      // Return a Promise directly in ClipboardItem to satisfy browser user activation checks (especially Safari/Chrome)
+      const blobPromise = (async () => {
+        const canvasDataStream = await domToPng(canvasRef.current!, {
+          quality: 1,
+          scale: 2,
+        });
+        const response = await fetch(canvasDataStream);
+        return await response.blob();
+      })();
+
+      const clipboardItem = new ClipboardItem({
+        "image/png": blobPromise as unknown as Blob,
+      });
+
+      await navigator.clipboard.write([clipboardItem]);
+      setCopyStatus("success");
+      setTimeout(() => setCopyStatus("idle"), 2000);
+
+      // Trigger Umami Event for Clipboard Copy
+      const umamiWindow = typeof window !== "undefined" ? (window as unknown as UmamiWindow) : null;
+      if (umamiWindow && umamiWindow.umami) {
+        umamiWindow.umami.track("image_copied", {
+          ratio: config.aspectRatio,
+          theme: gradientNameMapping[config.gradientClass] || "Custom",
+        });
+      }
+    } catch (err) {
+      console.error("Clipboard copy failed:", err);
+      setCopyStatus("error");
+      setTimeout(() => setCopyStatus("idle"), 2000);
+    } finally {
+      setIsCopying(false);
+    }
+  };
+
+  const shareToTwitter = () => {
+    setShareToast({ show: true, platform: "X (Twitter)" });
+    
+    // Copy in the background
+    handleCopyToClipboard();
+    
+    // Open X composer synchronously so browser doesn't block popup
+    const tweetText = encodeURIComponent("Just optimized a screenshot for social using BuildrStudio! ✨ (Press Cmd+V to paste the image)\n\n");
+    const tweetUrl = encodeURIComponent("https://buildrstudio.in");
+    window.open(`https://twitter.com/intent/tweet?text=${tweetText}&url=${tweetUrl}`, "_blank");
+    
+    setTimeout(() => {
+      setShareToast(null);
+    }, 3000);
+  };
+
+  const shareToLinkedIn = () => {
+    setShareToast({ show: true, platform: "LinkedIn" });
+    
+    // Copy in the background
+    handleCopyToClipboard();
+    
+    // Open LinkedIn feed directly so the user can paste the image in the composer
+    window.open("https://www.linkedin.com/feed/", "_blank");
+    
+    setTimeout(() => {
+      setShareToast(null);
+    }, 3000);
+  };
+
+  const shareNative = async () => {
+    if (!canvasRef.current) return;
+    try {
+      const canvasDataStream = await domToPng(canvasRef.current, {
+        quality: 1,
+        scale: 2,
+      });
+      const response = await fetch(canvasDataStream);
+      const imageBlob = await response.blob();
+      const file = new File([imageBlob], "buildrstudio-social-post.png", { type: "image/png" });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "BuildrStudio Social Graphic",
+          text: "Optimized screenshot via buildrStudio.in",
+        });
+      }
+    } catch (err) {
+      console.log("Native share cancelled or failed:", err);
+    }
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       {/* Visual Canvas State Panel */}
@@ -223,6 +320,7 @@ export default function LivePreviewCanvas({
               className={`canvas-capture-wrapper relative overflow-hidden ${config.gradientClass} ${config.aspectRatio}`}
               style={{
                 width: "100%",
+                maxWidth: config.aspectRatio === "aspect-video" ? "640px" : config.aspectRatio === "aspect-[4/5]" ? "400px" : "480px",
                 padding: `${config.padding}px`,
                 display: "flex",
                 alignItems: "center",
@@ -339,9 +437,23 @@ export default function LivePreviewCanvas({
           </div>
 
           {/* Action Trigger Buttons */}
-          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+          <div className="canvas-action-buttons" style={{ display: "flex", gap: "12px", justifyContent: "flex-end", flexWrap: "wrap" }}>
             <button type="button" className="btn-ghost" onClick={handleClear}>
               Change Screenshot
+            </button>
+
+            <button
+              type="button"
+              className="btn-outline btn-lg"
+              onClick={handleCopyToClipboard}
+              disabled={isCopying}
+              style={{
+                minWidth: "160px",
+                opacity: isCopying ? 0.75 : 1,
+                cursor: isCopying ? "not-allowed" : "pointer",
+              }}
+            >
+              {isCopying ? "Copying..." : copyStatus === "success" ? "✓ Copied!" : copyStatus === "error" ? "❌ Error" : "📋 Copy to Clipboard"}
             </button>
 
             <button
@@ -379,7 +491,86 @@ export default function LivePreviewCanvas({
               )}
             </button>
           </div>
+
+          {/* Quick Share & Engagement Panel */}
+          <div
+            className="comp-block"
+            style={{
+              marginTop: "8px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "12px",
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <div className="comp-label" style={{ marginBottom: "4px" }}>Share & Engagement</div>
+            <div className="share-buttons-container" style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+              <button
+                type="button"
+                className="btn-outline btn-sm"
+                onClick={shareToTwitter}
+                style={{ display: "flex", alignItems: "center", gap: "6px" }}
+              >
+                <span>🐦</span> Post on X (Twitter)
+              </button>
+              <button
+                type="button"
+                className="btn-outline btn-sm"
+                onClick={shareToLinkedIn}
+                style={{ display: "flex", alignItems: "center", gap: "6px" }}
+              >
+                <span>💼</span> Share on LinkedIn
+              </button>
+              {typeof navigator !== "undefined" && typeof navigator.share === "function" && (
+                <button
+                  type="button"
+                  className="btn-outline btn-sm"
+                  onClick={shareNative}
+                  style={{ display: "flex", alignItems: "center", gap: "6px" }}
+                >
+                  <span>📤</span> System Share
+                </button>
+              )}
+            </div>
+            <p style={{ fontSize: "11px", color: "var(--text-3)", margin: 0, lineHeight: 1.4 }}>
+              💡 <strong>Pro Tip:</strong> When you click <em>Post on X</em> or <em>Share on LinkedIn</em>, we copy the visual graphic directly to your clipboard automatically. Just press <strong>Cmd+V</strong> in the composer to attach it!
+            </p>
+          </div>
         </>
+      )}
+
+      {shareToast && shareToast.show && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "32px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "var(--fill)",
+            color: "var(--fill-text)",
+            padding: "16px 24px",
+            borderRadius: "var(--r-xl)",
+            boxShadow: "var(--shadow-lg)",
+            zIndex: 2000,
+            display: "flex",
+            flexDirection: "column",
+            gap: "6px",
+            alignItems: "center",
+            textAlign: "center",
+            maxWidth: "380px",
+            width: "calc(100% - 40px)",
+            animation: "slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ fontSize: "18px" }}>📋</span>
+            <strong style={{ fontSize: "14px" }}>Image Copied to Clipboard!</strong>
+          </div>
+          <span style={{ fontSize: "12px", opacity: 0.9, lineHeight: 1.4 }}>
+            Opening {shareToast.platform}... {shareToast.platform === "LinkedIn" ? "Click 'Start a post' and press " : "Just press "}<strong>Cmd+V</strong> (or <strong>Ctrl+V</strong>) to paste your post graphic!
+          </span>
+        </div>
       )}
 
       {/* Spinner animation keyframe injected locally */}
@@ -387,6 +578,10 @@ export default function LivePreviewCanvas({
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+        @keyframes slideUp {
+          from { transform: translate(-50%, 20px); opacity: 0; }
+          to { transform: translate(-50%, 0); opacity: 1; }
         }
       `}</style>
     </div>
