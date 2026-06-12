@@ -318,6 +318,7 @@ export default function Showcase() {
           <a href="#anchor" className="nav-link">Anchor</a>
           <a href="#flowzy" className="nav-link">Flowzy</a>
           <Link href="/blog" className="nav-link">Blog</Link>
+          <Link href="/roadmap" className="nav-link">Roadmap</Link>
           <ThemeToggle />
         </div>
       </header>
