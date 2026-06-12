@@ -85,33 +85,35 @@ export default function QuickPresets({ setConfig }: QuickPresetsProps) {
         </p>
       </div>
 
-      {PRESETS.map((preset) => (
-        <div
-          key={preset.name}
-          className="sel-row"
-          style={{ padding: "12px 14px", display: "flex", alignItems: "center", gap: "10px" }}
-          onClick={() => setConfig(preset.config)}
-        >
+      <div className="presets-list">
+        {PRESETS.map((preset) => (
           <div
-            className={preset.config.gradientClass}
-            style={{
-              width: "24px",
-              height: "24px",
-              borderRadius: "50%",
-              border: "1px solid var(--border)",
-              flexShrink: 0,
-            }}
-          />
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px" }}>
-            <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-1)", letterSpacing: "-0.2px" }}>
-              {preset.name}
-            </span>
-            <span style={{ fontSize: "11px", color: "var(--text-3)" }}>
-              {preset.description}
-            </span>
+            key={preset.name}
+            className="sel-row"
+            style={{ padding: "12px 14px", display: "flex", alignItems: "center", gap: "10px" }}
+            onClick={() => setConfig(preset.config)}
+          >
+            <div
+              className={preset.config.gradientClass}
+              style={{
+                width: "24px",
+                height: "24px",
+                borderRadius: "50%",
+                border: "1px solid var(--border)",
+                flexShrink: 0,
+              }}
+            />
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px" }}>
+              <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-1)", letterSpacing: "-0.2px" }}>
+                {preset.name}
+              </span>
+              <span style={{ fontSize: "11px", color: "var(--text-3)" }}>
+                {preset.description}
+              </span>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
