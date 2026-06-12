@@ -12,7 +12,7 @@
 
 :root {
   --bg:             #F7F7F7;
-  --bg-page:        #EDEDEC;
+  --bg-page:        #f6f5f1;
   --surface:        #FFFFFF;
   --surface-2:      #F0F0F0;
   --surface-3:      #E8E8E8;
@@ -38,7 +38,7 @@
 
 [data-theme="dark"] {
   --bg:             #111111;
-  --bg-page:        #0A0A0A;
+  --bg-page:        #0f0f0e;
   --surface:        #1C1C1C;
   --surface-2:      #252525;
   --surface-3:      #2E2E2E;

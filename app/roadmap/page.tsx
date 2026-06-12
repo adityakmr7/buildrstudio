@@ -237,6 +237,7 @@ export default function RoadmapPage() {
             <Link href="/showcase" className="nav-link">Showcase</Link>
             <Link href="/blog" className="nav-link">Blog</Link>
             <Link href="/roadmap" className="nav-link active">Roadmap</Link>
+            <Link href="/change-log" className="nav-link">Changelog</Link>
             <ThemeToggle />
           </div>
         </div>

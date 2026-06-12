@@ -196,6 +196,7 @@ export default function WorkspaceHub() {
             <Link href="/showcase" className="nav-link" id="showcase-nav-link">Showcase</Link>
             <Link href="/blog" className="nav-link" id="blog-nav-link">Blog</Link>
             <Link href="/roadmap" className="nav-link" id="roadmap-nav-link">Roadmap</Link>
+            <Link href="/change-log" className="nav-link" id="changelog-nav-link">Changelog</Link>
             <button
               id="header-go-pro-btn"
               onClick={handleOpenPremium}

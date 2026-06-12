@@ -350,6 +350,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           <Link href="/roadmap" className="nav-link">
             Roadmap
           </Link>
+          <Link href="/change-log" className="nav-link">
+            Changelog
+          </Link>
           <ThemeToggle />
         </div>
       </header>
