@@ -204,13 +204,216 @@ a { color: inherit; text-decoration: none; }
 .phil-footer { font-size: 13px; color: var(--fill-text); opacity: .4; margin-top: 20px; }
 
 /* ─── SCREENSHOT OPTIMIZER OVERRIDES ─── */
-
-/* Disable transitions inside canvas so domToPng gets a clean snapshot */
 .canvas-capture-wrapper,
 .canvas-capture-wrapper * {
   transition: none !important;
   animation: none !important;
 }
+
+/* ─── FULL-VIEWPORT WORKSPACE LAYOUT ─── */
+.workspace-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-page);
+}
+.workspace-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ─── TABBED SIDEBAR ─── */
+.tabbed-sidebar {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  height: 100%;
+  overflow: hidden;
+}
+.sidebar-tab-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3px;
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--surface);
+}
+.sidebar-tab-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 4px;
+  border-radius: var(--r-sm);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: background .12s, color .12s;
+  color: var(--text-3);
+  min-height: 52px;
+}
+.sidebar-tab-btn:hover {
+  background: var(--fill-subtle);
+  color: var(--text-2);
+}
+.sidebar-tab-btn.active {
+  background: var(--fill);
+  color: var(--fill-text);
+}
+.sidebar-tab-icon { font-size: 17px; line-height: 1; }
+.sidebar-tab-label { font-size: 9px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase; line-height: 1; }
+
+.sidebar-tab-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.sidebar-tab-content::-webkit-scrollbar { width: 4px; }
+.sidebar-tab-content::-webkit-scrollbar-track { background: transparent; }
+.sidebar-tab-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ─── CANVAS COLUMN ─── */
+.canvas-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ─── CANVAS TOOLBAR ─── */
+.canvas-toolbar {
+  flex-shrink: 0;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.canvas-toolbar-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+.canvas-toolbar-spacer { flex: 1; }
+.ratio-pill {
+  padding: 5px 10px;
+  border-radius: var(--r-full);
+  font-size: 11px;
+  font-weight: 700;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-2);
+  font-family: var(--font);
+  transition: all .12s;
+  white-space: nowrap;
+}
+.ratio-pill:hover  { border-color: var(--border-strong); color: var(--text-1); }
+.ratio-pill.active { background: var(--fill); border-color: var(--fill); color: var(--fill-text); }
+
+/* ─── CANVAS PREVIEW AREA ─── */
+.canvas-preview-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.canvas-preview-area::-webkit-scrollbar { width: 4px; }
+.canvas-preview-area::-webkit-scrollbar-track { background: transparent; }
+.canvas-preview-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ─── RANGE INPUTS ─── */
+.opt-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-strong);
+  outline: none;
+  cursor: pointer;
+}
+.opt-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--fill);
+  cursor: pointer;
+  border: 2px solid var(--surface);
+  box-shadow: 0 0 0 1.5px var(--border-strong);
+  transition: box-shadow .12s;
+}
+.opt-range::-webkit-slider-thumb:hover { box-shadow: 0 0 0 3px rgba(0,0,0,0.1); }
+[data-theme="dark"] .opt-range::-webkit-slider-thumb:hover { box-shadow: 0 0 0 3px rgba(255,255,255,0.12); }
+.opt-range::-moz-range-thumb {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--fill);
+  cursor: pointer;
+  border: 2px solid var(--surface);
+}
+
+/* ─── CANVAS LAYER UTILITIES ─── */
+.canvas-noise-layer { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: overlay; }
+.annotation-node    { position: absolute; user-select: none; z-index: 20; cursor: grab; }
+.annotation-node:active { cursor: grabbing; }
+
+/* ─── SIDEBAR CONTROL HELPERS ─── */
+.ctrl-row { display: flex; align-items: center; gap: 8px; }
+.ctrl-label { font-size: 10px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+.ctrl-section { display: flex; flex-direction: column; gap: 12px; }
+.ctrl-divider { height: 1px; background: var(--border); margin: 6px 0; }
+
+/* ─── RESPONSIVE FALLBACK ─── */
+@media (max-width: 900px) {
+  .workspace-body { flex-direction: column; overflow-y: auto; }
+  .tabbed-sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+  .sidebar-tab-content { max-height: 360px; }
+  .canvas-column { height: auto; overflow: visible; }
+  .canvas-preview-area { overflow: visible; padding: 16px; }
+  .canvas-toolbar { flex-wrap: wrap; height: auto; padding: 10px 16px; gap: 6px; }
+}
+@media (max-width: 600px) {
+  .sidebar-tab-grid { grid-template-columns: repeat(4, 1fr); }
+  .canvas-toolbar { flex-direction: column; align-items: flex-start; }
+}
+
+/* ─── COLLAPSIBLE SECTION ANIMATION ─── */
+@keyframes sectionOpen {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes slideUp {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to   { transform: translate(-50%, 0);    opacity: 1; }
+}
+
 
 /* ── Range inputs ──────────────────────────────────────────────────── */
 .opt-range {

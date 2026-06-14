@@ -1,24 +1,23 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import ControlSidebar from "./ControlSidebar";
-import LivePreviewCanvas from "./LivePreviewCanvas";
-import QuickPresets from "./QuickPresets";
+import TabbedSidebar from "./TabbedSidebar";
+import LivePreviewCanvas, { LivePreviewCanvasHandle } from "./LivePreviewCanvas";
 import PremiumModal from "./PremiumModal";
 import ThemeToggle from "./ThemeToggle";
 
-// ─── Annotation & Preset Types ───────────────────────────────────────────────
+// ─── Annotation & Preset Types ────────────────────────────────────────────────
 
 export interface Annotation {
   id: string;
   type: "badge" | "label" | "arrow-right" | "arrow-left" | "arrow-up" | "arrow-down";
   text: string;
-  x: number; // 0–100 % of canvas width
-  y: number; // 0–100 % of canvas height
-  color: string;      // text/icon color
-  bgColor: string;    // background (badge only)
-  fontSize: number;   // px
+  x: number;
+  y: number;
+  color: string;
+  bgColor: string;
+  fontSize: number;
 }
 
 export interface SavedPreset {
@@ -28,324 +27,376 @@ export interface SavedPreset {
   createdAt: number;
 }
 
-// ─── Gradient / Mesh Presets ─────────────────────────────────────────────────
+// ─── Gradient / Mesh Presets ──────────────────────────────────────────────────
 
-export interface GradientPreset {
-  name: string;
-  from: string;
-  via?: string;
-  to: string;
-}
+export interface GradientPreset { name: string; from: string; via?: string; to: string; }
+export interface MeshPreset     { name: string; colors: [string, string, string, string]; base: string; }
 
 export const GRADIENT_PRESETS: Record<string, GradientPreset> = {
-  sunset:          { name: "Sunset",          from: "#fb923c", via: "#ec4899", to: "#6366f1" },
-  "midnight-cyber":{ name: "Midnight Cyber",  from: "#4c1d95", via: "#1e1b4b", to: "#0f172a" },
-  ocean:           { name: "Ocean",           from: "#38bdf8",                 to: "#059669" },
-  "emerald-mist":  { name: "Emerald Mist",   from: "#2dd4bf",                 to: "#15803d" },
-  "neon-synth":    { name: "Neon Synth",      from: "#ec4899", via: "#ef4444", to: "#eab308" },
-  "minimal-light": { name: "Minimal Light",   from: "#f1f5f9",                 to: "#e2e8f0" },
-  "minimal-dark":  { name: "Minimal Dark",    from: "#262626",                 to: "#0a0a0a" },
-  cyberpunk:       { name: "Cyberpunk",       from: "#fde047", via: "#ec4899", to: "#ef4444" },
-  aurora:          { name: "Aurora",          from: "#6ee7b7", via: "#3b82f6", to: "#9333ea" },
-  "rose-gold":     { name: "Rose Gold",       from: "#fda4af",                 to: "#fb7185" },
+  sunset:             { name: "Sunset",         from: "#fb923c", via: "#ec4899", to: "#6366f1" },
+  "midnight-cyber":   { name: "Midnight Cyber", from: "#4c1d95", via: "#1e1b4b", to: "#0f172a" },
+  ocean:              { name: "Ocean",          from: "#38bdf8",                  to: "#059669" },
+  "emerald-mist":     { name: "Emerald Mist",  from: "#2dd4bf",                  to: "#15803d" },
+  "neon-synth":       { name: "Neon Synth",    from: "#ec4899", via: "#ef4444",  to: "#eab308" },
+  "minimal-light":    { name: "Minimal Light", from: "#f1f5f9",                  to: "#e2e8f0" },
+  "minimal-dark":     { name: "Minimal Dark",  from: "#262626",                  to: "#0a0a0a" },
+  cyberpunk:          { name: "Cyberpunk",      from: "#fde047", via: "#ec4899", to: "#ef4444" },
+  aurora:             { name: "Aurora",         from: "#6ee7b7", via: "#3b82f6", to: "#9333ea" },
+  "rose-gold":        { name: "Rose Gold",      from: "#fda4af",                 to: "#fb7185" },
 };
 
-export interface MeshPreset {
-  name: string;
-  colors: [string, string, string, string];
-  base: string;
-}
-
 export const MESH_PRESETS: Record<string, MeshPreset> = {
-  cosmic:     { name: "Cosmic",      colors: ["#7c3aed", "#2563eb", "#06b6d4", "#8b5cf6"], base: "#0f0f23" },
-  forest:     { name: "Forest",      colors: ["#065f46", "#047857", "#0d9488", "#15803d"], base: "#052e16" },
-  "sunset-m": { name: "Sunset Mesh", colors: ["#ef4444", "#f97316", "#eab308", "#ec4899"], base: "#1a0a00" },
-  nordic:     { name: "Nordic",      colors: ["#1d4ed8", "#0891b2", "#6d28d9", "#1e40af"], base: "#0c0f1a" },
+  cosmic:     { name: "Cosmic",      colors: ["#7c3aed","#2563eb","#06b6d4","#8b5cf6"], base: "#0f0f23" },
+  forest:     { name: "Forest",      colors: ["#065f46","#047857","#0d9488","#15803d"], base: "#052e16" },
+  "sunset-m": { name: "Sunset Mesh", colors: ["#ef4444","#f97316","#eab308","#ec4899"], base: "#1a0a00" },
+  nordic:     { name: "Nordic",      colors: ["#1d4ed8","#0891b2","#6d28d9","#1e40af"], base: "#0c0f1a" },
 };
 
 // ─── Core Config Type ─────────────────────────────────────────────────────────
 
 export interface OptimizationConfig {
-  // Layout
-  padding: number;           // 0–128
-  borderRadius: string;      // rounded-none | rounded-md | rounded-xl | rounded-3xl
-  dropShadow: string;        // shadow-none | shadow-md | shadow-xl | shadow-2xl
-  aspectRatio: string;       // aspect-video | aspect-square | aspect-[4/5] | aspect-[9/16]
+  padding: number;
+  borderRadius: string;
+  dropShadow: string;
+  aspectRatio: string;
 
-  // Background
   backgroundType: "gradient" | "solid" | "mesh" | "pattern" | "image";
-  gradientPreset: string;        // key into GRADIENT_PRESETS
-  gradientDirection: number;     // degrees: 45 | 90 | 135 | 180 | 225 | 270 | 315 | 360
-  solidColor: string;            // hex
-  meshPreset: string;            // key into MESH_PRESETS
+  gradientPreset: string;
+  gradientDirection: number;
+  solidColor: string;
+  meshPreset: string;
   patternType: "dots" | "grid" | "diagonal" | "crosshatch" | "circles";
-  patternColor: string;          // hex, pattern ink color
-  patternBgColor: string;        // hex, pattern background
-  noiseIntensity: number;        // 0–100
-
-  // Background image upload
+  patternColor: string;
+  patternBgColor: string;
+  noiseIntensity: number;
   backgroundImageUrl: string | null;
 
-  // Frame
   frameStyle: "macos" | "browser" | "terminal" | "iphone" | "android" | "none";
   frameDarkMode: boolean;
   browserUrl: string;
 
-  // Caption / Text Overlay
   captionTitle: string;
   captionSubtitle: string;
   captionAlign: "left" | "center" | "right";
   captionPosition: "top" | "bottom";
   captionTitleColor: string;
   captionSubtitleColor: string;
-  captionTitleSize: number;     // 12–48
+  captionTitleSize: number;
   captionGlass: boolean;
 
-  // Image adjustments
-  imageBrightness: number;      // 50–150 (100 = normal)
-  imageContrast: number;        // 50–150 (100 = normal)
-  imageSaturation: number;      // 0–200  (100 = normal)
-  imageScale: number;           // 70–110 (100 = normal)
+  imageBrightness: number;
+  imageContrast: number;
+  imageSaturation: number;
+  imageScale: number;
 
-  // Annotations
   annotations: Annotation[];
-
-  // User-saved presets
   savedPresets: SavedPreset[];
 }
 
 const DEFAULT_CONFIG: OptimizationConfig = {
-  padding: 48,
-  borderRadius: "rounded-xl",
-  dropShadow: "shadow-xl",
-  aspectRatio: "aspect-video",
-
-  backgroundType: "gradient",
-  gradientPreset: "sunset",
-  gradientDirection: 135,
-  solidColor: "#6366f1",
-  meshPreset: "cosmic",
-  patternType: "dots",
-  patternColor: "#ffffff",
-  patternBgColor: "#1e1b4b",
-  noiseIntensity: 0,
-  backgroundImageUrl: null,
-
-  frameStyle: "macos",
-  frameDarkMode: false,
-  browserUrl: "buildrstudio.in",
-
-  captionTitle: "",
-  captionSubtitle: "",
-  captionAlign: "center",
-  captionPosition: "bottom",
-  captionTitleColor: "#ffffff",
-  captionSubtitleColor: "rgba(255,255,255,0.75)",
-  captionTitleSize: 18,
-  captionGlass: true,
-
-  imageBrightness: 100,
-  imageContrast: 100,
-  imageSaturation: 100,
-  imageScale: 100,
-
-  annotations: [],
-  savedPresets: [],
+  padding: 48, borderRadius: "rounded-xl", dropShadow: "shadow-xl", aspectRatio: "aspect-video",
+  backgroundType: "gradient", gradientPreset: "sunset", gradientDirection: 135,
+  solidColor: "#6366f1", meshPreset: "cosmic", patternType: "dots",
+  patternColor: "#ffffff", patternBgColor: "#1e1b4b", noiseIntensity: 0, backgroundImageUrl: null,
+  frameStyle: "macos", frameDarkMode: false, browserUrl: "buildrstudio.in",
+  captionTitle: "", captionSubtitle: "", captionAlign: "center", captionPosition: "bottom",
+  captionTitleColor: "#ffffff", captionSubtitleColor: "rgba(255,255,255,0.75)", captionTitleSize: 18, captionGlass: true,
+  imageBrightness: 100, imageContrast: 100, imageSaturation: 100, imageScale: 100,
+  annotations: [], savedPresets: [],
 };
+
+// ─── Aspect Ratio Options ─────────────────────────────────────────────────────
+
+const RATIO_OPTIONS = [
+  { label: "16:9", value: "aspect-video"  },
+  { label: "1:1",  value: "aspect-square" },
+  { label: "4:5",  value: "aspect-[4/5]"  },
+  { label: "9:16", value: "aspect-[9/16]" },
+];
+
+// ─── CanvasToolbar ────────────────────────────────────────────────────────────
+
+interface CanvasToolbarProps {
+  config: OptimizationConfig;
+  setConfig: React.Dispatch<React.SetStateAction<OptimizationConfig>>;
+  imageSource: string | null;
+  setImageSource: React.Dispatch<React.SetStateAction<string | null>>;
+  liveRef: React.RefObject<LivePreviewCanvasHandle | null>;
+}
+
+function CanvasToolbar({ config, setConfig, imageSource, setImageSource, liveRef }: CanvasToolbarProps) {
+  const [isExporting, setIsExporting] = useState(false);
+  const [isCopying,   setIsCopying]   = useState(false);
+  const [copyStatus,  setCopyStatus]  = useState<"idle" | "ok" | "err">("idle");
+
+  const disabled = !imageSource;
+
+  const getRenderFn = () => liveRef.current?.renderToPng;
+
+  const handleExport = async () => {
+    const renderFn = getRenderFn();
+    if (!renderFn || disabled) return;
+    setIsExporting(true);
+    try {
+      const dataUrl = await renderFn();
+      const a = document.createElement("a");
+      a.download = `buildrstudio-${Date.now()}.png`;
+      a.href = dataUrl;
+      a.click();
+      a.remove();
+    } catch (e) {
+      console.error("Export error:", e);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleCopy = async () => {
+    const renderFn = getRenderFn();
+    if (!renderFn || disabled) return;
+    setIsCopying(true);
+    setCopyStatus("idle");
+    try {
+      const blobP = renderFn().then(async (dataUrl) => {
+        const res = await fetch(dataUrl);
+        return res.blob();
+      });
+      await navigator.clipboard.write([
+        new ClipboardItem({ "image/png": blobP as unknown as Blob }),
+      ]);
+      setCopyStatus("ok");
+      setTimeout(() => setCopyStatus("idle"), 2200);
+    } catch {
+      setCopyStatus("err");
+      setTimeout(() => setCopyStatus("idle"), 2200);
+    } finally {
+      setIsCopying(false);
+    }
+  };
+
+  const shareToTwitter = async () => {
+    if (disabled) return;
+    const renderFn = getRenderFn();
+    if (!renderFn) return;
+    // Copy first, then open Twitter
+    try {
+      const blobP = renderFn().then(async (dataUrl) => { const res = await fetch(dataUrl); return res.blob(); });
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": blobP as unknown as Blob })]);
+    } catch {}
+    liveRef.current?.showShareToast("X (Twitter)");
+    const text = encodeURIComponent("Just optimized a screenshot with BuildrStudio! ✨\n");
+    const url  = encodeURIComponent("https://buildrstudio.in");
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
+  };
+
+  const shareToLinkedIn = async () => {
+    if (disabled) return;
+    const renderFn = getRenderFn();
+    if (!renderFn) return;
+    try {
+      const blobP = renderFn().then(async (dataUrl) => { const res = await fetch(dataUrl); return res.blob(); });
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": blobP as unknown as Blob })]);
+    } catch {}
+    liveRef.current?.showShareToast("LinkedIn");
+    window.open("https://www.linkedin.com/feed/", "_blank");
+  };
+
+  const btnBase: React.CSSProperties = {
+    display: "flex", alignItems: "center", gap: "5px", border: "1.5px solid var(--border)",
+    borderRadius: "var(--r-sm)", background: "transparent", cursor: disabled ? "not-allowed" : "pointer",
+    fontFamily: "var(--font)", fontSize: "12px", fontWeight: 600, padding: "6px 10px",
+    color: disabled ? "var(--text-3)" : "var(--text-1)", opacity: disabled ? 0.45 : 1,
+    transition: "all .12s", whiteSpace: "nowrap",
+  };
+
+  return (
+    <div className="canvas-toolbar">
+      {/* Left: aspect ratio pills */}
+      <div style={{ display: "flex", gap: "4px" }}>
+        {RATIO_OPTIONS.map((r) => (
+          <button key={r.value} type="button"
+            className={`ratio-pill${config.aspectRatio === r.value ? " active" : ""}`}
+            onClick={() => setConfig((p) => ({ ...p, aspectRatio: r.value }))}>
+            {r.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="canvas-toolbar-divider" />
+
+      {/* Change screenshot */}
+      {imageSource && (
+        <button type="button" style={{ ...btnBase, color: "var(--text-2)", fontSize: "11px" }}
+          onClick={() => setImageSource(null)}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.color = "var(--text-1)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}>
+          <span style={{ fontSize: "13px" }}>🔄</span> Change
+        </button>
+      )}
+
+      <div className="canvas-toolbar-spacer" />
+
+      {/* Share buttons */}
+      <button type="button" style={btnBase} disabled={disabled} onClick={shareToTwitter}
+        onMouseEnter={(e) => { if (!disabled) { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.background = "var(--fill-subtle)"; }}}
+        onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "transparent"; }}>
+        <span>🐦</span> X
+      </button>
+      <button type="button" style={btnBase} disabled={disabled} onClick={shareToLinkedIn}
+        onMouseEnter={(e) => { if (!disabled) { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.background = "var(--fill-subtle)"; }}}
+        onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "transparent"; }}>
+        <span>💼</span> LinkedIn
+      </button>
+
+      <div className="canvas-toolbar-divider" />
+
+      {/* Copy */}
+      <button type="button" disabled={disabled || isCopying} onClick={handleCopy}
+        style={{ ...btnBase, cursor: (disabled || isCopying) ? "not-allowed" : "pointer", minWidth: "110px", justifyContent: "center",
+          background: copyStatus === "ok"  ? "var(--success-subtle, #dcfce7)" : "transparent",
+          borderColor: copyStatus === "ok" ? "var(--success, #22c55e)"        : "var(--border)",
+          color: copyStatus === "ok" ? "#15803d" : copyStatus === "err" ? "#dc2626" : disabled ? "var(--text-3)" : "var(--text-1)",
+        }}
+        onMouseEnter={(e) => { if (!disabled && !isCopying) { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.background = "var(--fill-subtle)"; }}}
+        onMouseLeave={(e) => { if (copyStatus !== "ok") { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "transparent"; }}}>
+        {isCopying    ? <><Spinner /> Copying…</>
+         : copyStatus === "ok"  ? <>✓ Copied!</>
+         : copyStatus === "err" ? <>❌ Error</>
+         : <><span>📋</span> Copy</>}
+      </button>
+
+      {/* Export */}
+      <button type="button" disabled={disabled || isExporting} onClick={handleExport}
+        style={{ ...btnBase, background: disabled ? "transparent" : "var(--fill)", borderColor: disabled ? "var(--border)" : "var(--fill)",
+          color: disabled ? "var(--text-3)" : "var(--fill-text)", cursor: (disabled || isExporting) ? "not-allowed" : "pointer",
+          minWidth: "130px", justifyContent: "center",
+        }}
+        onMouseEnter={(e) => { if (!disabled && !isExporting) e.currentTarget.style.opacity = "0.85"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}>
+        {isExporting ? <><Spinner light /> Exporting…</> : <><span>📥</span> Export PNG</>}
+      </button>
+    </div>
+  );
+}
+
+function Spinner({ light }: { light?: boolean }) {
+  return (
+    <span style={{ width: "12px", height: "12px", border: `2px solid ${light ? "rgba(255,255,255,0.3)" : "var(--border-strong)"}`, borderTop: `2px solid ${light ? "white" : "var(--text-1)"}`, borderRadius: "50%", display: "inline-block", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
+  );
+}
 
 // ─── WorkspaceHub ─────────────────────────────────────────────────────────────
 
 export default function WorkspaceHub() {
-  const [config, setConfig] = useState<OptimizationConfig>(DEFAULT_CONFIG);
+  const [config,      setConfig]      = useState<OptimizationConfig>(DEFAULT_CONFIG);
   const [imageSource, setImageSource] = useState<string | null>(null);
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
+  const liveRef = useRef<LivePreviewCanvasHandle>(null);
 
-  const handleOpenPremium = () => setIsPremiumOpen(true);
-
-  // Annotation position update (called from LivePreviewCanvas during drag)
   const handleUpdateAnnotation = useCallback((id: string, x: number, y: number) => {
     setConfig((prev) => ({
       ...prev,
-      annotations: prev.annotations.map((a) =>
-        a.id === id ? { ...a, x, y } : a
-      ),
+      annotations: prev.annotations.map((a) => (a.id === id ? { ...a, x, y } : a)),
     }));
   }, []);
 
   return (
-    <>
-      <style>{`
-        /* ─── HEADER ─── */
-        .site-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 20px 40px;
-          border-bottom: 1px solid var(--border);
-          background: var(--surface);
-          position: sticky;
-          top: 0;
-          z-index: 100;
-          transition: background .3s, border .3s;
-        }
-        .site-logo {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-        .site-logo-mark {
-          width: 36px;
-          height: 36px;
-          border-radius: 10px;
-          background: var(--fill);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 16px;
-          color: var(--fill-text);
-          font-weight: 800;
-        }
-        .site-logo-text {
-          font-size: 18px;
-          font-weight: 800;
-          color: var(--text-1);
-          letter-spacing: -0.5px;
-        }
-        .nav-links {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .nav-link {
-          font-size: 14px;
-          font-weight: 500;
-          color: var(--text-2);
-          padding: 8px 14px;
-          border-radius: var(--r-sm);
-          transition: all .15s;
-          cursor: pointer;
-        }
-        .nav-link:hover {
-          background: var(--fill-subtle);
-          color: var(--text-1);
-        }
+    <div className="workspace-root">
 
-        /* ─── SPACING ─── */
-        .spacing-xl { height: 64px; }
-        .spacing-lg { height: 48px; }
-        .spacing-md { height: 32px; }
+      {/* ── HEADER ── */}
+      <header style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "0 24px", borderBottom: "1px solid var(--border)",
+        background: "var(--surface)", height: "54px", flexShrink: 0, zIndex: 50,
+      }}>
+        {/* Logo */}
+        <Link href="/" id="site-logo-link" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
+          <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "var(--fill)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", color: "var(--fill-text)", fontWeight: 800 }}>B</div>
+          <span style={{ fontSize: "16px", fontWeight: 800, color: "var(--text-1)", letterSpacing: "-0.4px" }}>BuildrStudio</span>
+        </Link>
 
-        /* ─── WORKSPACE LAYOUT ─── */
-        .page {
-          max-width: 1360px !important;
-        }
-        .site-header-inner {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          width: 100%;
-          max-width: 1280px;
-          margin: 0 auto;
-        }
-        .workspace-grid {
-          display: grid;
-          grid-template-columns: 360px 1fr;
-          gap: 32px;
-          align-items: flex-start;
-        }
+        {/* Center: page title */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-1)" }}>
+            Screenshot → Social Optimizer
+          </span>
+          <span className="badge-pill" style={{ fontSize: "9px" }}>v2.0</span>
+        </div>
 
-        /* ─── RESPONSIVE ─── */
-        @media (max-width: 992px) {
-          .workspace-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-          }
-          .workspace-sidebar { order: 2; width: 100%; }
-          .workspace-canvas  { order: 1; width: 100%; margin-bottom: 12px; }
-          .site-header-inner { max-width: 100%; }
-        }
-        @media (max-width: 640px) {
-          .site-header { padding: 16px 20px; }
-          .site-header-inner { flex-direction: column; gap: 12px; align-items: center; }
-          .nav-links { width: 100%; justify-content: center; flex-wrap: wrap; }
-        }
-
-        /* ─── PRESETS & BUTTONS ─── */
-        .presets-list { display: grid; grid-template-columns: 1fr; gap: 8px; }
-        @media (min-width: 600px) and (max-width: 992px) {
-          .presets-list { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 600px) {
-          .canvas-action-buttons { flex-direction: column !important; width: 100%; }
-          .canvas-action-buttons button { width: 100% !important; min-width: 0 !important; justify-content: center; }
-          .share-buttons-container { flex-direction: column !important; width: 100%; }
-          .share-buttons-container button { width: 100% !important; justify-content: center; }
-        }
-      `}</style>
-
-      {/* ─── HEADER ─── */}
-      <header className="site-header">
-        <div className="site-header-inner">
-          <Link href="/" className="site-logo" id="site-logo-link">
-            <div className="site-logo-mark">B</div>
-            <span className="site-logo-text">BuildrStudio</span>
-          </Link>
-          <div className="nav-links">
-            <Link href="/showcase" className="nav-link" id="showcase-nav-link">Showcase</Link>
-            <Link href="/blog"     className="nav-link" id="blog-nav-link">Blog</Link>
-            <Link href="/roadmap"  className="nav-link" id="roadmap-nav-link">Roadmap</Link>
-            <Link href="/change-log" className="nav-link" id="changelog-nav-link">Changelog</Link>
-            <button
-              id="header-go-pro-btn"
-              onClick={handleOpenPremium}
-              className="btn-fill btn-sm"
-              style={{ background: "var(--fill)", color: "var(--fill-text)", fontWeight: 700, fontSize: "12px", cursor: "pointer", border: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}
-            >
-              👑 Go Pro
-            </button>
-            <ThemeToggle />
-          </div>
+        {/* Right: nav + actions */}
+        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+          {[
+            { href: "/showcase",   label: "Showcase"  },
+            { href: "/roadmap",    label: "Roadmap"   },
+            { href: "/change-log", label: "Changelog" },
+          ].map((n) => (
+            <Link key={n.href} href={n.href} style={{ fontSize: "13px", fontWeight: 500, color: "var(--text-2)", padding: "6px 10px", borderRadius: "var(--r-sm)", transition: "all .12s", textDecoration: "none" }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "var(--fill-subtle)"; e.currentTarget.style.color = "var(--text-1)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent";         e.currentTarget.style.color = "var(--text-2)"; }}>
+              {n.label}
+            </Link>
+          ))}
+          <div style={{ width: "1px", height: "18px", background: "var(--border)", margin: "0 4px" }} />
+          <button id="header-go-pro-btn" type="button" onClick={() => setIsPremiumOpen(true)}
+            className="btn-fill btn-sm"
+            style={{ fontWeight: 700, fontSize: "11px", cursor: "pointer", border: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            👑 Go Pro
+          </button>
+          <ThemeToggle />
         </div>
       </header>
 
-      {/* ─── MAIN ─── */}
-      <main className="page">
-        <div className="section-header">
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            <h1 className="section-title">Screenshot-to-Social Media Graphic Optimizer</h1>
-            <p style={{ fontSize: "13px", color: "var(--text-3)" }}>
-              Instantly turn raw screenshots into professional social graphics.
-            </p>
-          </div>
-          <span className="badge-pill">v2.0</span>
-        </div>
+      {/* ── WORKSPACE BODY ── */}
+      <div className="workspace-body">
 
-        <div className="workspace-grid" style={{ width: "100%", margin: "0 auto" }}>
-          {/* Left — Presets & Controls */}
-          <div className="workspace-sidebar" style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
-            <QuickPresets config={config} setConfig={setConfig} />
-            <ControlSidebar
-              config={config}
-              setConfig={setConfig}
-              onOpenPremium={handleOpenPremium}
-            />
-          </div>
+        {/* Left: Tabbed Sidebar */}
+        <TabbedSidebar
+          config={config}
+          setConfig={setConfig}
+          onOpenPremium={() => setIsPremiumOpen(true)}
+        />
 
-          {/* Right — Canvas */}
-          <div className="workspace-canvas" style={{ minWidth: 0, width: "100%" }}>
+        {/* Right: Canvas Column */}
+        <div className="canvas-column">
+          {/* Toolbar always visible above canvas */}
+          <CanvasToolbar
+            config={config}
+            setConfig={setConfig}
+            imageSource={imageSource}
+            setImageSource={setImageSource}
+            liveRef={liveRef}
+          />
+
+          {/* Canvas scrollable area */}
+          <div className="canvas-preview-area">
             <LivePreviewCanvas
+              ref={liveRef}
               config={config}
               imageSource={imageSource}
               setImageSource={setImageSource}
-              onOpenPremium={handleOpenPremium}
+              onOpenPremium={() => setIsPremiumOpen(true)}
               onUpdateAnnotation={handleUpdateAnnotation}
             />
           </div>
         </div>
-      </main>
+      </div>
 
       <PremiumModal isOpen={isPremiumOpen} onClose={() => setIsPremiumOpen(false)} />
-    </>
+
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        @keyframes slideUp {
+          from { transform: translate(-50%, 20px); opacity: 0; }
+          to   { transform: translate(-50%, 0);    opacity: 1; }
+        }
+        /* Ensure no scrollbars on the root page since workspace-root handles it */
+        body { overflow: hidden; }
+        @media (max-width: 900px) {
+          body { overflow: auto; }
+        }
+      `}</style>
+    </div>
   );
 }
