@@ -314,6 +314,11 @@ export default function WorkspaceHub() {
           <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "var(--fill)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", color: "var(--fill-text)", fontWeight: 800 }}>B</div>
           <span style={{ fontSize: "16px", fontWeight: 800, color: "var(--text-1)", letterSpacing: "-0.4px" }}>BuildrStudio</span>
         </Link>
+        {/* Visually hidden h1 for SEO — invisible to users, readable by crawlers */}
+        <h1 style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", borderWidth: 0 }}>
+          Screenshot to Social Media Graphic Optimizer — BuildrStudio
+        </h1>
+
 
         {/* Center: page title */}
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>

@@ -12,14 +12,49 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "BuildrStudio — Apps by Aditya Kumar",
+  metadataBase: new URL("https://buildrstudio.in"),
+  title: {
+    default: "BuildrStudio — Developer Tools by Aditya Kumar",
+    template: "%s — BuildrStudio",
+  },
   description:
-    "A collection of thoughtfully crafted apps designed and built by Aditya Kumar. Powered by the Ink Design System.",
+    "BuildrStudio is a suite of free developer tools — turn raw screenshots into stunning social media graphics, track habits with Anchor, and stay focused with Flowzy.",
+  authors: [{ name: "Aditya Kumar", url: "https://buildrstudio.in" }],
+  keywords: [
+    "screenshot optimizer",
+    "social media graphics",
+    "developer tools",
+    "screenshot to social",
+    "habit tracker",
+    "focus timer",
+    "pomodoro",
+    "BuildrStudio",
+    "Aditya Kumar",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: "BuildrStudio",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "BuildrStudio — Developer Tools by Aditya Kumar",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@adityakmr7",
+    creator: "@adityakmr7",
+    images: ["/og-image.png"],
+  },
   icons: {
     icon: "/icon.svg",
     apple: "/apple-icon.svg",
   },
 };
+
 
 export default function RootLayout({
   children,

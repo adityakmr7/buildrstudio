@@ -1,21 +1,65 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import Link from "next/link";
 import RoadmapRequestForm from "../components/RoadmapRequestForm";
 import ThemeToggle from "../components/ThemeToggle";
 
 export const metadata: Metadata = {
-  title: "Roadmap — BuildrStudio",
+  title: "Product Roadmap — Vote on What We Build Next",
   description:
-    "Vote on upcoming BuildrStudio tools for launch assets, content cards, carousels, README visuals, and app store screenshots.",
+    "Vote on upcoming BuildrStudio tools: launch asset generators, content cards, carousels, README visuals, app store screenshots, and more. Your vote shapes what ships next.",
+  alternates: {
+    canonical: "https://buildrstudio.in/roadmap",
+  },
+  openGraph: {
+    title: "Product Roadmap — BuildrStudio",
+    description:
+      "Vote on upcoming BuildrStudio tools and shape what we ship next — from launch asset generators to README visuals and app store screenshots.",
+    type: "website",
+    url: "https://buildrstudio.in/roadmap",
+    locale: "en_US",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "BuildrStudio Product Roadmap",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Product Roadmap — BuildrStudio",
+    description:
+      "Vote on what BuildrStudio builds next — launch assets, content cards, app store screenshots, and more.",
+    images: ["/og-image.png"],
+  },
 };
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "BuildrStudio", item: "https://buildrstudio.in" },
+    { "@type": "ListItem", position: 2, name: "Roadmap", item: "https://buildrstudio.in/roadmap" },
+  ],
+};
+
+
 
 export default function RoadmapPage() {
   return (
     <>
+      <Script
+        id="json-ld-roadmap"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <style>{`
         .site-header {
           display: flex;
           align-items: center;
+
           justify-content: space-between;
           padding: 20px 40px;
           border-bottom: 1px solid var(--border);
