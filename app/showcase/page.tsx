@@ -1,17 +1,86 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import Link from "next/link";
 import ThemeToggle from "../components/ThemeToggle";
 
 export const metadata: Metadata = {
-  title: "App Showcase — BuildrStudio",
+  title: "App Showcase — Anchor & Flowzy",
   description:
-    "Discover thoughtfully designed productivity tools by Aditya Kumar, featuring the Anchor habit tracker and Flowzy focus timer.",
+    "Discover Anchor — the minimal habit tracker built on the two-minute rule — and Flowzy, the Pomodoro focus timer for deep work. Free iOS apps by Aditya Kumar.",
+  alternates: {
+    canonical: "https://buildrstudio.in/showcase",
+  },
+  openGraph: {
+    title: "App Showcase — Anchor & Flowzy | BuildrStudio",
+    description:
+      "Discover Anchor (habit tracker) and Flowzy (Pomodoro focus timer) — thoughtfully designed iOS apps by Aditya Kumar.",
+    type: "website",
+    url: "https://buildrstudio.in/showcase",
+    locale: "en_US",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "BuildrStudio App Showcase",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "App Showcase — Anchor & Flowzy | BuildrStudio",
+    description:
+      "Anchor (habit tracker) and Flowzy (Pomodoro focus timer) — free iOS apps by Aditya Kumar.",
+    images: ["/og-image.png"],
+  },
 };
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "BuildrStudio", item: "https://buildrstudio.in" },
+        { "@type": "ListItem", position: 2, name: "Showcase", item: "https://buildrstudio.in/showcase" },
+      ],
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: "Anchor — Habit Tracker",
+      operatingSystem: "iOS, Android",
+      applicationCategory: "HealthApplication",
+      description: "Build better habits with intention. A minimal habit tracker based on the two-minute rule and cue-based habit stacking.",
+      author: { "@type": "Person", name: "Aditya Kumar", url: "https://buildrstudio.in" },
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: "Flowzy — Focus Timer",
+      operatingSystem: "iOS",
+      applicationCategory: "ProductivityApplication",
+      description: "The focus timer that respects how your brain works. Deep work sessions built on the Pomodoro Technique with task linking and weekly analytics.",
+      author: { "@type": "Person", name: "Aditya Kumar", url: "https://buildrstudio.in" },
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      url: "https://apps.apple.com/app/id6748275526",
+    },
+  ],
+};
+
+
 
 export default function Showcase() {
   return (
     <>
+      <Script
+        id="json-ld-showcase"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      {/* Visually hidden h1 for SEO — does not affect layout */}
+      <h1 className="sr-only">App Showcase — Anchor Habit Tracker &amp; Flowzy Focus Timer by BuildrStudio</h1>
       <style>{`
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
         /* ─── HEADER ─── */
         .site-header {
           display: flex;
@@ -319,6 +388,7 @@ export default function Showcase() {
           <a href="#flowzy" className="nav-link">Flowzy</a>
           <Link href="/blog" className="nav-link">Blog</Link>
           <Link href="/roadmap" className="nav-link">Roadmap</Link>
+          <Link href="/change-log" className="nav-link">Changelog</Link>
           <ThemeToggle />
         </div>
       </header>

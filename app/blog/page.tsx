@@ -1,11 +1,59 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import Link from "next/link";
 import ThemeToggle from "../components/ThemeToggle";
 import { getHashnodePostsPage } from "../lib/hashnode";
 
 export const metadata: Metadata = {
-  title: "BuildrStudio Blog",
-  description: "Latest posts from Aditya Kumar's Hashnode blog.",
+  title: "Blog — Frontend, React Native & Product Building",
+  description:
+    "Notes on frontend architecture, React Native patterns, product building, and the systems behind focused apps. Written by Aditya Kumar.",
+  alternates: {
+    canonical: "https://buildrstudio.in/blog",
+  },
+  openGraph: {
+    title: "BuildrStudio Blog — Frontend, React Native & Product Building",
+    description:
+      "Notes on frontend architecture, React Native patterns, product building, and the systems behind focused apps. Written by Aditya Kumar.",
+    type: "website",
+    url: "https://buildrstudio.in/blog",
+    locale: "en_US",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "BuildrStudio Blog",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BuildrStudio Blog — Frontend, React Native & Product Building",
+    description:
+      "Notes on frontend architecture, React Native patterns, and the systems behind focused apps. By Aditya Kumar.",
+    images: ["/og-image.png"],
+  },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "BuildrStudio", item: "https://buildrstudio.in" },
+        { "@type": "ListItem", position: 2, name: "Blog", item: "https://buildrstudio.in/blog" },
+      ],
+    },
+    {
+      "@type": "Blog",
+      name: "BuildrStudio Blog",
+      url: "https://buildrstudio.in/blog",
+      description: "Notes on frontend architecture, React Native patterns, product building, and the systems behind focused apps.",
+      author: { "@type": "Person", name: "Aditya Kumar", url: "https://adityakmr.hashnode.dev/" },
+    },
+  ],
 };
 
 function formatPublishDate(value: string) {
@@ -329,11 +377,17 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         }
       `}</style>
 
+      <Script
+        id="json-ld-blog"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <header className="site-header">
-        <div className="site-logo">
+        <Link href="/" className="site-logo">
           <div className="site-logo-mark">B</div>
           <span className="site-logo-text">BuildrStudio</span>
-        </div>
+        </Link>
         <div className="nav-links">
           <Link href="/" className="nav-link">
             Home
@@ -349,6 +403,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           </Link>
           <Link href="/roadmap" className="nav-link">
             Roadmap
+          </Link>
+          <Link href="/change-log" className="nav-link">
+            Changelog
           </Link>
           <ThemeToggle />
         </div>
