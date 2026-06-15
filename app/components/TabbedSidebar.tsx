@@ -577,6 +577,59 @@ function TabAnnotations({ config, update }: { config: OptimizationConfig; update
 
 // ─── TAB CONTENT: Presets ─────────────────────────────────────────────────────
 
+// Reusable accordion header used only in the Presets tab
+function PresetAccordion({
+  title,
+  count,
+  isOpen,
+  onToggle,
+  children,
+}: {
+  title: string;
+  count?: number;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div style={{ borderRadius: "var(--r-md)", border: "1px solid var(--border)", overflow: "hidden", background: "var(--surface)" }}>
+      {/* Header */}
+      <button
+        type="button"
+        onClick={onToggle}
+        style={{
+          width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "10px 12px", background: "none", border: "none", cursor: "pointer",
+          fontFamily: "var(--font)",
+          borderBottom: isOpen ? "1px solid var(--border)" : "none",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+          <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--text-1)" }}>{title}</span>
+          {count !== undefined && count > 0 && (
+            <span style={{ fontSize: "9px", fontWeight: 700, background: "var(--fill)", color: "var(--fill-text)", borderRadius: "999px", padding: "1px 6px" }}>
+              {count}
+            </span>
+          )}
+        </div>
+        <span style={{
+          fontSize: "9px", color: "var(--text-3)",
+          display: "inline-block",
+          transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+          transition: "transform 0.2s ease",
+        }}>▼</span>
+      </button>
+      {/* Body */}
+      {isOpen && (
+        <div style={{ padding: "10px 12px", display: "flex", flexDirection: "column", gap: "6px" }}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 function TabPresets({ config, setConfig }: { config: OptimizationConfig; setConfig: React.Dispatch<React.SetStateAction<OptimizationConfig>> }) {
   const [presetName, setPresetName] = useState("");
 
@@ -598,56 +651,90 @@ function TabPresets({ config, setConfig }: { config: OptimizationConfig; setConf
     try { localStorage.setItem("bs_saved_presets", JSON.stringify(updated)); } catch {}
   };
 
+  // Track which accordion panels are open
+  const [openBuiltin,  setOpenBuiltin]  = useState(true);
+  const [openMine,     setOpenMine]     = useState(true);
+  const [openSave,     setOpenSave]     = useState(false);
+
   return (
     <div className="ctrl-section">
-      {/* Save current */}
-      <div>
-        <SectionLabel>Save Current Config</SectionLabel>
-        <div style={{ display: "flex", gap: "6px" }}>
-          <input type="text" className="input-field" placeholder="Preset name" value={presetName}
-            onChange={(e) => setPresetName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && savePreset()}
-            style={{ flex: 1, fontSize: "12px", padding: "7px 10px" }} />
-          <button type="button" className="btn-fill btn-sm" onClick={savePreset} style={{ whiteSpace: "nowrap", flexShrink: 0 }}>Save</button>
-        </div>
-      </div>
 
-      {/* My saved presets */}
-      {config.savedPresets.length > 0 && (
-        <>
-          <div className="ctrl-divider" />
-          <SectionLabel>My Presets</SectionLabel>
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            {config.savedPresets.map((p) => (
-              <div key={p.id} style={{ display: "flex", alignItems: "center", gap: "7px", padding: "8px 10px", background: "var(--surface-2)", borderRadius: "var(--r-sm)" }}>
-                <button type="button" onClick={() => setConfig((prev) => ({ ...prev, ...p.config }))}
-                  style={{ flex: 1, background: "none", border: "none", cursor: "pointer", textAlign: "left", fontFamily: "var(--font)" }}>
-                  <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--text-1)", display: "block" }}>{p.name}</span>
-                  <span style={{ fontSize: "9px", color: "var(--text-3)" }}>{new Date(p.createdAt).toLocaleDateString()}</span>
-                </button>
-                <button type="button" onClick={() => deletePreset(p.id)}
-                  style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", fontSize: "12px" }}>✕</button>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* Built-in presets */}
-      <div className="ctrl-divider" />
-      <SectionLabel>Built-in Presets</SectionLabel>
-      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+      {/* ── Built-in Presets ── */}
+      <PresetAccordion
+        title="Quick Presets"
+        count={BUILTIN_PRESETS.length}
+        isOpen={openBuiltin}
+        onToggle={() => setOpenBuiltin((v) => !v)}
+      >
         {BUILTIN_PRESETS.map((preset) => (
-          <div key={preset.name} className="sel-row"
-            style={{ padding: "9px 10px", display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}
-            onClick={() => applyBuiltin(preset.config)}>
-            <div style={{ width: "22px", height: "22px", borderRadius: "50%", border: "1.5px solid var(--border)", flexShrink: 0, ...presetSwatchCSS(preset) }} />
+          <div key={preset.name}
+            onClick={() => applyBuiltin(preset.config)}
+            style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 6px", borderRadius: "var(--r-sm)", cursor: "pointer", transition: "background .12s" }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "var(--fill-subtle)")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+          >
+            <div style={{ width: "24px", height: "24px", borderRadius: "50%", flexShrink: 0, border: "1.5px solid var(--border)", ...presetSwatchCSS(preset) }} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--text-1)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{preset.name}</span>
-              <span style={{ fontSize: "10px", color: "var(--text-3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block" }}>{preset.description}</span>
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--text-1)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {preset.name}
+              </span>
+              <span style={{ fontSize: "10px", color: "var(--text-3)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {preset.description}
+              </span>
             </div>
+            <span style={{ fontSize: "13px", color: "var(--text-3)", flexShrink: 0 }}>›</span>
           </div>
         ))}
-      </div>
+      </PresetAccordion>
+
+      {/* ── My Saved Presets ── */}
+      <PresetAccordion
+        title="My Presets"
+        count={config.savedPresets.length}
+        isOpen={openMine}
+        onToggle={() => setOpenMine((v) => !v)}
+      >
+        {config.savedPresets.length === 0 ? (
+          <p style={{ fontSize: "11px", color: "var(--text-3)", margin: 0, textAlign: "center", padding: "8px 0" }}>
+            No saved presets yet. Save your current config below.
+          </p>
+        ) : (
+          config.savedPresets.map((p) => (
+            <div key={p.id} style={{ display: "flex", alignItems: "center", gap: "7px", padding: "7px 6px", borderRadius: "var(--r-sm)", transition: "background .12s" }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "var(--fill-subtle)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+              <button type="button" onClick={() => setConfig((prev) => ({ ...prev, ...p.config }))}
+                style={{ flex: 1, background: "none", border: "none", cursor: "pointer", textAlign: "left", fontFamily: "var(--font)", padding: 0 }}>
+                <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--text-1)", display: "block" }}>{p.name}</span>
+                <span style={{ fontSize: "9px", color: "var(--text-3)" }}>{new Date(p.createdAt).toLocaleDateString()}</span>
+              </button>
+              <button type="button" onClick={() => deletePreset(p.id)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", fontSize: "12px", flexShrink: 0, lineHeight: 1 }}>✕</button>
+            </div>
+          ))
+        )}
+      </PresetAccordion>
+
+      {/* ── Save Current Config ── */}
+      <PresetAccordion
+        title="Save Current Config"
+        isOpen={openSave}
+        onToggle={() => setOpenSave((v) => !v)}
+      >
+        <p style={{ fontSize: "11px", color: "var(--text-3)", margin: 0, lineHeight: 1.5 }}>
+          Give your current settings a name and save for quick re-use.
+        </p>
+        <div style={{ display: "flex", gap: "6px", marginTop: "2px" }}>
+          <input type="text" className="input-field" placeholder="e.g. Dark Product Shot"
+            value={presetName}
+            onChange={(e) => setPresetName(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && savePreset()}
+            style={{ flex: 1, fontSize: "12px", padding: "7px 10px" }} />
+          <button type="button" className="btn-fill btn-sm" onClick={savePreset}
+            style={{ whiteSpace: "nowrap", flexShrink: 0 }}>Save</button>
+        </div>
+      </PresetAccordion>
+
     </div>
   );
 }
