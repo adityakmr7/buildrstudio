@@ -22,8 +22,8 @@ const FAQS = [
     a: "Yes! The Pro tier includes a Brand Presets kit where you can lock in your exact hex codes, brand fonts, and custom watermark text for automatic use on any tool.",
   },
   {
-    q: "Is there a discount for annual billing?",
-    a: "Yes, choosing annual billing saves you 30% compared to monthly subscriptions.",
+    q: "Are you planning to add AI features in the future?",
+    a: "Yes! We are currently researching AI capabilities to auto-detect your app's brand colors, suggest optimized title copywriting, and automatically build visual layouts from a single raw screenshot. These features are in the research phase and will roll out as beta trials in the future.",
   },
 ];
 
@@ -518,6 +518,39 @@ export default function SaaSLandingPage() {
             </p>
             <span className="tool-arrow">Launch Generator →</span>
           </Link>
+        </div>
+
+        {/* AI research spotlight */}
+        <div className="ai-spotlight" style={{ maxWidth: "1200px", margin: "40px auto 0", padding: "0 40px" }}>
+          <div style={{
+            background: "linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%)",
+            border: "1.5px dashed var(--border-strong)",
+            borderRadius: "20px",
+            padding: "28px 36px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "24px",
+            flexWrap: "wrap",
+          }}>
+            <div style={{ flex: 1, minWidth: "280px" }}>
+              <span className="badge-pill" style={{ background: "var(--fill-subtle)", color: "var(--fill)", fontSize: "10px", fontWeight: 700, marginBottom: "10px", display: "inline-block" }}>
+                ✨ Future Research Lab
+              </span>
+              <h3 style={{ fontSize: "18px", fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.3px" }}>AI-Powered Mockup Engine</h3>
+              <p style={{ fontSize: "13px", color: "var(--text-2)", margin: 0, lineHeight: 1.5 }}>
+                We are actively exploring AI capabilities to automatically extract color palettes, write high-converting copy headlines, and lay out compliant app submissions from raw developer screenshots.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsPremiumOpen(true)}
+              className="btn-outline btn-sm"
+              style={{ display: "flex", gap: "8px", alignItems: "center", fontWeight: 700, cursor: "pointer" }}
+            >
+              <span>🔔</span> Get AI Updates
+            </button>
+          </div>
         </div>
       </section>
 
