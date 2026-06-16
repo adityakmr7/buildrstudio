@@ -15,10 +15,14 @@ export interface LivePreviewCanvasHandle {
 
 interface LivePreviewCanvasProps {
   config: OptimizationConfig;
+  onUpdateConfig?: (key: keyof OptimizationConfig, val: any) => void;
   imageSource: string | null;
   setImageSource: React.Dispatch<React.SetStateAction<string | null>>;
   onOpenPremium: () => void;
   onUpdateAnnotation: (id: string, x: number, y: number) => void;
+  isFeedPreview?: boolean;
+  isWatermarkUnlocked?: boolean;
+  onOpenUnlockWatermark?: () => void;
 }
 
 interface UmamiWindow extends Window {
@@ -168,21 +172,87 @@ function FrameBar({ frameStyle, frameDarkMode, browserUrl }: Pick<OptimizationCo
 
 // ─── CaptionOverlay ───────────────────────────────────────────────────────────
 
-function CaptionOverlay({ config }: { config: OptimizationConfig }) {
-  if (!config.captionTitle && !config.captionSubtitle) return null;
+function CaptionOverlay({
+  config,
+  onUpdateConfig,
+}: {
+  config: OptimizationConfig;
+  onUpdateConfig?: (key: keyof OptimizationConfig, val: any) => void;
+}) {
+  const displayTitle = config.captionTitle;
+  const displaySubtitle = config.captionSubtitle;
+
+  if (!displayTitle && !displaySubtitle) return null;
+
   return (
     <div style={{
       position: "absolute", left: 0, right: 0, [config.captionPosition]: 0,
       padding: "12px 18px", textAlign: config.captionAlign, zIndex: 5,
       ...(config.captionGlass ? { backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", background: "rgba(0,0,0,0.22)" } : {}),
     }}>
-      {config.captionTitle && (
-        <div style={{ fontSize: `${config.captionTitleSize}px`, fontWeight: 800, color: config.captionTitleColor, lineHeight: 1.15, letterSpacing: "-0.3px" }}>
+      {displayTitle && (
+        <div
+          contentEditable={!!onUpdateConfig}
+          suppressContentEditableWarning
+          onBlur={(e) => {
+            const text = e.currentTarget.textContent || "";
+            if (onUpdateConfig) {
+              onUpdateConfig("captionTitle", text);
+            }
+          }}
+          style={{
+            fontSize: `${config.captionTitleSize}px`,
+            fontWeight: 800,
+            color: config.captionTitleColor,
+            lineHeight: 1.15,
+            letterSpacing: "-0.3px",
+            outline: "none",
+            cursor: onUpdateConfig ? "text" : "default",
+            padding: "2px 4px",
+            borderRadius: "4px",
+            border: onUpdateConfig ? "1px dashed transparent" : "none",
+            transition: "border-color 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            if (onUpdateConfig) e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)";
+          }}
+          onMouseLeave={(e) => {
+            if (onUpdateConfig) e.currentTarget.style.borderColor = "transparent";
+          }}
+        >
           {config.captionTitle}
         </div>
       )}
-      {config.captionSubtitle && (
-        <div style={{ fontSize: `${Math.max(config.captionTitleSize - 5, 10)}px`, color: config.captionSubtitleColor, marginTop: "3px", lineHeight: 1.4, fontWeight: 500 }}>
+      {displaySubtitle && (
+        <div
+          contentEditable={!!onUpdateConfig}
+          suppressContentEditableWarning
+          onBlur={(e) => {
+            const text = e.currentTarget.textContent || "";
+            if (onUpdateConfig) {
+              onUpdateConfig("captionSubtitle", text);
+            }
+          }}
+          style={{
+            fontSize: `${Math.max(config.captionTitleSize - 5, 10)}px`,
+            color: config.captionSubtitleColor,
+            marginTop: "3px",
+            lineHeight: 1.4,
+            fontWeight: 500,
+            outline: "none",
+            cursor: onUpdateConfig ? "text" : "default",
+            padding: "2px 4px",
+            borderRadius: "4px",
+            border: onUpdateConfig ? "1px dashed transparent" : "none",
+            transition: "border-color 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            if (onUpdateConfig) e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
+          }}
+          onMouseLeave={(e) => {
+            if (onUpdateConfig) e.currentTarget.style.borderColor = "transparent";
+          }}
+        >
           {config.captionSubtitle}
         </div>
       )}
@@ -221,7 +291,17 @@ function AnnotationNode({ ann, onMouseDown }: { ann: Annotation; onMouseDown: (e
 // ─── LivePreviewCanvas ────────────────────────────────────────────────────────
 
 const LivePreviewCanvas = forwardRef<LivePreviewCanvasHandle, LivePreviewCanvasProps>(
-  function LivePreviewCanvas({ config, imageSource, setImageSource, onOpenPremium, onUpdateAnnotation }, ref) {
+  function LivePreviewCanvas({
+    config,
+    onUpdateConfig,
+    imageSource,
+    setImageSource,
+    onOpenPremium,
+    onUpdateAnnotation,
+    isFeedPreview = false,
+    isWatermarkUnlocked = false,
+    onOpenUnlockWatermark = () => {},
+  }, ref) {
     const canvasRef    = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragging,  setIsDragging]  = useState(false);
@@ -276,8 +356,31 @@ const LivePreviewCanvas = forwardRef<LivePreviewCanvasHandle, LivePreviewCanvasP
           if (items[i].type.indexOf("image") !== -1) { const f = items[i].getAsFile(); if (f) handleFile(f); }
         }
       };
+
+      const onDragOver = (e: DragEvent) => {
+        e.preventDefault();
+      };
+
+      const onDrop = (e: DragEvent) => {
+        e.preventDefault();
+        const files = e.dataTransfer?.files;
+        if (files && files.length > 0) {
+          const f = files[0];
+          if (f.type.startsWith("image/")) {
+            handleFile(f);
+          }
+        }
+      };
+
       window.addEventListener("paste", onPaste);
-      return () => window.removeEventListener("paste", onPaste);
+      window.addEventListener("dragover", onDragOver);
+      window.addEventListener("drop", onDrop);
+
+      return () => {
+        window.removeEventListener("paste", onPaste);
+        window.removeEventListener("dragover", onDragOver);
+        window.removeEventListener("drop", onDrop);
+      };
     }, [handleFile]);
 
     const bgStyle   = computeBackground(config);
@@ -311,56 +414,174 @@ const LivePreviewCanvas = forwardRef<LivePreviewCanvasHandle, LivePreviewCanvasP
       );
     }
 
-    return (
-      <>
-        {/* Canvas */}
-        <div
-          ref={canvasRef}
-          className={`canvas-capture-wrapper relative overflow-hidden ${config.aspectRatio}`}
-          style={{ ...bgStyle, width: "100%", maxWidth: canvasMaxWidth, padding: `${config.padding}px`, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}
-        >
-          {/* Noise layer */}
-          {config.noiseIntensity > 0 && (
-            <div className="canvas-noise-layer" style={{ opacity: config.noiseIntensity / 100, zIndex: 1 }}>
-              <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                <filter id="bs-noise">
-                  <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-                  <feColorMatrix type="saturate" values="0" />
-                </filter>
-                <rect width="100%" height="100%" filter="url(#bs-noise)" />
-              </svg>
-            </div>
-          )}
-
-          {/* Caption (top) */}
-          {config.captionPosition === "top" && <CaptionOverlay config={config} />}
-
-          {/* Frame + Screenshot */}
-          <div className={`${config.borderRadius} ${config.dropShadow} overflow-hidden`}
-            style={{ background: "var(--surface)", border: "1px solid var(--border)", width: "100%", display: "flex", flexDirection: "column", position: "relative", zIndex: 2 }}>
-            <FrameBar frameStyle={config.frameStyle} frameDarkMode={config.frameDarkMode} browserUrl={config.browserUrl} />
-            <div style={{ flex: 1, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--surface)" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={imageSource} alt="Screenshot" style={{ width: "100%", height: "100%", maxHeight: imgMaxHeight, objectFit: "contain", display: "block", filter: imgFilter, transform: `scale(${config.imageScale / 100})`, transformOrigin: "center center" }} />
-            </div>
+    const canvasElement = (
+      <div
+        ref={canvasRef}
+        className={`canvas-capture-wrapper relative overflow-hidden ${config.aspectRatio}`}
+        style={{ ...bgStyle, width: "100%", maxWidth: isFeedPreview ? "100%" : canvasMaxWidth, padding: `${config.padding}px`, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}
+      >
+        {/* Noise layer */}
+        {config.noiseIntensity > 0 && (
+          <div className="canvas-noise-layer" style={{ opacity: config.noiseIntensity / 100, zIndex: 1 }}>
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+              <filter id="bs-noise">
+                <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+                <feColorMatrix type="saturate" values="0" />
+              </filter>
+              <rect width="100%" height="100%" filter="url(#bs-noise)" />
+            </svg>
           </div>
+        )}
 
-          {/* Caption (bottom) */}
-          {config.captionPosition === "bottom" && <CaptionOverlay config={config} />}
+        {/* Caption (top) */}
+        {config.captionPosition === "top" && <CaptionOverlay config={config} onUpdateConfig={onUpdateConfig} />}
 
-          {/* Annotations */}
-          {config.annotations.map((ann) => (
-            <AnnotationNode key={ann.id} ann={ann} onMouseDown={handleAnnotMouseDown} />
-          ))}
+        {/* Frame + Screenshot */}
+        <div className={`${config.borderRadius} ${config.dropShadow} overflow-hidden`}
+          style={{ background: "var(--surface)", border: "1px solid var(--border)", width: "100%", display: "flex", flexDirection: "column", position: "relative", zIndex: 2 }}>
+          <FrameBar frameStyle={config.frameStyle} frameDarkMode={config.frameDarkMode} browserUrl={config.browserUrl} />
+          <div style={{ flex: 1, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--surface)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={imageSource} alt="Screenshot" style={{ width: "100%", height: "100%", maxHeight: imgMaxHeight, objectFit: "contain", display: "block", filter: imgFilter, transform: `scale(${config.imageScale / 100})`, transformOrigin: "center center" }} />
+          </div>
+        </div>
 
-          {/* Watermark */}
-          <div className="badge-dark" onClick={onOpenPremium} title="Upgrade to Pro to remove"
+        {/* Caption (bottom) */}
+        {config.captionPosition === "bottom" && <CaptionOverlay config={config} onUpdateConfig={onUpdateConfig} />}
+
+        {/* Annotations */}
+        {config.annotations.map((ann) => (
+          <AnnotationNode key={ann.id} ann={ann} onMouseDown={handleAnnotMouseDown} />
+        ))}
+
+        {/* Watermark */}
+        {!isWatermarkUnlocked && (
+          <div className="badge-dark" onClick={(e) => { e.stopPropagation(); onOpenUnlockWatermark(); }} title="Unlock to remove"
             style={{ position: "absolute", bottom: "12px", right: "14px", fontSize: "10px", fontWeight: 600, opacity: 0.9, zIndex: 30, padding: "3px 9px", userSelect: "none", cursor: "pointer", transition: "transform 0.15s" }}
             onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.06)")}
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}>
             via buildrStudio.in 👑
           </div>
-        </div>
+        )}
+      </div>
+    );
+
+    return (
+      <>
+        {isFeedPreview ? (
+          <div style={{
+            width: "100%",
+            maxWidth: "600px",
+            margin: "0 auto",
+            padding: "20px",
+            background: "var(--surface)",
+            border: "1.5px solid var(--border)",
+            borderRadius: "var(--r-xl)",
+            boxShadow: "var(--shadow-sm)",
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+            color: "var(--text-1)",
+            textAlign: "left",
+          }}>
+            {/* User Info Header */}
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+              <div style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, var(--fill), var(--fill-subtle))",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "20px",
+                fontWeight: 700,
+                color: "var(--fill-text)",
+                userSelect: "none",
+              }}>
+                🚀
+              </div>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <span
+                    contentEditable
+                    suppressContentEditableWarning
+                    style={{ fontWeight: 700, fontSize: "15px", color: "var(--text-1)", outline: "none", cursor: "text" }}
+                  >
+                    You
+                  </span>
+                  <span style={{ fontSize: "14px", color: "var(--text-3)" }}>· 2m</span>
+                </div>
+                <span
+                  contentEditable
+                  suppressContentEditableWarning
+                  style={{ fontSize: "14px", color: "var(--text-3)", outline: "none", cursor: "text" }}
+                >
+                  @yourhandle
+                </span>
+              </div>
+            </div>
+
+            {/* Tweet text */}
+            <div
+              contentEditable
+              suppressContentEditableWarning
+              style={{
+                fontSize: "15px",
+                lineHeight: "1.5",
+                color: "var(--text-1)",
+                marginBottom: "14px",
+                outline: "none",
+                cursor: "text",
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              Just designed this screenshot using @BuildrStudio. The gradients and direct caption editing are so smooth! 🚀✨ #buildinpublic
+            </div>
+
+            {/* Media box */}
+            <div style={{
+              borderRadius: "16px",
+              overflow: "hidden",
+              border: "1.5px solid var(--border)",
+              background: "var(--surface-2)",
+              position: "relative",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}>
+              {canvasElement}
+            </div>
+
+            {/* Action Footer */}
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              maxWidth: "425px",
+              marginTop: "12px",
+              paddingLeft: "4px",
+              color: "var(--text-3)",
+              fontSize: "13px",
+              userSelect: "none",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer" }}>
+                <span>💬</span> <span>12</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer" }}>
+                <span>🔁</span> <span>5</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer" }}>
+                <span>❤️</span> <span>48</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer" }}>
+                <span>🔖</span> <span>10</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer" }}>
+                <span>📤</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          canvasElement
+        )}
 
         {/* Share toast */}
         {shareToast?.show && (

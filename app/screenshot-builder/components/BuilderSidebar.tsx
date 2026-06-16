@@ -27,6 +27,9 @@ interface BuilderSidebarProps {
   setConfig: React.Dispatch<React.SetStateAction<BuilderConfig>>;
   onExport: () => void;
   onCopy: () => void;
+  isWatermarkUnlocked: boolean;
+  onOpenUnlockWatermark: () => void;
+  onOpenPremium: () => void;
 }
 
 type TabId = "device" | "text" | "style" | "presets" | "export";
@@ -576,6 +579,15 @@ function TabDevice({
             unit="x"
           />
           <RangeSlider
+            label="Horizontal Offset"
+            min={0}
+            max={100}
+            step={1}
+            value={config.imageOffsetX}
+            onChange={(v) => update("imageOffsetX", v)}
+            unit="%"
+          />
+          <RangeSlider
             label="Vertical Offset"
             min={0}
             max={100}
@@ -690,9 +702,15 @@ function TabText({
 function TabStyle({
   config,
   update,
+  isWatermarkUnlocked,
+  onOpenUnlockWatermark,
+  onOpenPremium,
 }: {
   config: BuilderConfig;
   update: <K extends keyof BuilderConfig>(k: K, v: BuilderConfig[K]) => void;
+  isWatermarkUnlocked: boolean;
+  onOpenUnlockWatermark: () => void;
+  onOpenPremium: () => void;
 }) {
   const bgTypes = ["gradient", "solid", "mesh"] as const;
 
@@ -811,6 +829,20 @@ function TabStyle({
         />
       </div>
 
+      {/* Panoramic Layout Spanning */}
+      <div>
+        <SectionLabel>Panoramic Spanning Shift</SectionLabel>
+        <SegmentedControl
+          options={[
+            { label: "None (Center)", value: "none" },
+            { label: "Left Span (Shift Right)", value: "left" },
+            { label: "Right Span (Shift Left)", value: "right" },
+          ]}
+          value={config.panoramic}
+          onChange={(v) => update("panoramic", v)}
+        />
+      </div>
+
       {/* Frame Toggles */}
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         <Toggle
@@ -823,6 +855,31 @@ function TabStyle({
           value={config.frameShadow}
           onChange={(v) => update("frameShadow", v)}
         />
+        <Toggle
+          label="Auto-sync styles across deck"
+          value={config.autoSyncTheme}
+          onChange={(v) => update("autoSyncTheme", v)}
+        />
+      </div>
+      {/* Watermark Callout */}
+      <div style={{ marginTop: "16px", borderTop: "1px solid var(--border)", paddingTop: "16px" }}>
+        {isWatermarkUnlocked ? (
+          <button type="button" onClick={onOpenPremium}
+            style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", borderRadius: "var(--r-md)", background: "var(--success-subtle, #dcfce7)", border: "1.5px solid var(--success, #22c55e)", cursor: "pointer", fontFamily: "var(--font)", transition: "all .12s" }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--text-1)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--success, #22c55e)"; }}>
+            <span style={{ fontSize: "12px", fontWeight: 600, color: "#15803d" }}>Watermark Unlocked! (24h) ✨</span>
+            <span className="badge-pill" style={{ background: "var(--success, #22c55e)", color: "white", fontSize: "10px" }}>🔓 Active</span>
+          </button>
+        ) : (
+          <button type="button" onClick={onOpenUnlockWatermark}
+            style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", borderRadius: "var(--r-md)", background: "var(--fill-subtle)", border: "1.5px solid var(--border)", cursor: "pointer", fontFamily: "var(--font)", transition: "all .12s" }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--text-1)"; e.currentTarget.style.background = "var(--fill)"; e.currentTarget.querySelector("span")!.style.color = "var(--fill-text)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "var(--fill-subtle)"; e.currentTarget.querySelector("span")!.style.color = "var(--text-2)"; }}>
+            <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-2)", transition: "color .12s" }}>Remove watermark · 4K export</span>
+            <span className="badge-pill" style={{ background: "var(--fill)", color: "var(--fill-text)", fontSize: "10px" }}>👑 Pro</span>
+          </button>
+        )}
       </div>
     </div>
   );
@@ -830,12 +887,90 @@ function TabStyle({
 
 // ── Tab: Presets ───────────────────────────────────────────────────────────────
 
+const LAYOUT_PRESETS = [
+  {
+    name: "Feature Highlight",
+    desc: "Centered device frame, top captions, standard scale",
+    config: {
+      textPosition: "top" as const,
+      headlineSize: 3.2,
+      subtextSize: 1.4,
+      frameVisible: true,
+      frameMode: "flat" as const,
+      panoramic: "none" as const,
+      imageScale: 0.9,
+      imageOffsetX: 50,
+      imageOffsetY: 50,
+    },
+  },
+  {
+    name: "3D Mockup Hero",
+    desc: "Bottom captions, large 3D tilted frame",
+    config: {
+      textPosition: "bottom" as const,
+      headlineSize: 3.0,
+      subtextSize: 1.3,
+      frameVisible: true,
+      frameMode: "tilt3d" as const,
+      panoramic: "none" as const,
+      imageScale: 0.95,
+      imageOffsetX: 50,
+      imageOffsetY: 50,
+    },
+  },
+  {
+    name: "Split-Frame Detailed View",
+    desc: "Text at top, borderless screenshot zoomed taking lower half",
+    config: {
+      textPosition: "top" as const,
+      headlineSize: 3.2,
+      subtextSize: 1.4,
+      frameVisible: false,
+      panoramic: "none" as const,
+      imageScale: 1.15,
+      imageOffsetX: 50,
+      imageOffsetY: 70,
+    },
+  },
+  {
+    name: "Panoramic Duo (Left)",
+    desc: "Device shifted to the right boundary for left-side span",
+    config: {
+      textPosition: "top" as const,
+      headlineSize: 3.2,
+      subtextSize: 1.4,
+      frameVisible: true,
+      frameMode: "flat" as const,
+      panoramic: "left" as const,
+      imageScale: 1.0,
+      imageOffsetX: 50,
+      imageOffsetY: 50,
+    },
+  },
+  {
+    name: "Panoramic Duo (Right)",
+    desc: "Device shifted to the left boundary for right-side span",
+    config: {
+      textPosition: "top" as const,
+      headlineSize: 3.2,
+      subtextSize: 1.4,
+      frameVisible: true,
+      frameMode: "flat" as const,
+      panoramic: "right" as const,
+      imageScale: 1.0,
+      imageOffsetX: 50,
+      imageOffsetY: 50,
+    },
+  },
+];
+
 function TabPresets({
   setConfig,
 }: {
   setConfig: React.Dispatch<React.SetStateAction<BuilderConfig>>;
 }) {
   const [openBuiltin, setOpenBuiltin] = useState(true);
+  const [openLayouts, setOpenLayouts] = useState(true);
 
   const applyPreset = (presetPreset: typeof QUICK_PRESETS[0]["config"]) => {
     setConfig((prev) => ({
@@ -844,8 +979,15 @@ function TabPresets({
     }));
   };
 
+  const applyLayoutPreset = (layoutPreset: typeof LAYOUT_PRESETS[0]["config"]) => {
+    setConfig((prev) => ({
+      ...prev,
+      ...layoutPreset,
+    }));
+  };
+
   return (
-    <div className="ctrl-section">
+    <div className="ctrl-section" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       <PresetAccordion
         title="Quick Style Presets"
         isOpen={openBuiltin}
@@ -939,6 +1081,75 @@ function TabPresets({
           })}
         </div>
       </PresetAccordion>
+
+      <PresetAccordion
+        title="Marketing Layout Templates"
+        isOpen={openLayouts}
+        onToggle={() => setOpenLayouts((v) => !v)}
+      >
+        <p style={{ fontSize: "11px", color: "var(--text-3)", margin: 0, lineHeight: 1.4 }}>
+          Instantly structure the screen layout: select device positions, caption alignment, tilts, or panoramic spanning mockups.
+        </p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "4px" }}>
+          {LAYOUT_PRESETS.map((preset) => (
+            <div
+              key={preset.name}
+              onClick={() => applyLayoutPreset(preset.config)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                padding: "8px 12px",
+                borderRadius: "var(--r-sm)",
+                cursor: "pointer",
+                border: "1px solid var(--border)",
+                background: "var(--surface)",
+                transition: "all 0.12s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "var(--fill-subtle)";
+                e.currentTarget.style.borderColor = "var(--text-1)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "var(--surface)";
+                e.currentTarget.style.borderColor = "var(--border)";
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <span
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    color: "var(--text-1)",
+                    display: "block",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {preset.name}
+                </span>
+                <span
+                  style={{
+                    fontSize: "10px",
+                    color: "var(--text-3)",
+                    display: "block",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {preset.desc}
+                </span>
+              </div>
+              <span style={{ fontSize: "14px", color: "var(--text-3)", flexShrink: 0 }}>
+                ›
+              </span>
+            </div>
+          ))}
+        </div>
+      </PresetAccordion>
     </div>
   );
 }
@@ -999,6 +1210,9 @@ export default function BuilderSidebar({
   setConfig,
   onExport,
   onCopy,
+  isWatermarkUnlocked,
+  onOpenUnlockWatermark,
+  onOpenPremium,
 }: BuilderSidebarProps) {
   const [activeTab, setActiveTab] = useState<TabId>("device");
 
@@ -1029,7 +1243,15 @@ export default function BuilderSidebar({
       <div className="sidebar-tab-content" role="tabpanel">
         {activeTab === "device" && <TabDevice config={config} update={update} />}
         {activeTab === "text" && <TabText config={config} update={update} />}
-        {activeTab === "style" && <TabStyle config={config} update={update} />}
+        {activeTab === "style" && (
+          <TabStyle
+            config={config}
+            update={update}
+            isWatermarkUnlocked={isWatermarkUnlocked}
+            onOpenUnlockWatermark={onOpenUnlockWatermark}
+            onOpenPremium={onOpenPremium}
+          />
+        )}
         {activeTab === "presets" && <TabPresets setConfig={setConfig} />}
         {activeTab === "export" && <TabExport onExport={onExport} onCopy={onCopy} />}
       </div>

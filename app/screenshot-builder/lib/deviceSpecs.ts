@@ -143,6 +143,7 @@ export interface BuilderConfig {
   // Image
   screenshotUrl: string | null;
   imageScale: number;       // 0.5 – 1.5
+  imageOffsetX: number;     // percentage 0–100
   imageOffsetY: number;     // percentage 0–100
 
   // Text
@@ -168,12 +169,17 @@ export interface BuilderConfig {
   frameMode: FrameMode;
   frameVisible: boolean;
   frameShadow: boolean;
+
+  // Spanning / Deck sync settings
+  panoramic: "none" | "left" | "right";
+  autoSyncTheme: boolean;
 }
 
 export const DEFAULT_CONFIG: BuilderConfig = {
   deviceId: "iphone-67",
   screenshotUrl: null,
   imageScale: 0.9,
+  imageOffsetX: 50,
   imageOffsetY: 50,
   headline: "Your App. Your Story.",
   subtext: "Download on the App Store today.",
@@ -193,4 +199,6 @@ export const DEFAULT_CONFIG: BuilderConfig = {
   frameMode: "flat",
   frameVisible: true,
   frameShadow: true,
+  panoramic: "none",
+  autoSyncTheme: true,
 };

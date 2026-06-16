@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import TabbedSidebar from "./TabbedSidebar";
 import LivePreviewCanvas, { LivePreviewCanvasHandle } from "./LivePreviewCanvas";
 import PremiumModal from "./PremiumModal";
 import AppHeader from "./AppHeader";
+import UnlockWatermarkModal from "./UnlockWatermarkModal";
 
 // ─── Annotation & Preset Types ────────────────────────────────────────────────
 
@@ -121,9 +122,19 @@ interface CanvasToolbarProps {
   imageSource: string | null;
   setImageSource: React.Dispatch<React.SetStateAction<string | null>>;
   liveRef: React.RefObject<LivePreviewCanvasHandle | null>;
+  isFeedPreview: boolean;
+  setIsFeedPreview: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function CanvasToolbar({ config, setConfig, imageSource, setImageSource, liveRef }: CanvasToolbarProps) {
+function CanvasToolbar({
+  config,
+  setConfig,
+  imageSource,
+  setImageSource,
+  liveRef,
+  isFeedPreview,
+  setIsFeedPreview,
+}: CanvasToolbarProps) {
   const [isExporting, setIsExporting] = useState(false);
   const [isCopying,   setIsCopying]   = useState(false);
   const [copyStatus,  setCopyStatus]  = useState<"idle" | "ok" | "err">("idle");
@@ -235,6 +246,20 @@ function CanvasToolbar({ config, setConfig, imageSource, setImageSource, liveRef
 
       <div className="canvas-toolbar-spacer" />
 
+      {/* Feed Simulator Toggle */}
+      <button type="button" style={{
+        ...btnBase,
+        background: isFeedPreview ? "var(--fill-subtle)" : "transparent",
+        borderColor: isFeedPreview ? "var(--text-1)" : "var(--border)",
+        color: isFeedPreview ? "var(--text-1)" : "var(--text-2)",
+      }} disabled={disabled} onClick={() => setIsFeedPreview(!isFeedPreview)}
+        onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.borderColor = "var(--text-1)"; }}
+        onMouseLeave={(e) => { if (!isFeedPreview) e.currentTarget.style.borderColor = "var(--border)"; }}>
+        <span>👁️</span> {isFeedPreview ? "Show Image Only" : "Simulate Feed"}
+      </button>
+
+      <div className="canvas-toolbar-divider" />
+
       {/* Share buttons */}
       <button type="button" style={btnBase} disabled={disabled} onClick={shareToTwitter}
         onMouseEnter={(e) => { if (!disabled) { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.background = "var(--fill-subtle)"; }}}
@@ -290,7 +315,36 @@ export default function WorkspaceHub() {
   const [config,      setConfig]      = useState<OptimizationConfig>(DEFAULT_CONFIG);
   const [imageSource, setImageSource] = useState<string | null>(null);
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
+  const [isFeedPreview, setIsFeedPreview] = useState(false);
+  const [isWatermarkUnlocked, setIsWatermarkUnlocked] = useState(false);
+  const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
   const liveRef = useRef<LivePreviewCanvasHandle>(null);
+
+  useEffect(() => {
+    const checkUnlock = () => {
+      const untilStr = localStorage.getItem("watermark_unlocked_until");
+      if (untilStr) {
+        const until = parseInt(untilStr, 10);
+        if (until > Date.now()) {
+          setIsWatermarkUnlocked(true);
+        } else {
+          localStorage.removeItem("watermark_unlocked_until");
+          setIsWatermarkUnlocked(false);
+        }
+      } else {
+        setIsWatermarkUnlocked(false);
+      }
+    };
+    checkUnlock();
+    window.addEventListener("focus", checkUnlock);
+    return () => window.removeEventListener("focus", checkUnlock);
+  }, []);
+
+  const handleUnlockWatermark = () => {
+    const unlockedUntil = Date.now() + 24 * 60 * 60 * 1000;
+    localStorage.setItem("watermark_unlocked_until", unlockedUntil.toString());
+    setIsWatermarkUnlocked(true);
+  };
 
   const handleUpdateAnnotation = useCallback((id: string, x: number, y: number) => {
     setConfig((prev) => ({
@@ -298,6 +352,71 @@ export default function WorkspaceHub() {
       annotations: prev.annotations.map((a) => (a.id === id ? { ...a, x, y } : a)),
     }));
   }, []);
+
+  // Extract colors and automatically set solid color
+  useEffect(() => {
+    if (!imageSource) return;
+
+    const extractColors = async () => {
+      try {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return;
+          canvas.width = 30;
+          canvas.height = 30;
+          ctx.drawImage(img, 0, 0, 30, 30);
+
+          const data = ctx.getImageData(0, 0, 30, 30).data;
+          const colorCount: Record<string, number> = {};
+
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i+1];
+            const b = data[i+2];
+            const a = data[i+3];
+            if (a < 200) continue;
+
+            const qr = Math.round(r / 20) * 20;
+            const qg = Math.round(g / 20) * 20;
+            const qb = Math.round(b / 20) * 20;
+            const hex = "#" + ((1 << 24) + (qr << 16) + (qg << 8) + qb).toString(16).slice(1);
+            colorCount[hex] = (colorCount[hex] || 0) + 1;
+          }
+
+          const sorted = Object.entries(colorCount)
+            .sort((a, b) => b[1] - a[1])
+            .map(x => x[0]);
+
+          if (sorted.length > 0) {
+            const dominantColor = sorted.find(c => {
+              const r = parseInt(c.slice(1, 3), 16);
+              const g = parseInt(c.slice(3, 5), 16);
+              const b = parseInt(c.slice(5, 7), 16);
+              const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+              return brightness > 30 && brightness < 225;
+            }) || sorted[0];
+
+            if (dominantColor) {
+              setConfig((prev) => {
+                if (prev.backgroundType === "solid" && (prev.solidColor === "#6366f1" || prev.solidColor === "#0f172a")) {
+                  return { ...prev, solidColor: dominantColor };
+                }
+                return prev;
+              });
+            }
+          }
+        };
+        img.src = imageSource;
+      } catch (err) {
+        console.warn("Color extraction failed:", err);
+      }
+    };
+
+    extractColors();
+  }, [imageSource]);
 
   return (
     <div className="workspace-root">
@@ -312,6 +431,8 @@ export default function WorkspaceHub() {
           config={config}
           setConfig={setConfig}
           onOpenPremium={() => setIsPremiumOpen(true)}
+          isWatermarkUnlocked={isWatermarkUnlocked}
+          onOpenUnlockWatermark={() => setIsUnlockModalOpen(true)}
         />
 
         {/* Right: Canvas Column */}
@@ -323,6 +444,8 @@ export default function WorkspaceHub() {
             imageSource={imageSource}
             setImageSource={setImageSource}
             liveRef={liveRef}
+            isFeedPreview={isFeedPreview}
+            setIsFeedPreview={setIsFeedPreview}
           />
 
           {/* Canvas scrollable area */}
@@ -330,16 +453,30 @@ export default function WorkspaceHub() {
             <LivePreviewCanvas
               ref={liveRef}
               config={config}
+              onUpdateConfig={(key, val) => setConfig((prev) => ({ ...prev, [key]: val }))}
               imageSource={imageSource}
               setImageSource={setImageSource}
               onOpenPremium={() => setIsPremiumOpen(true)}
               onUpdateAnnotation={handleUpdateAnnotation}
+              isFeedPreview={isFeedPreview}
+              isWatermarkUnlocked={isWatermarkUnlocked}
+              onOpenUnlockWatermark={() => setIsUnlockModalOpen(true)}
             />
           </div>
         </div>
       </div>
 
       <PremiumModal isOpen={isPremiumOpen} onClose={() => setIsPremiumOpen(false)} />
+
+      <UnlockWatermarkModal
+        isOpen={isUnlockModalOpen}
+        onClose={() => setIsUnlockModalOpen(false)}
+        onUnlock={handleUnlockWatermark}
+        onOpenPremium={() => {
+          setIsUnlockModalOpen(false);
+          setIsPremiumOpen(true);
+        }}
+      />
 
       <style>{`
         @keyframes spin {

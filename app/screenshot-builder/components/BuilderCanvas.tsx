@@ -9,6 +9,8 @@ import React, {
   useImperativeHandle,
   useRef,
   useCallback,
+  useState,
+  useEffect,
 } from "react";
 import { domToPng } from "modern-screenshot";
 import type {
@@ -33,6 +35,9 @@ export interface BuilderCanvasHandle {
 
 interface BuilderCanvasProps {
   config: BuilderConfig;
+  onUpdateConfig?: (key: keyof BuilderConfig, val: any) => void;
+  isWatermarkUnlocked?: boolean;
+  onOpenUnlockWatermark?: () => void;
 }
 
 // ── Background helpers ────────────────────────────────────────────────────────
@@ -69,7 +74,20 @@ function computeBg(config: BuilderConfig): React.CSSProperties {
 
 // ── Caption block ─────────────────────────────────────────────────────────────
 
-function CaptionBlock({ config, maxWidth }: { config: BuilderConfig; maxWidth: number }) {
+function CaptionBlock({
+  config,
+  maxWidth,
+  onUpdateConfig,
+}: {
+  config: BuilderConfig;
+  maxWidth: number;
+  onUpdateConfig?: (key: keyof BuilderConfig, val: any) => void;
+}) {
+  const displayHeadline = config.headline;
+  const displaySubtext = config.subtext;
+
+  if (!displayHeadline && !displaySubtext) return null;
+
   return (
     <div style={{
       width: "100%",
@@ -80,30 +98,74 @@ function CaptionBlock({ config, maxWidth }: { config: BuilderConfig; maxWidth: n
       padding: "0.8em 1.2em",
       textAlign: "center",
     }}>
-      {config.headline && (
-        <p style={{
-          margin: 0,
-          fontSize: `${config.headlineSize}em`,
-          fontWeight: 800,
-          color: config.headlineColor,
-          lineHeight: 1.1,
-          letterSpacing: "-0.03em",
-          fontFamily: "var(--font)",
-          maxWidth,
-        }}>
+      {displayHeadline && (
+        <p
+          contentEditable={!!onUpdateConfig}
+          suppressContentEditableWarning
+          onBlur={(e) => {
+            const text = e.currentTarget.textContent || "";
+            if (onUpdateConfig) {
+              onUpdateConfig("headline", text);
+            }
+          }}
+          style={{
+            margin: 0,
+            fontSize: `${config.headlineSize}em`,
+            fontWeight: 800,
+            color: config.headlineColor,
+            lineHeight: 1.1,
+            letterSpacing: "-0.03em",
+            fontFamily: "var(--font)",
+            maxWidth,
+            outline: "none",
+            cursor: onUpdateConfig ? "text" : "default",
+            padding: "2px 6px",
+            borderRadius: "6px",
+            border: onUpdateConfig ? "2px dashed transparent" : "none",
+            transition: "border-color 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            if (onUpdateConfig) e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)";
+          }}
+          onMouseLeave={(e) => {
+            if (onUpdateConfig) e.currentTarget.style.borderColor = "transparent";
+          }}
+        >
           {config.headline}
         </p>
       )}
-      {config.subtext && (
-        <p style={{
-          margin: 0,
-          fontSize: `${config.subtextSize}em`,
-          fontWeight: 500,
-          color: config.subtextColor,
-          lineHeight: 1.4,
-          fontFamily: "var(--font)",
-          maxWidth,
-        }}>
+      {displaySubtext && (
+        <p
+          contentEditable={!!onUpdateConfig}
+          suppressContentEditableWarning
+          onBlur={(e) => {
+            const text = e.currentTarget.textContent || "";
+            if (onUpdateConfig) {
+              onUpdateConfig("subtext", text);
+            }
+          }}
+          style={{
+            margin: 0,
+            fontSize: `${config.subtextSize}em`,
+            fontWeight: 500,
+            color: config.subtextColor,
+            lineHeight: 1.4,
+            fontFamily: "var(--font)",
+            maxWidth,
+            outline: "none",
+            cursor: onUpdateConfig ? "text" : "default",
+            padding: "2px 6px",
+            borderRadius: "6px",
+            border: onUpdateConfig ? "2px dashed transparent" : "none",
+            transition: "border-color 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            if (onUpdateConfig) e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
+          }}
+          onMouseLeave={(e) => {
+            if (onUpdateConfig) e.currentTarget.style.borderColor = "transparent";
+          }}
+        >
           {config.subtext}
         </p>
       )}
@@ -119,9 +181,20 @@ interface InnerCanvasProps {
   /** Scale factor: preview is scaled down from actual canvas size */
   scale: number;
   innerRef: React.RefObject<HTMLDivElement | null>;
+  onUpdateConfig?: (key: keyof BuilderConfig, val: any) => void;
+  isWatermarkUnlocked: boolean;
+  onOpenUnlockWatermark: () => void;
 }
 
-function InnerCanvas({ config, spec, scale, innerRef }: InnerCanvasProps) {
+function InnerCanvas({
+  config,
+  spec,
+  scale,
+  innerRef,
+  onUpdateConfig,
+  isWatermarkUnlocked,
+  onOpenUnlockWatermark,
+}: InnerCanvasProps) {
   const bgStyle = computeBg(config);
   const hasTop = config.textPosition === "top";
 
@@ -154,6 +227,13 @@ function InnerCanvas({ config, spec, scale, innerRef }: InnerCanvasProps) {
   const scaledFrameW = frameW * frameScale;
   const scaledFrameH = frameH * frameScale;
 
+  let panoramicTransform = "";
+  if (config.panoramic === "left") {
+    panoramicTransform = "translateX(35%)";
+  } else if (config.panoramic === "right") {
+    panoramicTransform = "translateX(-35%)";
+  }
+
   return (
     <div
       ref={innerRef}
@@ -176,7 +256,7 @@ function InnerCanvas({ config, spec, scale, innerRef }: InnerCanvasProps) {
       {/* Caption top */}
       {hasTop && (
         <div style={{ width: "100%", paddingBottom: "2em", zIndex: 1 }}>
-          <CaptionBlock config={config} maxWidth={spec.canvasW * 0.85} />
+          <CaptionBlock config={config} maxWidth={spec.canvasW * 0.85} onUpdateConfig={onUpdateConfig} />
         </div>
       )}
 
@@ -191,6 +271,7 @@ function InnerCanvas({ config, spec, scale, innerRef }: InnerCanvasProps) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          transform: panoramicTransform || undefined,
         }}>
           <div style={{
             position: "absolute",
@@ -206,6 +287,7 @@ function InnerCanvas({ config, spec, scale, innerRef }: InnerCanvasProps) {
               shadow={config.frameShadow}
               tilt3d={config.frameMode === "tilt3d"}
               imageScale={config.imageScale}
+              imageOffsetX={config.imageOffsetX}
               imageOffsetY={config.imageOffsetY}
             >
               {config.screenshotUrl ? (
@@ -228,14 +310,20 @@ function InnerCanvas({ config, spec, scale, innerRef }: InnerCanvasProps) {
             borderRadius: 40,
             overflow: "hidden",
             zIndex: 1,
-            transform: `scale(${config.imageScale})`,
+            transform: `scale(${config.imageScale})` + (config.panoramic === "left" ? " translateX(35%)" : config.panoramic === "right" ? " translateX(-35%)" : ""),
             boxShadow: config.frameShadow ? "0 40px 120px rgba(0,0,0,0.5)" : undefined,
           }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={config.screenshotUrl}
               alt="App screenshot"
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: "block",
+                objectPosition: `${config.imageOffsetX}% ${config.imageOffsetY}%`
+              }}
             />
           </div>
         )
@@ -244,7 +332,48 @@ function InnerCanvas({ config, spec, scale, innerRef }: InnerCanvasProps) {
       {/* Caption bottom */}
       {!hasTop && (
         <div style={{ width: "100%", paddingTop: "2em", zIndex: 1 }}>
-          <CaptionBlock config={config} maxWidth={spec.canvasW * 0.85} />
+          <CaptionBlock config={config} maxWidth={spec.canvasW * 0.85} onUpdateConfig={onUpdateConfig} />
+        </div>
+      )}
+
+      {/* Watermark */}
+      {!isWatermarkUnlocked && (
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenUnlockWatermark();
+          }}
+          title="Click to remove watermark"
+          style={{
+            position: "absolute",
+            bottom: "16px",
+            right: "18px",
+            fontSize: "12px",
+            fontWeight: 700,
+            color: "rgba(255, 255, 255, 0.45)",
+            background: "rgba(0, 0, 0, 0.35)",
+            padding: "4px 10px",
+            borderRadius: "6px",
+            backdropFilter: "blur(4px)",
+            userSelect: "none",
+            cursor: "pointer",
+            zIndex: 100,
+            fontFamily: "var(--font)",
+            transition: "all 0.15s ease",
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "#fff";
+            e.currentTarget.style.background = "rgba(0,0,0,0.6)";
+            e.currentTarget.style.transform = "scale(1.05)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "rgba(255, 255, 255, 0.45)";
+            e.currentTarget.style.background = "rgba(0, 0, 0, 0.35)";
+            e.currentTarget.style.transform = "scale(1)";
+          }}
+        >
+          via buildrStudio.in 👑
         </div>
       )}
     </div>
@@ -254,14 +383,43 @@ function InnerCanvas({ config, spec, scale, innerRef }: InnerCanvasProps) {
 // ── Exported component ────────────────────────────────────────────────────────
 
 const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
-  function BuilderCanvas({ config }, ref) {
+  function BuilderCanvas({
+    config,
+    onUpdateConfig,
+    isWatermarkUnlocked = false,
+    onOpenUnlockWatermark = () => {},
+  }, ref) {
     const spec = getDevice(config.deviceId);
     const captureRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [containerWidth, setContainerWidth] = useState(600);
+
+    useEffect(() => {
+      const el = containerRef.current;
+      if (!el) return;
+
+      setContainerWidth(el.getBoundingClientRect().width || 600);
+
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          setContainerWidth(entry.contentRect.width || 600);
+        }
+      });
+      resizeObserver.observe(el);
+      return () => resizeObserver.disconnect();
+    }, []);
 
     // Scale the large canvas to fit the preview column.
     // We target a display height of ~580px for portrait, ~340px for landscape.
     const targetH = spec.isLandscape ? 340 : 560;
-    const scale = targetH / spec.canvasH;
+    let scale = targetH / spec.canvasH;
+
+    // Prevent horizontal overflow on smaller viewports
+    const padding = 64; // 32px padding on each side
+    const maxW = Math.max(200, containerWidth - padding);
+    if (spec.canvasW * scale > maxW) {
+      scale = maxW / spec.canvasW;
+    }
 
     // The scaled-down display dimensions
     const displayW = spec.canvasW * scale;
@@ -302,7 +460,7 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
     }), [getCapture, spec.id]);
 
     return (
-      <div style={{
+      <div ref={containerRef} style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -327,6 +485,9 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
             spec={spec}
             scale={scale}
             innerRef={captureRef}
+            onUpdateConfig={onUpdateConfig}
+            isWatermarkUnlocked={isWatermarkUnlocked}
+            onOpenUnlockWatermark={onOpenUnlockWatermark}
           />
         </div>
 

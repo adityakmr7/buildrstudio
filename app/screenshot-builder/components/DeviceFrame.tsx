@@ -17,6 +17,8 @@ interface DeviceFrameProps {
   tilt3d?: boolean;
   /** Scale of the screenshot inside the frame: 0.5–1.5 */
   imageScale?: number;
+  /** Horizontal offset of the screenshot inside the frame (0–100) */
+  imageOffsetX?: number;
   /** Vertical offset of the screenshot inside the frame (0–100) */
   imageOffsetY?: number;
 }
@@ -199,7 +201,7 @@ function Tilt3DWrapper({ children, enable }: { children: React.ReactNode; enable
 
 // ── Main Export ────────────────────────────────────────────────────────────────
 
-export default function DeviceFrame({ spec, children, shadow, tilt3d, imageScale = 1, imageOffsetY = 50 }: DeviceFrameProps) {
+export default function DeviceFrame({ spec, children, shadow, tilt3d, imageScale = 1, imageOffsetX = 50, imageOffsetY = 50 }: DeviceFrameProps) {
   const screenshotContent = (
     <div style={{
       width: "100%",
@@ -220,7 +222,7 @@ export default function DeviceFrame({ spec, children, shadow, tilt3d, imageScale
           <div style={{
             width: `${imageScale * 100}%`,
             height: `${imageScale * 100}%`,
-            transform: `translateY(${imageOffsetY - 50}%)`,
+            transform: `translate(${imageOffsetX - 50}%, ${imageOffsetY - 50}%)`,
             flexShrink: 0,
           }}>
             {children}

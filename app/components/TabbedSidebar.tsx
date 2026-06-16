@@ -15,6 +15,8 @@ interface TabbedSidebarProps {
   config: OptimizationConfig;
   setConfig: React.Dispatch<React.SetStateAction<OptimizationConfig>>;
   onOpenPremium: () => void;
+  isWatermarkUnlocked: boolean;
+  onOpenUnlockWatermark: () => void;
 }
 
 type TabId = "bg" | "frame" | "layout" | "caption" | "image" | "annotations" | "presets";
@@ -741,7 +743,13 @@ function TabPresets({ config, setConfig }: { config: OptimizationConfig; setConf
 
 // ─── TabbedSidebar ────────────────────────────────────────────────────────────
 
-export default function TabbedSidebar({ config, setConfig, onOpenPremium }: TabbedSidebarProps) {
+export default function TabbedSidebar({
+  config,
+  setConfig,
+  onOpenPremium,
+  isWatermarkUnlocked,
+  onOpenUnlockWatermark,
+}: TabbedSidebarProps) {
   const [activeTab, setActiveTab] = useState<TabId>("bg");
 
   const update = <K extends keyof OptimizationConfig>(key: K, value: OptimizationConfig[K]) =>
@@ -784,15 +792,25 @@ export default function TabbedSidebar({ config, setConfig, onOpenPremium }: Tabb
         {activeTab === "presets"     && <TabPresets       config={config} setConfig={setConfig} />}
       </div>
 
-      {/* Pro callout (always visible at bottom) */}
+      {/* Pro / Watermark callout (always visible at bottom) */}
       <div style={{ padding: "10px 14px", borderTop: "1px solid var(--border)", flexShrink: 0 }}>
-        <button type="button" onClick={onOpenPremium}
-          style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", borderRadius: "var(--r-md)", background: "var(--fill-subtle)", border: "1.5px solid var(--border)", cursor: "pointer", fontFamily: "var(--font)", transition: "all .12s" }}
-          onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--text-1)"; e.currentTarget.style.background = "var(--fill)"; e.currentTarget.querySelector("span")!.style.color = "var(--fill-text)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "var(--fill-subtle)"; e.currentTarget.querySelector("span")!.style.color = "var(--text-2)"; }}>
-          <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-2)", transition: "color .12s" }}>Remove watermark · 4K export</span>
-          <span className="badge-pill" style={{ background: "var(--fill)", color: "var(--fill-text)", fontSize: "10px" }}>👑 Pro</span>
-        </button>
+        {isWatermarkUnlocked ? (
+          <button type="button" onClick={onOpenPremium}
+            style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", borderRadius: "var(--r-md)", background: "var(--success-subtle, #dcfce7)", border: "1.5px solid var(--success, #22c55e)", cursor: "pointer", fontFamily: "var(--font)", transition: "all .12s" }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--text-1)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--success, #22c55e)"; }}>
+            <span style={{ fontSize: "12px", fontWeight: 600, color: "#15803d" }}>Watermark Unlocked! (24h) ✨</span>
+            <span className="badge-pill" style={{ background: "var(--success, #22c55e)", color: "white", fontSize: "10px" }}>🔓 Active</span>
+          </button>
+        ) : (
+          <button type="button" onClick={onOpenUnlockWatermark}
+            style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", borderRadius: "var(--r-md)", background: "var(--fill-subtle)", border: "1.5px solid var(--border)", cursor: "pointer", fontFamily: "var(--font)", transition: "all .12s" }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--text-1)"; e.currentTarget.style.background = "var(--fill)"; e.currentTarget.querySelector("span")!.style.color = "var(--fill-text)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "var(--fill-subtle)"; e.currentTarget.querySelector("span")!.style.color = "var(--text-2)"; }}>
+            <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-2)", transition: "color .12s" }}>Remove watermark · 4K export</span>
+            <span className="badge-pill" style={{ background: "var(--fill)", color: "var(--fill-text)", fontSize: "10px" }}>👑 Pro</span>
+          </button>
+        )}
       </div>
     </aside>
   );
