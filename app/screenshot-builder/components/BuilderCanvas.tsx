@@ -125,6 +125,35 @@ function InnerCanvas({ config, spec, scale, innerRef }: InnerCanvasProps) {
   const bgStyle = computeBg(config);
   const hasTop = config.textPosition === "top";
 
+  // Determine normalized frame dimensions
+  let frameW = 300;
+  let frameH = 620;
+  if (spec.frameType === "iphone-dynamic" || spec.frameType === "iphone-notch") {
+    frameW = 300;
+    frameH = 620;
+  } else if (spec.frameType === "ipad") {
+    frameW = 300;
+    frameH = 420;
+  } else if (spec.frameType === "android") {
+    frameW = 290;
+    frameH = 600;
+  } else if (spec.frameType === "android-tab") {
+    if (spec.isLandscape) {
+      frameW = 500;
+      frameH = 320;
+    } else {
+      frameW = 320;
+      frameH = 440;
+    }
+  }
+
+  // Scale the frame to occupy a reasonable percentage of the canvas height (e.g. 65%)
+  const targetFrameH = spec.canvasH * 0.65;
+  const frameScale = targetFrameH / frameH;
+
+  const scaledFrameW = frameW * frameScale;
+  const scaledFrameH = frameH * frameScale;
+
   return (
     <div
       ref={innerRef}
@@ -133,7 +162,7 @@ function InnerCanvas({ config, spec, scale, innerRef }: InnerCanvasProps) {
         width: spec.canvasW,
         height: spec.canvasH,
         transform: `scale(${scale})`,
-        transformOrigin: "top center",
+        transformOrigin: "top left",
         flexShrink: 0,
         display: "flex",
         flexDirection: "column",
@@ -153,23 +182,42 @@ function InnerCanvas({ config, spec, scale, innerRef }: InnerCanvasProps) {
 
       {/* Device frame */}
       {config.frameVisible ? (
-        <div style={{ zIndex: 1, flexShrink: 0 }}>
-          <DeviceFrame
-            spec={spec}
-            shadow={config.frameShadow}
-            tilt3d={config.frameMode === "tilt3d"}
-            imageScale={config.imageScale}
-            imageOffsetY={config.imageOffsetY}
-          >
-            {config.screenshotUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={config.screenshotUrl}
-                alt="App screenshot"
-                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-              />
-            ) : null}
-          </DeviceFrame>
+        <div style={{
+          width: scaledFrameW,
+          height: scaledFrameH,
+          position: "relative",
+          zIndex: 1,
+          flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+          <div style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: frameW,
+            height: frameH,
+            transform: `scale(${frameScale})`,
+            transformOrigin: "top left",
+          }}>
+            <DeviceFrame
+              spec={spec}
+              shadow={config.frameShadow}
+              tilt3d={config.frameMode === "tilt3d"}
+              imageScale={config.imageScale}
+              imageOffsetY={config.imageOffsetY}
+            >
+              {config.screenshotUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={config.screenshotUrl}
+                  alt="App screenshot"
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                />
+              ) : null}
+            </DeviceFrame>
+          </div>
         </div>
       ) : (
         /* No frame — just the screenshot */
