@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
-import ThemeToggle from "../components/ThemeToggle";
+import AppHeader from "../components/AppHeader";
 import { getHashnodePostsPage } from "../lib/hashnode";
 
 export const metadata: Metadata = {
@@ -120,63 +120,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   return (
     <>
       <style>{`
-        .site-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 20px 40px;
-          border-bottom: 1px solid var(--border);
-          background: var(--surface);
-          position: sticky;
-          top: 0;
-          z-index: 100;
-          transition: background .3s, border .3s;
-        }
-        .site-logo {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-        .site-logo-mark {
-          width: 36px;
-          height: 36px;
-          border-radius: 10px;
-          background: var(--fill);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 16px;
-          color: var(--fill-text);
-          font-weight: 800;
-        }
-        .site-logo-text {
-          font-size: 18px;
-          font-weight: 800;
-          color: var(--text-1);
-          letter-spacing: -0.5px;
-        }
-        .nav-links {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .nav-link {
-          font-size: 14px;
-          font-weight: 500;
-          color: var(--text-2);
-          padding: 8px 14px;
-          border-radius: var(--r-sm);
-          transition: all .15s;
-        }
-        .nav-link:hover {
-          background: var(--fill-subtle);
-          color: var(--text-1);
-        }
-        .nav-link.active {
-          background: var(--fill-subtle);
-          color: var(--text-1);
-          font-weight: 700;
-        }
+
         .page-shell {
           max-width: 1100px;
           margin: 0 auto;
@@ -353,9 +297,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           }
         }
         @media (max-width: 768px) {
-          .site-header {
-            padding: 16px 20px;
-          }
+
           .page-shell {
             padding: 28px 20px 48px;
           }
@@ -383,36 +325,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <header className="site-header">
-        <Link href="/" className="site-logo">
-          <div className="site-logo-mark">B</div>
-          <span className="site-logo-text">BuildrStudio</span>
-        </Link>
-        <div className="nav-links">
-          <Link href="/social-optimizer" className="nav-link">
-            Social Optimizer
-          </Link>
-          <Link href="/screenshot-builder" className="nav-link">
-            Screenshot Builder
-          </Link>
-          <Link href="/#anchor" className="nav-link">
-            Anchor
-          </Link>
-          <Link href="/#flowzy" className="nav-link">
-            Flowzy
-          </Link>
-          <Link href="/blog" className="nav-link active">
-            Blog
-          </Link>
-          <Link href="/roadmap" className="nav-link">
-            Roadmap
-          </Link>
-          <Link href="/change-log" className="nav-link">
-            Changelog
-          </Link>
-          <ThemeToggle />
-        </div>
-      </header>
+      <AppHeader activeRoute="blog" />
 
       <main className="page-shell">
         <section className="hero-card">

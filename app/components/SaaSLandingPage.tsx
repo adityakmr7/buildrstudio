@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
 import PremiumModal from "./PremiumModal";
+import AppHeader from "./AppHeader";
 
 const FAQS = [
   {
@@ -453,18 +454,7 @@ export default function SaaSLandingPage() {
       `}</style>
 
       {/* ── HEADER ── */}
-      <header className="site-header">
-        <Link href="/" className="site-logo">
-          <div className="site-logo-mark">B</div>
-          <span className="site-logo-text">BuildrStudio</span>
-        </Link>
-        <div className="header-actions">
-          <Link href="/social-optimizer" className="header-link">
-            Open Editor
-          </Link>
-          <ThemeToggle />
-        </div>
-      </header>
+      <AppHeader activeRoute="home" onOpenPremium={() => setIsPremiumOpen(true)} />
 
       {/* ── HERO ── */}
       <section className="hero">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
 import ThemeToggle from "../components/ThemeToggle";
+import AppHeader from "../components/AppHeader";
 
 export const metadata: Metadata = {
   title: "App Showcase — Anchor & Flowzy",
@@ -376,23 +377,7 @@ export default function Showcase() {
         }
       `}</style>
 
-      {/* ─── HEADER ─── */}
-      <header className="site-header">
-        <Link href="/" className="site-logo">
-          <div className="site-logo-mark">B</div>
-          <span className="site-logo-text">BuildrStudio</span>
-        </Link>
-        <div className="nav-links">
-          <Link href="/social-optimizer" className="nav-link">Social Optimizer</Link>
-          <Link href="/screenshot-builder" className="nav-link">Screenshot Builder</Link>
-          <a href="#anchor" className="nav-link">Anchor</a>
-          <a href="#flowzy" className="nav-link">Flowzy</a>
-          <Link href="/blog" className="nav-link">Blog</Link>
-          <Link href="/roadmap" className="nav-link">Roadmap</Link>
-          <Link href="/change-log" className="nav-link">Changelog</Link>
-          <ThemeToggle />
-        </div>
-      </header>
+      <AppHeader activeRoute="showcase" />
 
       {/* ─── VERTICAL SPACER ─── */}
       <div className="spacing-xl" />

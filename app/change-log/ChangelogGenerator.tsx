@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import Link from "next/link";
-import ThemeToggle from "../components/ThemeToggle";
+import AppHeader from "../components/AppHeader";
 import { ChangelogCard, CARD_W, CARD_H, type CardData, type Template } from "../components/ChangeLogCard";
 
 const TEMPLATES: { id: Template; label: string }[] = [
@@ -90,68 +90,7 @@ export default function ChangelogGenerator() {
   return (
     <div className="ink-app">
       <style>{`
-        .site-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 20px 40px;
-          border-bottom: 1px solid var(--border);
-          background: var(--surface);
-          position: sticky;
-          top: 0;
-          z-index: 100;
-          transition: background .3s, border .3s;
-        }
-        .site-header-inner {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          width: 100%;
-          max-width: 1280px;
-          margin: 0 auto;
-        }
-        .site-logo {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-        .site-logo-mark {
-          width: 36px;
-          height: 36px;
-          border-radius: 10px;
-          background: var(--fill);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 16px;
-          color: var(--fill-text);
-          font-weight: 800;
-        }
-        .site-logo-text {
-          font-size: 18px;
-          font-weight: 800;
-          color: var(--text-1);
-          letter-spacing: -0.5px;
-        }
-        .nav-links {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .nav-link {
-          font-size: 14px;
-          font-weight: 500;
-          color: var(--text-2);
-          padding: 8px 14px;
-          border-radius: var(--r-sm);
-          transition: all .15s;
-          cursor: pointer;
-        }
-        .nav-link:hover,
-        .nav-link.active {
-          background: var(--fill-subtle);
-          color: var(--text-1);
-        }
+
         .swatch {
           width: 32px;
           height: 32px;
@@ -208,20 +147,7 @@ export default function ChangelogGenerator() {
         @media (max-width: 900px) {
           .generator-grid { grid-template-columns: 1fr !important; }
         }
-        @media (max-width: 768px) {
-          .site-header {
-            padding: 16px 20px;
-          }
-          .site-header-inner {
-            align-items: flex-start;
-            gap: 14px;
-            flex-direction: column;
-          }
-          .nav-links {
-            width: 100%;
-            flex-wrap: wrap;
-          }
-        }
+
         @media (max-width: 640px) {
           .generator-header {
             flex-direction: column;
@@ -238,23 +164,7 @@ export default function ChangelogGenerator() {
         }
       `}</style>
 
-      <header className="site-header">
-        <div className="site-header-inner">
-          <Link href="/" className="site-logo">
-            <div className="site-logo-mark">B</div>
-            <span className="site-logo-text">BuildrStudio</span>
-          </Link>
-          <div className="nav-links">
-            <Link href="/social-optimizer" className="nav-link">Social Optimizer</Link>
-            <Link href="/screenshot-builder" className="nav-link">Screenshot Builder</Link>
-            <Link href="/showcase" className="nav-link">Showcase</Link>
-            <Link href="/blog" className="nav-link">Blog</Link>
-            <Link href="/roadmap" className="nav-link">Roadmap</Link>
-            <Link href="/change-log" className="nav-link active">Changelog</Link>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      <AppHeader activeRoute="change-log" />
 
       <main className="page" style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 28px 64px" }}>
         {/* Header */}
