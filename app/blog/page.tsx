@@ -392,6 +392,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           <Link href="/" className="nav-link">
             Home
           </Link>
+          <Link href="/screenshot-builder" className="nav-link">
+            Screenshot Builder
+          </Link>
           <Link href="/#anchor" className="nav-link">
             Anchor
           </Link>

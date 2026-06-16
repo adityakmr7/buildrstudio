@@ -246,6 +246,7 @@ export default function ChangelogGenerator() {
           </Link>
           <div className="nav-links">
             <Link href="/" className="nav-link">Optimizer</Link>
+            <Link href="/screenshot-builder" className="nav-link">Screenshot Builder</Link>
             <Link href="/showcase" className="nav-link">Showcase</Link>
             <Link href="/blog" className="nav-link">Blog</Link>
             <Link href="/roadmap" className="nav-link">Roadmap</Link>

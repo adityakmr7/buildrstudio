@@ -384,6 +384,7 @@ export default function Showcase() {
         </Link>
         <div className="nav-links">
           <Link href="/" className="nav-link">Screenshot Optimizer</Link>
+          <Link href="/screenshot-builder" className="nav-link">Screenshot Builder</Link>
           <a href="#anchor" className="nav-link">Anchor</a>
           <a href="#flowzy" className="nav-link">Flowzy</a>
           <Link href="/blog" className="nav-link">Blog</Link>

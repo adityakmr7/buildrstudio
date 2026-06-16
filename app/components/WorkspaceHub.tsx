@@ -331,6 +331,7 @@ export default function WorkspaceHub() {
         {/* Right: nav + actions */}
         <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
           {[
+            { href: "/screenshot-builder", label: "Screenshot Builder" },
             { href: "/showcase",   label: "Showcase"  },
             { href: "/roadmap",    label: "Roadmap"   },
             { href: "/change-log", label: "Changelog" },
