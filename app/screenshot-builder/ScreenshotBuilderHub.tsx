@@ -5,13 +5,11 @@
 // Holds state, coordinates export triggers, and renders the header + workspace.
 
 import React, { useState, useRef } from "react";
-import Link from "next/link";
 import type { BuilderConfig } from "./lib/deviceSpecs";
 import { DEFAULT_CONFIG } from "./lib/deviceSpecs";
 import BuilderSidebar from "./components/BuilderSidebar";
 import BuilderCanvas, { BuilderCanvasHandle } from "./components/BuilderCanvas";
 import PremiumModal from "../components/PremiumModal";
-import ThemeToggle from "../components/ThemeToggle";
 import AppHeader from "../components/AppHeader";
 
 export default function ScreenshotBuilderHub() {

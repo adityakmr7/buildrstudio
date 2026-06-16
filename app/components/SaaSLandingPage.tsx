@@ -5,7 +5,6 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import ThemeToggle from "./ThemeToggle";
 import PremiumModal from "./PremiumModal";
 import AppHeader from "./AppHeader";
 

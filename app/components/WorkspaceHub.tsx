@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import Link from "next/link";
 import TabbedSidebar from "./TabbedSidebar";
 import LivePreviewCanvas, { LivePreviewCanvasHandle } from "./LivePreviewCanvas";
 import PremiumModal from "./PremiumModal";
-import ThemeToggle from "./ThemeToggle";
 import AppHeader from "./AppHeader";
 
 // ─── Annotation & Preset Types ────────────────────────────────────────────────

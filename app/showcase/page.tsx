@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import Link from "next/link";
-import ThemeToggle from "../components/ThemeToggle";
 import AppHeader from "../components/AppHeader";
 
 export const metadata: Metadata = {
