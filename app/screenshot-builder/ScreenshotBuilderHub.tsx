@@ -171,7 +171,7 @@ export default function ScreenshotBuilderHub() {
       </header>
 
       {/* ── BODY ── */}
-      <div className="workspace-body" style={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden" }}>
+      <div className="workspace-body">
         {/* Left config sidebar */}
         <BuilderSidebar
           config={config}
