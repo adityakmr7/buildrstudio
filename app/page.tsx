@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import WorkspaceHub from "./components/WorkspaceHub";
+import SaaSLandingPage from "./components/SaaSLandingPage";
 
 export const metadata: Metadata = {
-  title: "Screenshot to Social Media Graphic Optimizer",
+  title: "BuildrStudio — Beautiful Launch Assets for Developers & Indie Hackers",
   description:
-    "Free tool to instantly turn raw developer screenshots, terminal outputs, and code captures into beautiful social media images for X/Twitter, LinkedIn, and Instagram. Add gradients, frames, captions and more.",
+    "Design high-converting App Store screenshot mockups, social graphics, and release changelog cards in seconds. Built for speed and visual excellence.",
   alternates: {
     canonical: "https://buildrstudio.in",
   },
   openGraph: {
-    title: "Screenshot to Social Media Graphic Optimizer — BuildrStudio",
+    title: "BuildrStudio — Beautiful Launch Visuals",
     description:
-      "Free tool to instantly turn raw developer screenshots into beautiful social media images. Add gradients, frames, captions, and export in one click.",
+      "Design high-converting App Store mockups, social graphics, and release changelog cards in seconds.",
     type: "website",
     url: "https://buildrstudio.in",
     locale: "en_US",
@@ -21,46 +21,50 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "BuildrStudio Screenshot Optimizer",
+        alt: "BuildrStudio Creative Suite",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Screenshot to Social Media Graphic Optimizer — BuildrStudio",
+    title: "BuildrStudio — Beautiful Launch Visuals",
     description:
-      "Free tool to turn raw developer screenshots into beautiful social media images. Add gradients, frames, captions — export in one click.",
+      "Design high-converting App Store mockups, social graphics, and release changelog cards in seconds.",
     images: ["/og-image.png"],
   },
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: "BuildrStudio Screenshot Optimizer",
-  url: "https://buildrstudio.in",
-  description:
-    "Free web tool to convert developer screenshots into beautiful social media graphics with gradient backgrounds, device frames, captions, and one-click PNG export.",
-  applicationCategory: "DeveloperApplication",
-  operatingSystem: "Web",
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "USD",
-  },
-  author: {
-    "@type": "Person",
-    name: "Aditya Kumar",
-    url: "https://buildrstudio.in",
-  },
-  featureList: [
-    "Gradient backgrounds",
-    "Device frames (macOS, browser, iPhone, Android, terminal)",
-    "Caption overlays",
-    "Aspect ratio options (16:9, 1:1, 4:5, 9:16)",
-    "One-click PNG export",
-    "Annotation badges and labels",
-    "Preset styles",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://buildrstudio.in/#website",
+      "url": "https://buildrstudio.in",
+      "name": "BuildrStudio",
+      "description":
+        "Creative asset generation suite for developer screenshots, social graphic optimization, and App Store mockups.",
+      "publisher": {
+        "@type": "Person",
+        "name": "Aditya Kumar",
+      },
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://buildrstudio.in/#webapp",
+      "url": "https://buildrstudio.in",
+      "name": "BuildrStudio Creative Suite",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires CSS3/HTML5",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+      },
+      "description":
+        "Instant design asset generator for product builders. Create App Store mockups, social media optimized screenshots, and release changelog graphics.",
+    },
   ],
 };
 
@@ -68,12 +72,11 @@ export default function Home() {
   return (
     <>
       <Script
-        id="json-ld-webapp"
+        id="json-ld-website"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <WorkspaceHub />
+      <SaaSLandingPage />
     </>
   );
 }
-

@@ -277,7 +277,7 @@ export default function RoadmapPage() {
             <span className="site-logo-text">BuildrStudio</span>
           </Link>
           <div className="nav-links">
-            <Link href="/" className="nav-link">Optimizer</Link>
+            <Link href="/social-optimizer" className="nav-link">Social Optimizer</Link>
             <Link href="/screenshot-builder" className="nav-link">Screenshot Builder</Link>
             <Link href="/showcase" className="nav-link">Showcase</Link>
             <Link href="/blog" className="nav-link">Blog</Link>

@@ -116,7 +116,8 @@ export default function ScreenshotBuilderHub() {
         {/* Navigation & Actions */}
         <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
           {[
-            { href: "/",           label: "Optimizer" },
+            { href: "/social-optimizer", label: "Social Optimizer" },
+            { href: "/screenshot-builder", label: "Screenshot Builder" },
             { href: "/showcase",   label: "Showcase" },
             { href: "/roadmap",    label: "Roadmap" },
             { href: "/change-log", label: "Changelog" },

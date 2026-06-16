@@ -389,8 +389,8 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           <span className="site-logo-text">BuildrStudio</span>
         </Link>
         <div className="nav-links">
-          <Link href="/" className="nav-link">
-            Home
+          <Link href="/social-optimizer" className="nav-link">
+            Social Optimizer
           </Link>
           <Link href="/screenshot-builder" className="nav-link">
             Screenshot Builder
