@@ -6,6 +6,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
+import PremiumModal from "./PremiumModal";
 
 const FAQS = [
   {
@@ -27,7 +28,7 @@ const FAQS = [
 ];
 
 export default function SaaSLandingPage() {
-  const [isYearly, setIsYearly] = useState(true);
+  const [isPremiumOpen, setIsPremiumOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
 
   const toggleFaq = (index: number) => {
@@ -575,22 +576,7 @@ export default function SaaSLandingPage() {
           <h2>Flexible Pricing Plans</h2>
           <p>Choose the tier that fits your launch requirements.</p>
         </div>
-        <div className="toggle-wrapper">
-          <button
-            onClick={() => setIsYearly(false)}
-            className={`toggle-btn ${!isYearly ? "active" : ""}`}
-          >
-            Monthly
-          </button>
-          <button
-            onClick={() => setIsYearly(true)}
-            className={`toggle-btn ${isYearly ? "active" : ""}`}
-          >
-            Yearly (Save 30%)
-          </button>
-        </div>
-
-        <div className="pricing-cards">
+        <div className="pricing-cards" style={{ marginTop: "20px" }}>
           {/* Free Tier */}
           <div className="price-card">
             <h3 className="price-name">Free Plan</h3>
@@ -618,11 +604,11 @@ export default function SaaSLandingPage() {
 
           {/* Pro Tier */}
           <div className="price-card pro">
-            <span className="badge-pro">Most Popular</span>
+            <span className="badge-pro">Early Access</span>
             <h3 className="price-name" style={{ color: "var(--fill)" }}>Pro Plan</h3>
             <div>
-              <span className="price-val">{isYearly ? "$6" : "$9"}</span>
-              <span className="price-period"> / month {isYearly && " (billed annually)"}</span>
+              <span className="price-val" style={{ fontSize: "28px" }}>Pricing TBD</span>
+              <span className="price-period"> · 50% Waitlist Discount</span>
             </div>
             <p style={{ fontSize: "13px", color: "var(--text-3)", margin: 0 }}>
               Batch exporters and custom brand presets for marketing builders.
@@ -634,13 +620,14 @@ export default function SaaSLandingPage() {
               <li className="price-feature"><span>✓</span> Custom brand presets & swatches</li>
               <li className="price-feature"><span>✓</span> 4K high-resolution PNG & WebP</li>
             </ul>
-            <Link
-              href="/social-optimizer"
+            <button
+              type="button"
+              onClick={() => setIsPremiumOpen(true)}
               className="btn-fill btn-md"
-              style={{ textAlign: "center", textDecoration: "none", fontWeight: 700 }}
+              style={{ width: "100%", justifyContent: "center", fontWeight: 700, cursor: "pointer", border: "none" }}
             >
-              Unlock Pro Features
-            </Link>
+              Join Waitlist & Save 50%
+            </button>
           </div>
         </div>
       </section>
@@ -682,6 +669,9 @@ export default function SaaSLandingPage() {
           © {new Date().getFullYear()} BuildrStudio. All rights reserved.
         </div>
       </footer>
+
+      {/* Premium interest waitlist popup */}
+      <PremiumModal isOpen={isPremiumOpen} onClose={() => setIsPremiumOpen(false)} />
     </div>
   );
 }
