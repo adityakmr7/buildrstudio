@@ -312,7 +312,7 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
-            z-index: 1200;
+            z-index: 9999;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.25s ease;
@@ -329,7 +329,7 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
             width: 100%;
             max-width: 320px;
             background: var(--surface);
-            z-index: 1201;
+            z-index: 10000;
             padding: 24px;
             display: flex;
             flex-direction: column;
@@ -518,99 +518,99 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
             ☰
           </button>
         </div>
+      </header>
 
-        {/* Mobile Navigation Backdrop */}
-        <div 
-          className={`mobile-drawer-backdrop ${mobileMenuOpen ? "open" : ""}`} 
-          onClick={() => setMobileMenuOpen(false)} 
-        />
+      {/* Mobile Navigation Backdrop */}
+      <div 
+        className={`mobile-drawer-backdrop ${mobileMenuOpen ? "open" : ""}`} 
+        onClick={() => setMobileMenuOpen(false)} 
+      />
 
-        {/* Mobile Navigation Drawer Panel */}
-        <div className={`mobile-drawer-panel ${mobileMenuOpen ? "open" : ""}`}>
-          <div className="mobile-drawer-header">
-            <div className="hdr-logo">
-              <div className="hdr-logo-mark">B</div>
-              <span className="hdr-logo-text">BuildrStudio</span>
-            </div>
-            <button 
-              type="button" 
-              className="mobile-drawer-close"
-              onClick={() => setMobileMenuOpen(false)}
-              aria-label="Close menu"
-            >
-              ✕
-            </button>
+      {/* Mobile Navigation Drawer Panel */}
+      <div className={`mobile-drawer-panel ${mobileMenuOpen ? "open" : ""}`}>
+        <div className="mobile-drawer-header">
+          <div className="hdr-logo">
+            <div className="hdr-logo-mark">B</div>
+            <span className="hdr-logo-text">BuildrStudio</span>
           </div>
-
-          <div>
-            <span className="mobile-section-label">Launch Creative Tools</span>
-            <div className="mobile-grid">
-              <Link
-                href="/social-optimizer"
-                className={`mobile-link ${activeRoute === "social-optimizer" ? "active" : ""}`}
-              >
-                <span>🎨</span>
-                <span>Social Optimizer</span>
-              </Link>
-              <Link
-                href="/screenshot-builder"
-                className={`mobile-link ${activeRoute === "screenshot-builder" ? "active" : ""}`}
-              >
-                <span>📱</span>
-                <span>Screenshot Builder</span>
-              </Link>
-              <Link
-                href="/change-log"
-                className={`mobile-link ${activeRoute === "change-log" ? "active" : ""}`}
-              >
-                <span>⚡</span>
-                <span>Changelog Maker</span>
-              </Link>
-            </div>
-          </div>
-
-          <div style={{ height: "1px", background: "var(--border)", margin: "4px 0" }} />
-
-          <div>
-            <span className="mobile-section-label">General</span>
-            <div className="mobile-grid">
-              <Link
-                href="/showcase"
-                className={`mobile-link ${activeRoute === "showcase" ? "active" : ""}`}
-              >
-                <span>⭐</span>
-                <span>Showcase Gallery</span>
-              </Link>
-              <Link href="/blog" className={`mobile-link ${activeRoute === "blog" ? "active" : ""}`}>
-                <span>📝</span>
-                <span>Blog Publication</span>
-              </Link>
-              <Link
-                href="/roadmap"
-                className={`mobile-link ${activeRoute === "roadmap" ? "active" : ""}`}
-              >
-                <span>🗺️</span>
-                <span>Product Roadmap</span>
-              </Link>
-            </div>
-          </div>
-
-          <div style={{ flexGrow: 1 }} />
-
-          <button
-            type="button"
-            className="pro-btn"
-            style={{ width: "100%", justifyContent: "center", padding: "12px", fontSize: "13px" }}
-            onClick={() => {
-              setMobileMenuOpen(false);
-              handleProClick();
-            }}
+          <button 
+            type="button" 
+            className="mobile-drawer-close"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="Close menu"
           >
-            <span>👑</span>
-            <span>Unlock Premium Pro</span>
+            ✕
           </button>
         </div>
-      </header>
+
+        <div>
+          <span className="mobile-section-label">Launch Creative Tools</span>
+          <div className="mobile-grid">
+            <Link
+              href="/social-optimizer"
+              className={`mobile-link ${activeRoute === "social-optimizer" ? "active" : ""}`}
+            >
+              <span>🎨</span>
+              <span>Social Optimizer</span>
+            </Link>
+            <Link
+              href="/screenshot-builder"
+              className={`mobile-link ${activeRoute === "screenshot-builder" ? "active" : ""}`}
+            >
+              <span>📱</span>
+              <span>Screenshot Builder</span>
+            </Link>
+            <Link
+              href="/change-log"
+              className={`mobile-link ${activeRoute === "change-log" ? "active" : ""}`}
+            >
+              <span>⚡</span>
+              <span>Changelog Maker</span>
+            </Link>
+          </div>
+        </div>
+
+        <div style={{ height: "1px", background: "var(--border)", margin: "4px 0" }} />
+
+        <div>
+          <span className="mobile-section-label">General</span>
+          <div className="mobile-grid">
+            <Link
+              href="/showcase"
+              className={`mobile-link ${activeRoute === "showcase" ? "active" : ""}`}
+            >
+              <span>⭐</span>
+              <span>Showcase Gallery</span>
+            </Link>
+            <Link href="/blog" className={`mobile-link ${activeRoute === "blog" ? "active" : ""}`}>
+              <span>📝</span>
+              <span>Blog Publication</span>
+            </Link>
+            <Link
+              href="/roadmap"
+              className={`mobile-link ${activeRoute === "roadmap" ? "active" : ""}`}
+            >
+              <span>🗺️</span>
+              <span>Product Roadmap</span>
+            </Link>
+          </div>
+        </div>
+
+        <div style={{ flexGrow: 1 }} />
+
+        <button
+          type="button"
+          className="pro-btn"
+          style={{ width: "100%", justifyContent: "center", padding: "12px", fontSize: "13px" }}
+          onClick={() => {
+            setMobileMenuOpen(false);
+            handleProClick();
+          }}
+        >
+          <span>👑</span>
+          <span>Unlock Premium Pro</span>
+        </button>
+      </div>
 
       {/* Renders modal fallback if onOpenPremium prop was not provided */}
       {!onOpenPremium && (
