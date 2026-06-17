@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
 import RoadmapRequestForm from "../components/RoadmapRequestForm";
-import ThemeToggle from "../components/ThemeToggle";
+import AppHeader from "../components/AppHeader";
 
 export const metadata: Metadata = {
   title: "Product Roadmap — Vote on What We Build Next",
@@ -270,22 +270,7 @@ export default function RoadmapPage() {
         }
       `}</style>
 
-      <header className="site-header">
-        <div className="site-header-inner">
-          <Link href="/" className="site-logo">
-            <div className="site-logo-mark">B</div>
-            <span className="site-logo-text">BuildrStudio</span>
-          </Link>
-          <div className="nav-links">
-            <Link href="/" className="nav-link">Optimizer</Link>
-            <Link href="/showcase" className="nav-link">Showcase</Link>
-            <Link href="/blog" className="nav-link">Blog</Link>
-            <Link href="/roadmap" className="nav-link active">Roadmap</Link>
-            <Link href="/change-log" className="nav-link">Changelog</Link>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      <AppHeader activeRoute="roadmap" />
 
       <main className="page roadmap-page">
         <section className="roadmap-hero">
