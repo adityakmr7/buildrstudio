@@ -6,6 +6,7 @@ import LivePreviewCanvas, { LivePreviewCanvasHandle } from "./LivePreviewCanvas"
 import PremiumModal from "./PremiumModal";
 import AppHeader from "./AppHeader";
 import UnlockWatermarkModal from "./UnlockWatermarkModal";
+import { useToast } from "./Toast";
 
 // ─── Annotation & Preset Types ────────────────────────────────────────────────
 
@@ -138,6 +139,7 @@ function CanvasToolbar({
   const [isExporting, setIsExporting] = useState(false);
   const [isCopying,   setIsCopying]   = useState(false);
   const [copyStatus,  setCopyStatus]  = useState<"idle" | "ok" | "err">("idle");
+  const { toast } = useToast();
 
   const disabled = !imageSource;
 
@@ -154,8 +156,17 @@ function CanvasToolbar({
       a.href = dataUrl;
       a.click();
       a.remove();
+      toast("PNG exported! Share it on social media", "success", {
+        label: "Share on X",
+        onClick: () => {
+          const text = encodeURIComponent("Just designed this with @BuildrStudio — turn screenshots into social-ready graphics in seconds!\n");
+          const url = encodeURIComponent("https://buildrstudio.in");
+          window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
+        },
+      });
     } catch (e) {
       console.error("Export error:", e);
+      toast("Export failed — please try again", "error");
     } finally {
       setIsExporting(false);
     }
@@ -175,9 +186,11 @@ function CanvasToolbar({
         new ClipboardItem({ "image/png": blobP as unknown as Blob }),
       ]);
       setCopyStatus("ok");
+      toast("Copied to clipboard!", "success");
       setTimeout(() => setCopyStatus("idle"), 2200);
     } catch {
       setCopyStatus("err");
+      toast("Failed to copy — try exporting instead", "error");
       setTimeout(() => setCopyStatus("idle"), 2200);
     } finally {
       setIsCopying(false);
@@ -319,6 +332,36 @@ export default function WorkspaceHub() {
   const [isWatermarkUnlocked, setIsWatermarkUnlocked] = useState(false);
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
   const liveRef = useRef<LivePreviewCanvasHandle>(null);
+  const { toast } = useToast();
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (!mod) return;
+      if (e.key === "s") {
+        e.preventDefault();
+        if (!imageSource || !liveRef.current) return;
+        liveRef.current.renderToPng().then((dataUrl) => {
+          const a = document.createElement("a");
+          a.download = `buildrstudio-${Date.now()}.png`;
+          a.href = dataUrl;
+          a.click();
+          a.remove();
+          toast("PNG exported! (⌘S)", "success", {
+            label: "Share on X",
+            onClick: () => {
+              const text = encodeURIComponent("Just designed this with @BuildrStudio — turn screenshots into social-ready graphics in seconds!\n");
+              const url = encodeURIComponent("https://buildrstudio.in");
+              window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
+            },
+          });
+        }).catch(() => toast("Export failed", "error"));
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [imageSource, toast]);
 
   useEffect(() => {
     const checkUnlock = () => {

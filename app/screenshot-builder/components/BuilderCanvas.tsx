@@ -350,9 +350,9 @@ function InnerCanvas({
             right: "18px",
             fontSize: "12px",
             fontWeight: 700,
-            color: "rgba(255, 255, 255, 0.45)",
-            background: "rgba(0, 0, 0, 0.35)",
-            padding: "4px 10px",
+            color: "rgba(255, 255, 255, 0.7)",
+            background: "rgba(0, 0, 0, 0.55)",
+            padding: "5px 12px",
             borderRadius: "6px",
             backdropFilter: "blur(4px)",
             userSelect: "none",
@@ -360,20 +360,21 @@ function InnerCanvas({
             zIndex: 100,
             fontFamily: "var(--font)",
             transition: "all 0.15s ease",
-            border: "1px solid rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            letterSpacing: "0.2px",
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = "#fff";
-            e.currentTarget.style.background = "rgba(0,0,0,0.6)";
+            e.currentTarget.style.background = "rgba(0,0,0,0.7)";
             e.currentTarget.style.transform = "scale(1.05)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = "rgba(255, 255, 255, 0.45)";
-            e.currentTarget.style.background = "rgba(0, 0, 0, 0.35)";
+            e.currentTarget.style.color = "rgba(255, 255, 255, 0.7)";
+            e.currentTarget.style.background = "rgba(0, 0, 0, 0.55)";
             e.currentTarget.style.transform = "scale(1)";
           }}
         >
-          via buildrStudio.in 👑
+          Made with buildrstudio.in
         </div>
       )}
     </div>

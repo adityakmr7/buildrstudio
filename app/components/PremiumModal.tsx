@@ -5,9 +5,18 @@ import { useEffect, useState } from "react";
 interface PremiumModalProps {
   isOpen: boolean;
   onClose: () => void;
+  feature?: "watermark" | "4k-export" | "3d-tilt" | "brand-presets" | "batch-export";
 }
 
-export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
+const FEATURE_HEADLINES: Record<string, string> = {
+  "watermark": "Remove Watermark — Go Pro",
+  "4k-export": "Unlock 4K Exports — Go Pro",
+  "3d-tilt": "Unlock 3D Device Tilts — Go Pro",
+  "brand-presets": "Save Brand Presets — Go Pro",
+  "batch-export": "Batch Multi-Device Export — Go Pro",
+};
+
+export default function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -124,15 +133,20 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
         <div style={{ display: "flex", flexDirection: "column", gap: "8px", textAlign: "center" }}>
           <div style={{ fontSize: "36px", marginBottom: "4px" }}>👑</div>
           <h2 className="ink-title" style={{ fontSize: "22px", letterSpacing: "-0.5px" }}>
-            Go Premium (Custom Branding & 4K Export)
+            {feature ? FEATURE_HEADLINES[feature] ?? "Upgrade to Pro" : "Upgrade to Pro"}
           </h2>
+          <p style={{ fontSize: "28px", fontWeight: 800, color: "var(--text-1)", margin: 0, letterSpacing: "-1px" }}>
+            $4<span style={{ fontSize: "14px", fontWeight: 500, color: "var(--text-3)" }}>/mo</span>
+            <span style={{ fontSize: "13px", fontWeight: 500, color: "var(--text-3)", marginLeft: "8px", textDecoration: "line-through" }}>$8</span>
+            <span className="badge-dark" style={{ fontSize: "10px", marginLeft: "8px", verticalAlign: "middle" }}>50% OFF</span>
+          </p>
         </div>
 
         {/* Modal Content */}
         {!isSubmitted ? (
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <p className="ink-body" style={{ fontSize: "14px", textAlign: "center", color: "var(--text-2)" }}>
-              Premium features are coming soon. Drop your email below to request early access and get <strong>50% off</strong> when we launch.
+              Pro launches soon. Drop your email to lock in <strong>50% off</strong> — only early supporters get this price.
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -198,7 +212,7 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
                 style={{ width: "100%", justifyContent: "center" }}
                 disabled={isLoading}
               >
-                {isLoading ? "Saving..." : "Get 50% Off At Launch"}
+                {isLoading ? "Saving..." : "Lock In $4/mo — Get Pro"}
               </button>
               <span style={{ fontSize: "11px", color: "var(--text-3)", textAlign: "center" }}>
                 Get BuildrStudio launch updates. No spam.

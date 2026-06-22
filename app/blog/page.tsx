@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
+import Image from "next/image";
 import AppHeader from "../components/AppHeader";
 import { getHashnodePostsPage } from "../lib/hashnode";
 
@@ -365,10 +366,12 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               {blogPosts.map((post) => (
                 <article key={post.id} className="post-card">
                   {post.coverImageUrl ? (
-                    <img
+                    <Image
                       src={post.coverImageUrl}
                       alt={post.title}
                       className="post-cover"
+                      width={600}
+                      height={338}
                       loading="lazy"
                     />
                   ) : null}

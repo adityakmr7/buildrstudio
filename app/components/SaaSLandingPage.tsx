@@ -543,6 +543,112 @@ export default function SaaSLandingPage() {
         </div>
       </section>
 
+      {/* ── SOCIAL PROOF / EXAMPLES ── */}
+      <section style={{ maxWidth: "1200px", margin: "80px auto 0", padding: "0 40px" }}>
+        <div className="section-title">
+          <h2>Made with BuildrStudio</h2>
+          <p>Real examples created in under 30 seconds — no design skills required.</p>
+        </div>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: "20px",
+          marginBottom: "100px",
+        }}>
+          {[
+            {
+              bg: "linear-gradient(135deg, #6366f1, #a855f7, #ec4899)",
+              title: "Anchor — Habit Tracker",
+              subtitle: "Build habits that stick",
+              type: "App Store Screenshot",
+            },
+            {
+              bg: "linear-gradient(135deg, #0ea5e9, #38bdf8, #7dd3fc)",
+              title: "Ship faster with AI",
+              subtitle: "Terminal output → social graphic",
+              type: "Social Media Post",
+            },
+            {
+              bg: "linear-gradient(135deg, #f97316, #fb923c, #fbbf24)",
+              title: "v2.5 — Batch Export",
+              subtitle: "New: multi-device rendering",
+              type: "Changelog Card",
+            },
+          ].map((example, idx) => (
+            <div key={idx} style={{
+              borderRadius: "20px",
+              overflow: "hidden",
+              border: "1px solid var(--border)",
+              transition: "transform 0.25s, box-shadow 0.25s",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.12)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+            >
+              <div style={{
+                background: example.bg,
+                aspectRatio: "16/10",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "32px 24px",
+                textAlign: "center",
+                gap: "8px",
+              }}>
+                <div style={{
+                  width: "60px",
+                  height: "100px",
+                  borderRadius: "12px",
+                  background: "rgba(255,255,255,0.15)",
+                  backdropFilter: "blur(8px)",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: "8px",
+                }}>
+                  <div style={{
+                    width: "40px",
+                    height: "72px",
+                    borderRadius: "6px",
+                    background: "rgba(255,255,255,0.25)",
+                  }} />
+                </div>
+                <div style={{ color: "#fff", fontSize: "18px", fontWeight: 800, letterSpacing: "-0.3px" }}>
+                  {example.title}
+                </div>
+                <div style={{ color: "rgba(255,255,255,0.8)", fontSize: "13px", fontWeight: 500 }}>
+                  {example.subtitle}
+                </div>
+              </div>
+              <div style={{
+                background: "var(--surface)",
+                padding: "14px 18px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}>
+                <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--text-2)" }}>{example.type}</span>
+                <span style={{ fontSize: "11px", color: "var(--text-3)" }}>30 sec</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <style>{`
+          @media (max-width: 900px) {
+            .examples-grid { grid-template-columns: 1fr !important; }
+          }
+        `}</style>
+      </section>
+
       {/* ── FIGMA VS BUILDRSTUDIO ── */}
       <section className="vs-section">
         <div className="section-title">
@@ -626,11 +732,11 @@ export default function SaaSLandingPage() {
 
           {/* Pro Tier */}
           <div className="price-card pro">
-            <span className="badge-pro">Early Access</span>
+            <span className="badge-pro">Launch Price</span>
             <h3 className="price-name" style={{ color: "var(--fill)" }}>Pro Plan</h3>
             <div>
-              <span className="price-val" style={{ fontSize: "28px" }}>Pricing TBD</span>
-              <span className="price-period"> · 50% Waitlist Discount</span>
+              <span className="price-val">$4</span>
+              <span className="price-period"> /month · <span style={{ textDecoration: "line-through", opacity: 0.5 }}>$8</span> 50% launch discount</span>
             </div>
             <p style={{ fontSize: "13px", color: "var(--text-3)", margin: 0 }}>
               Batch exporters and custom brand presets for marketing builders.
@@ -648,7 +754,7 @@ export default function SaaSLandingPage() {
               className="btn-fill btn-md"
               style={{ width: "100%", justifyContent: "center", fontWeight: 700, cursor: "pointer", border: "none" }}
             >
-              Join Waitlist & Save 50%
+              Get Pro — $4/mo
             </button>
           </div>
         </div>

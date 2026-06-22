@@ -390,24 +390,71 @@ const LivePreviewCanvas = forwardRef<LivePreviewCanvasHandle, LivePreviewCanvasP
 
     if (!imageSource) {
       return (
-        <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "0" }}>
+        <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "20px" }}>
+          {/* Demo Preview */}
+          <div style={{
+            width: "100%", maxWidth: "640px", margin: "0 auto",
+            borderRadius: "var(--r-2xl)", overflow: "hidden",
+            border: "1px solid var(--border)", boxShadow: "var(--shadow-md)",
+          }}>
+            <div style={{
+              background: "linear-gradient(135deg, #fb923c, #ec4899, #6366f1)",
+              padding: "48px 32px", display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center", gap: "12px",
+              aspectRatio: "16/9", position: "relative",
+            }}>
+              <div style={{
+                background: "var(--surface)", borderRadius: "12px", overflow: "hidden",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.3)", width: "75%", maxWidth: "380px",
+                border: "1px solid var(--border)",
+              }}>
+                <div style={{
+                  background: "var(--surface-2)", height: "24px", display: "flex",
+                  alignItems: "center", padding: "0 10px", gap: "5px",
+                  borderBottom: "1px solid var(--border)",
+                }}>
+                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#FF5F56" }} />
+                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#FFBD2E" }} />
+                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#27C93F" }} />
+                </div>
+                <div style={{
+                  padding: "24px 20px", fontSize: "11px", fontFamily: "monospace",
+                  color: "var(--text-2)", lineHeight: 1.8, background: "var(--surface)",
+                }}>
+                  <span style={{ color: "#22c55e" }}>$</span> npm run build<br />
+                  <span style={{ color: "var(--text-3)" }}>Building production bundle...</span><br />
+                  <span style={{ color: "#22c55e" }}>✓</span> Compiled successfully in 2.4s
+                </div>
+              </div>
+              <div style={{
+                position: "absolute", bottom: "12px", right: "14px", fontSize: "10px",
+                fontWeight: 700, color: "#fff", background: "rgba(0,0,0,0.55)",
+                padding: "4px 10px", borderRadius: "6px", backdropFilter: "blur(4px)",
+                border: "1px solid rgba(255,255,255,0.1)", fontFamily: "var(--font)",
+              }}>
+                Made with buildrstudio.in
+              </div>
+            </div>
+          </div>
+
+          {/* Upload CTA */}
           <div
             onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
             onDragLeave={() => setIsDragging(false)}
             onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files?.[0]; if (f) handleFile(f); }}
             onClick={() => fileInputRef.current?.click()}
             style={{
-              height: "380px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", borderRadius: "var(--r-2xl)", border: `2px dashed ${isDragging ? "var(--text-1)" : "var(--border-strong)"}`,
+              padding: "28px 24px", display: "flex", alignItems: "center", justifyContent: "center",
+              cursor: "pointer", borderRadius: "var(--r-xl)", border: `2px dashed ${isDragging ? "var(--text-1)" : "var(--border-strong)"}`,
               background: isDragging ? "var(--fill-subtle)" : "var(--surface)", transition: "all 0.2s ease",
-              gap: "16px", textAlign: "center", padding: "24px",
+              gap: "16px", textAlign: "left",
             }}>
             <input ref={fileInputRef} type="file" accept="image/*" style={{ display: "none" }}
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
-            <div style={{ width: "60px", height: "60px", borderRadius: "50%", background: "var(--fill-subtle)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px" }}>📸</div>
+            <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "var(--fill)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", color: "var(--fill-text)", flexShrink: 0 }}>+</div>
             <div>
-              <div style={{ fontSize: "16px", fontWeight: 700, color: "var(--text-1)", marginBottom: "6px" }}>Drop your screenshot here</div>
-              <p style={{ fontSize: "13px", color: "var(--text-3)", margin: 0 }}>Or click to browse · Cmd+V to paste from clipboard</p>
+              <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-1)", marginBottom: "3px" }}>Drop your screenshot to get started</div>
+              <p style={{ fontSize: "12px", color: "var(--text-3)", margin: 0 }}>Click to browse · Cmd+V to paste · PNG, JPG, WebP</p>
             </div>
           </div>
         </div>
@@ -456,11 +503,17 @@ const LivePreviewCanvas = forwardRef<LivePreviewCanvasHandle, LivePreviewCanvasP
 
         {/* Watermark */}
         {!isWatermarkUnlocked && (
-          <div className="badge-dark" onClick={(e) => { e.stopPropagation(); onOpenUnlockWatermark(); }} title="Unlock to remove"
-            style={{ position: "absolute", bottom: "12px", right: "14px", fontSize: "10px", fontWeight: 600, opacity: 0.9, zIndex: 30, padding: "3px 9px", userSelect: "none", cursor: "pointer", transition: "transform 0.15s" }}
+          <div onClick={(e) => { e.stopPropagation(); onOpenUnlockWatermark(); }} title="Unlock to remove"
+            style={{
+              position: "absolute", bottom: "12px", right: "14px", fontSize: "10px", fontWeight: 700, zIndex: 30,
+              padding: "4px 10px", userSelect: "none", cursor: "pointer", transition: "transform 0.15s",
+              background: "rgba(0,0,0,0.55)", color: "#fff", borderRadius: "6px",
+              backdropFilter: "blur(4px)", border: "1px solid rgba(255,255,255,0.1)",
+              fontFamily: "var(--font)", letterSpacing: "0.2px",
+            }}
             onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.06)")}
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}>
-            via buildrStudio.in 👑
+            Made with buildrstudio.in
           </div>
         )}
       </div>

@@ -12,6 +12,7 @@ import BuilderCanvas, { BuilderCanvasHandle } from "./components/BuilderCanvas";
 import PremiumModal from "../components/PremiumModal";
 import AppHeader from "../components/AppHeader";
 import UnlockWatermarkModal from "../components/UnlockWatermarkModal";
+import { useToast } from "../components/Toast";
 
 export default function ScreenshotBuilderHub() {
   const [deck, setDeck] = useState<{
@@ -41,6 +42,25 @@ export default function ScreenshotBuilderHub() {
   const [isWatermarkUnlocked, setIsWatermarkUnlocked] = useState(false);
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
   const canvasRef = useRef<BuilderCanvasHandle>(null);
+  const { toast } = useToast();
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (!mod) return;
+      if (e.key === "s") {
+        e.preventDefault();
+        handleExport();
+      }
+      if (e.key === "c" && e.shiftKey) {
+        e.preventDefault();
+        handleCopy();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  });
 
   useEffect(() => {
     const checkUnlock = () => {
@@ -74,8 +94,18 @@ export default function ScreenshotBuilderHub() {
 
   const handleExport = () => {
     if (canvasRef.current) {
-      canvasRef.current.exportPng().catch((err) => {
+      canvasRef.current.exportPng().then(() => {
+        toast("Screenshot exported!", "success", {
+          label: "Share on X",
+          onClick: () => {
+            const text = encodeURIComponent("Just built these App Store screenshots in seconds with @BuildrStudio!\n");
+            const url = encodeURIComponent("https://buildrstudio.in/screenshot-builder");
+            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
+          },
+        });
+      }).catch((err) => {
         console.error("Export failed:", err);
+        toast("Export failed — please try again", "error");
       });
     }
   };
@@ -83,9 +113,10 @@ export default function ScreenshotBuilderHub() {
   const handleCopy = () => {
     if (canvasRef.current) {
       canvasRef.current.copyToClipboard().then(() => {
-        alert("Copied PNG image to clipboard!");
+        toast("Copied to clipboard!", "success");
       }).catch((err) => {
         console.error("Copy failed:", err);
+        toast("Copy failed — try exporting instead", "error");
       });
     }
   };
@@ -346,7 +377,7 @@ export default function ScreenshotBuilderHub() {
 
   const handleDeleteScreen = (idx: number) => {
     if (deck.screens.length <= 1) {
-      alert("You must keep at least one screen in the deck!");
+      toast("You must keep at least one screen", "info");
       return;
     }
     setDeck((prev) => {
