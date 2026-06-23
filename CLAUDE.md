@@ -13,7 +13,9 @@ BuildrStudio is a suite of free browser-based developer tools for creating polis
 - **Language:** TypeScript (strict mode)
 - **Styling:** Tailwind CSS v4 + custom "Ink Design System" (CSS custom properties, no component library)
 - **Package manager:** Bun (bun.lock)
-- **Database:** Neon Postgres (serverless driver `@neondatabase/serverless`) — used only for the waitlist/interest API
+- **Database:** Neon Postgres (serverless driver `@neondatabase/serverless`) — users, subscriptions, waitlist
+- **Auth:** NextAuth.js v5 (Auth.js) with Google OAuth, JWT sessions
+- **Payments:** Lemon Squeezy (subscription billing, webhook-driven)
 - **Screenshot capture:** `html-to-image` and `modern-screenshot` for client-side PNG export
 - **Analytics:** Vercel Analytics, Vercel Speed Insights, Umami
 - **Deployment:** Vercel
@@ -123,11 +125,33 @@ Client-side screenshot export uses `html-to-image` / `modern-screenshot`. The ca
 - **Component file naming:** PascalCase for `.tsx` files, camelCase for `.ts` utility files.
 - **The `AppHeader` component is shared across all routes** — it accepts `activeRoute` and `onOpenPremium` props.
 
+### Authentication & payments
+
+- **Auth:** NextAuth.js v5 with Google OAuth, JWT session strategy. Config in root `auth.ts`.
+- **Session:** `AuthProvider` (SessionProvider) wraps the app in `layout.tsx`. Use `useSession()` in client components.
+- **Pro gating:** `session.user.isPro` boolean is set in the JWT callback by checking the `subscriptions` table.
+- **Checkout flow:** User clicks "Go Pro" → PremiumModal → if signed in, POST `/api/checkout` → redirect to Lemon Squeezy hosted checkout → webhook updates subscription status.
+- **Webhooks:** `/api/webhooks/lemonsqueezy` verifies HMAC signature and upserts subscription records.
+
 ## Environment variables
 
 ```bash
-# Required for waitlist/interest API
+# Required for database
 NEON_DATABASE_URL=postgresql://...   # or DATABASE_URL
+
+# Required for auth
+AUTH_SECRET=<random-32-char-string>       # NextAuth.js secret (run: openssl rand -base64 32)
+GOOGLE_CLIENT_ID=<google-oauth-client-id>
+GOOGLE_CLIENT_SECRET=<google-oauth-client-secret>
+
+# Required for payments
+LEMONSQUEEZY_API_KEY=<ls-api-key>
+LEMONSQUEEZY_STORE_ID=<ls-store-id>
+LEMONSQUEEZY_VARIANT_ID=<ls-variant-id>   # The $4/mo Pro plan variant
+LEMONSQUEEZY_WEBHOOK_SECRET=<ls-webhook-signing-secret>
+
+# App URL (for checkout redirects)
+NEXT_PUBLIC_APP_URL=https://buildrstudio.in
 
 # Optional — blog page
 HASHNODE_GQL_ENDPOINT=https://gql.hashnode.com/    # default
@@ -136,10 +160,11 @@ HASHNODE_PUBLICATION_HOST=adityakmr.hashnode.dev    # default
 
 ## Database
 
-Single table `waitlist_requests` in Neon Postgres, auto-created on first write. Used by:
+Tables in Neon Postgres, auto-created on first write:
 
-- `PremiumModal` — source: `premium_modal`
-- `RoadmapRequestForm` — source: `roadmap_request`
+- **`users`** — id, email, name, image, email_verified, created_at
+- **`subscriptions`** — user_id, ls_subscription_id, status, current_period_end, cancel_at_period_end
+- **`waitlist_requests`** — email collection for interest/roadmap forms
 
 ## Common tasks
 

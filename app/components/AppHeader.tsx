@@ -10,6 +10,8 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
 import PremiumModal from "./PremiumModal";
+import AuthModal from "./AuthModal";
+import UserMenu from "./UserMenu";
 
 interface AppHeaderProps {
   activeRoute?: "social-optimizer" | "screenshot-builder" | "showcase" | "blog" | "roadmap" | "change-log" | "home";
@@ -19,6 +21,7 @@ interface AppHeaderProps {
 export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
 
   // Close menus when location changes
   useEffect(() => {
@@ -505,7 +508,12 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
             <span>👑</span>
             <span className="pro-btn-text">Go Pro</span>
           </button>
-          
+
+          <UserMenu
+            onOpenAuth={() => setIsAuthOpen(true)}
+            onOpenPremium={handleProClick}
+          />
+
           <ThemeToggle />
 
           {/* Burger menu button on mobile */}
@@ -616,6 +624,8 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
       {!onOpenPremium && (
         <PremiumModal isOpen={isPremiumOpen} onClose={() => setIsPremiumOpen(false)} />
       )}
+
+      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
     </>
   );
 }
