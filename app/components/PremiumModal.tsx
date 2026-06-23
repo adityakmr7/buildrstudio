@@ -1,70 +1,53 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useSession, signIn } from "next-auth/react";
 
 interface PremiumModalProps {
   isOpen: boolean;
   onClose: () => void;
+  feature?: "watermark" | "4k-export" | "3d-tilt" | "brand-presets" | "batch-export";
+  defaultPlan?: "pro" | "ai_pro";
 }
 
-export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
-  const [email, setEmail] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [submitError, setSubmitError] = useState("");
+const FEATURE_HEADLINES: Record<string, string> = {
+  watermark: "Remove Watermark — Go Pro",
+  "4k-export": "Unlock 4K Exports — Go Pro",
+  "3d-tilt": "Unlock 3D Device Tilts — Go Pro",
+  "brand-presets": "Save Brand Presets — Go Pro",
+  "batch-export": "Batch Multi-Device Export — Go Pro",
+};
 
-  // Check if they already subscribed in this browser session
-  useEffect(() => {
-    if (isOpen) {
-      const savedEmail = localStorage.getItem("premium_interest_email");
-      const timer = setTimeout(() => {
-        if (savedEmail) {
-          setEmail(savedEmail);
-          setIsSubmitted(true);
-        } else {
-          setIsSubmitted(false);
-          setEmail("");
-        }
-        setSubmitError("");
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
+export default function PremiumModal({ isOpen, onClose, feature, defaultPlan }: PremiumModalProps) {
+  const { data: session, status } = useSession();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [selectedPlan, setSelectedPlan] = useState<"pro" | "ai_pro">(defaultPlan ?? "pro");
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
+  const isAuthenticated = status === "authenticated" && !!session?.user;
+  const isPro = session?.user?.isPro;
 
+  const handleCheckout = async () => {
     setIsLoading(true);
-    setSubmitError("");
+    setError("");
 
     try {
-      const response = await fetch("/api/interest", {
+      const res = await fetch("/api/checkout", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          source: "premium_modal",
-          featureKey: "premium-branding-4k-export",
-          pathname: window.location.pathname,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: selectedPlan }),
       });
+      const data = (await res.json()) as { url?: string; error?: string };
 
-      const payload = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Unable to save your request right now.");
+      if (!res.ok || !data.url) {
+        throw new Error(data.error ?? "Failed to start checkout");
       }
 
-      localStorage.setItem("premium_interest_email", email);
-      setIsSubmitted(true);
-    } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : "Unable to save your request right now.");
-    } finally {
+      window.location.href = data.url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
       setIsLoading(false);
     }
   };
@@ -120,65 +103,146 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
           ✕
         </button>
 
-        {/* Modal Header */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px", textAlign: "center" }}>
-          <div style={{ fontSize: "36px", marginBottom: "4px" }}>👑</div>
-          <h2 className="ink-title" style={{ fontSize: "22px", letterSpacing: "-0.5px" }}>
-            Go Premium (Custom Branding & 4K Export)
-          </h2>
-        </div>
-
-        {/* Modal Content */}
-        {!isSubmitted ? (
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            <p className="ink-body" style={{ fontSize: "14px", textAlign: "center", color: "var(--text-2)" }}>
-              Premium features are coming soon. Drop your email below to request early access and get <strong>50% off</strong> when we launch.
+        {/* Already Pro */}
+        {isPro ? (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: "36px" }}>✨</div>
+            <h2
+              className="ink-title"
+              style={{ fontSize: "22px", letterSpacing: "-0.5px" }}
+            >
+              You&apos;re already Pro!
+            </h2>
+            <p
+              className="ink-body"
+              style={{ fontSize: "14px", color: "var(--text-2)" }}
+            >
+              All premium features are unlocked. Enjoy building with
+              BuildrStudio Pro.
             </p>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              {/* Feature List */}
-              <div
-                style={{
-                  background: "var(--fill-subtle)",
-                  borderRadius: "var(--r-md)",
-                  padding: "14px 18px",
-                  fontSize: "12px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "8px",
-                  color: "var(--text-2)",
-                }}
+            <button
+              type="button"
+              className="btn-outline btn-sm"
+              onClick={onClose}
+              style={{ alignSelf: "center", marginTop: "8px" }}
+            >
+              Close
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Modal Header */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px",
+                textAlign: "center",
+              }}
+            >
+              <div style={{ fontSize: "36px", marginBottom: "4px" }}>👑</div>
+              <h2
+                className="ink-title"
+                style={{ fontSize: "22px", letterSpacing: "-0.5px" }}
               >
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <span>✨</span>
-                  <span><strong>Remove Watermark</strong> (Export clean screenshots)</span>
-                </div>
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <span>🎨</span>
-                  <span><strong>Custom Watermark / Logo</strong> (Add your own brand badge)</span>
-                </div>
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <span>🖥️</span>
-                  <span><strong>4K Serialization Rendering</strong> (Highest sharpness possible)</span>
-                </div>
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <span>✍️</span>
-                  <span><strong>Custom Typography</strong> (Change browser mockup fonts)</span>
-                </div>
-              </div>
+                {feature
+                  ? (FEATURE_HEADLINES[feature] ?? "Upgrade Your Plan")
+                  : "Upgrade Your Plan"}
+              </h2>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "4px" }}>
-              <input
-                type="email"
-                required
-                className="input-field"
-                placeholder="Enter your email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
-              />
-              {submitError && (
+            {/* Plan Toggle */}
+            <div style={{ display: "flex", gap: "8px" }}>
+              {(["pro", "ai_pro"] as const).map((plan) => {
+                const active = selectedPlan === plan;
+                const isPro = plan === "pro";
+                return (
+                  <button
+                    key={plan}
+                    type="button"
+                    onClick={() => setSelectedPlan(plan)}
+                    style={{
+                      flex: 1,
+                      padding: "12px 10px",
+                      borderRadius: "var(--r-md)",
+                      border: active ? "2px solid var(--fill)" : "1px solid var(--border)",
+                      background: active ? "var(--fill-subtle)" : "transparent",
+                      cursor: "pointer",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div style={{ fontSize: "20px", fontWeight: 800, color: "var(--text-1)" }}>
+                      {isPro ? "$4" : "$20"}
+                      <span style={{ fontSize: "12px", fontWeight: 500, color: "var(--text-3)" }}>/mo</span>
+                    </div>
+                    <div style={{ fontSize: "12px", fontWeight: 600, color: active ? "var(--fill)" : "var(--text-2)", marginTop: "2px" }}>
+                      {isPro ? "Pro" : "AI Pro"}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Feature List */}
+            <div
+              style={{
+                background: "var(--fill-subtle)",
+                borderRadius: "var(--r-md)",
+                padding: "14px 18px",
+                fontSize: "12px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px",
+                color: "var(--text-2)",
+              }}
+            >
+              <div style={{ display: "flex", gap: "8px" }}>
+                <span>✨</span>
+                <span><strong>Remove Watermark</strong> (Export clean screenshots)</span>
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <span>🖥️</span>
+                <span><strong>3D Device Tilts & 4K Export</strong></span>
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <span>📦</span>
+                <span><strong>Batch Multi-Device Export</strong></span>
+              </div>
+              {selectedPlan === "ai_pro" && (
+                <>
+                  <div style={{ height: "1px", background: "var(--border)", margin: "4px 0" }} />
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <span>🤖</span>
+                    <span><strong>Unlimited AI Copywriting</strong></span>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <span>🌍</span>
+                    <span><strong>AI Translation (15+ languages)</strong></span>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <span>⚡</span>
+                    <span><strong>Smart Tone & Category Targeting</strong></span>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* CTA */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+              }}
+            >
+              {error && (
                 <div
                   style={{
                     background: "var(--fill-subtle)",
@@ -189,57 +253,46 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
                     padding: "10px 12px",
                   }}
                 >
-                  {submitError}
+                  {error}
                 </div>
               )}
-              <button
-                type="submit"
-                className="btn-fill"
-                style={{ width: "100%", justifyContent: "center" }}
-                disabled={isLoading}
+
+              {isAuthenticated ? (
+                <button
+                  type="button"
+                  className="btn-fill"
+                  style={{ width: "100%", justifyContent: "center" }}
+                  disabled={isLoading}
+                  onClick={handleCheckout}
+                >
+                  {isLoading ? "Redirecting..." : selectedPlan === "ai_pro" ? "Get AI Pro — $20/mo" : "Get Pro — $4/mo"}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="btn-fill"
+                  style={{ width: "100%", justifyContent: "center" }}
+                  onClick={() =>
+                    signIn("google", { callbackUrl: window.location.href })
+                  }
+                >
+                  Sign in with Google to Subscribe
+                </button>
+              )}
+
+              <span
+                style={{
+                  fontSize: "11px",
+                  color: "var(--text-3)",
+                  textAlign: "center",
+                }}
               >
-                {isLoading ? "Saving..." : "Get 50% Off At Launch"}
-              </button>
-              <span style={{ fontSize: "11px", color: "var(--text-3)", textAlign: "center" }}>
-                Get BuildrStudio launch updates. No spam.
+                {isAuthenticated
+                  ? "Secure checkout via Lemon Squeezy. Cancel anytime."
+                  : "Sign in first, then subscribe to unlock Pro features."}
               </span>
             </div>
-          </form>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px", textAlign: "center" }}>
-            <div
-              style={{
-                width: "48px",
-                height: "48px",
-                borderRadius: "50%",
-                background: "var(--fill)",
-                color: "var(--fill-text)",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "20px",
-                margin: "0 auto",
-              }}
-            >
-              ✓
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <span style={{ fontSize: "16px", fontWeight: 700, color: "var(--text-1)" }}>
-                You&apos;re on the list!
-              </span>
-              <p className="ink-body" style={{ fontSize: "13px", color: "var(--text-2)" }}>
-                We have saved your email (<strong>{email}</strong>). We will send your <strong>50% discount code</strong> as soon as these features launch.
-              </p>
-            </div>
-            <button
-              type="button"
-              className="btn-outline btn-sm"
-              onClick={onClose}
-              style={{ alignSelf: "center", marginTop: "8px" }}
-            >
-              Close
-            </button>
-          </div>
+          </>
         )}
       </div>
 

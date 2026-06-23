@@ -29,6 +29,7 @@ import DeviceFrame from "./DeviceFrame";
 export interface BuilderCanvasHandle {
   exportPng: () => Promise<void>;
   copyToClipboard: () => Promise<void>;
+  getCapture: () => Promise<string>;
 }
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -286,6 +287,8 @@ function InnerCanvas({
               spec={spec}
               shadow={config.frameShadow}
               tilt3d={config.frameMode === "tilt3d"}
+              tiltX={config.tiltX}
+              tiltY={config.tiltY}
               imageScale={config.imageScale}
               imageOffsetX={config.imageOffsetX}
               imageOffsetY={config.imageOffsetY}
@@ -350,9 +353,9 @@ function InnerCanvas({
             right: "18px",
             fontSize: "12px",
             fontWeight: 700,
-            color: "rgba(255, 255, 255, 0.45)",
-            background: "rgba(0, 0, 0, 0.35)",
-            padding: "4px 10px",
+            color: "rgba(255, 255, 255, 0.7)",
+            background: "rgba(0, 0, 0, 0.55)",
+            padding: "5px 12px",
             borderRadius: "6px",
             backdropFilter: "blur(4px)",
             userSelect: "none",
@@ -360,20 +363,21 @@ function InnerCanvas({
             zIndex: 100,
             fontFamily: "var(--font)",
             transition: "all 0.15s ease",
-            border: "1px solid rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            letterSpacing: "0.2px",
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = "#fff";
-            e.currentTarget.style.background = "rgba(0,0,0,0.6)";
+            e.currentTarget.style.background = "rgba(0,0,0,0.7)";
             e.currentTarget.style.transform = "scale(1.05)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = "rgba(255, 255, 255, 0.45)";
-            e.currentTarget.style.background = "rgba(0, 0, 0, 0.35)";
+            e.currentTarget.style.color = "rgba(255, 255, 255, 0.7)";
+            e.currentTarget.style.background = "rgba(0, 0, 0, 0.55)";
             e.currentTarget.style.transform = "scale(1)";
           }}
         >
-          via buildrStudio.in 👑
+          Made with buildrstudio.in
         </div>
       )}
     </div>
@@ -409,9 +413,7 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
       return () => resizeObserver.disconnect();
     }, []);
 
-    // Scale the large canvas to fit the preview column.
-    // We target a display height of ~580px for portrait, ~340px for landscape.
-    const targetH = spec.isLandscape ? 340 : 560;
+    const targetH = spec.isLandscape ? 400 : 640;
     let scale = targetH / spec.canvasH;
 
     // Prevent horizontal overflow on smaller viewports
@@ -440,6 +442,7 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
     }, []);
 
     useImperativeHandle(ref, () => ({
+      getCapture,
       async exportPng() {
         const dataUrl = await getCapture();
         const a = document.createElement("a");
@@ -467,9 +470,11 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
         justifyContent: "center",
         flex: 1,
         minHeight: 0,
-        padding: "24px 32px",
-        gap: 20,
+        padding: "20px 24px",
+        gap: 16,
         overflowY: "auto",
+        backgroundImage: "radial-gradient(circle, var(--border) 0.5px, transparent 0.5px)",
+        backgroundSize: "16px 16px",
       }}>
         {/* Canvas wrapper — shows exact scaled display */}
         <div style={{
@@ -477,8 +482,8 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
           height: displayH,
           position: "relative",
           overflow: "hidden",
-          borderRadius: 12,
-          boxShadow: "0 8px 40px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06)",
+          borderRadius: 14,
+          boxShadow: "0 12px 48px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.08)",
         }}>
           <InnerCanvas
             config={config}

@@ -238,9 +238,9 @@ a { color: inherit; text-decoration: none; }
 }
 .sidebar-tab-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 3px;
-  padding: 8px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  padding: 6px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   background: var(--surface);
@@ -250,8 +250,8 @@ a { color: inherit; text-decoration: none; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 8px 4px;
+  gap: 2px;
+  padding: 6px 2px;
   border-radius: var(--r-sm);
   border: none;
   background: transparent;
@@ -259,7 +259,7 @@ a { color: inherit; text-decoration: none; }
   font-family: var(--font);
   transition: background .12s, color .12s;
   color: var(--text-3);
-  min-height: 52px;
+  min-height: 44px;
 }
 .sidebar-tab-btn:hover {
   background: var(--fill-subtle);
@@ -402,7 +402,7 @@ a { color: inherit; text-decoration: none; }
   .canvas-toolbar { flex-wrap: wrap; height: auto; padding: 10px 16px; gap: 6px; }
 }
 @media (max-width: 600px) {
-  .sidebar-tab-grid { grid-template-columns: repeat(4, 1fr); }
+  .sidebar-tab-grid { grid-template-columns: repeat(5, 1fr); }
   .canvas-toolbar { flex-direction: column; align-items: flex-start; }
 }
 
@@ -418,76 +418,5 @@ a { color: inherit; text-decoration: none; }
 @keyframes slideUp {
   from { transform: translate(-50%, 20px); opacity: 0; }
   to   { transform: translate(-50%, 0);    opacity: 1; }
-}
-
-
-/* ── Range inputs ──────────────────────────────────────────────────── */
-.opt-range {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 5px;
-  border-radius: 3px;
-  background: var(--border-strong);
-  outline: none;
-  cursor: pointer;
-}
-.opt-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--fill);
-  cursor: pointer;
-  border: 2px solid var(--bg);
-  box-shadow: 0 0 0 1px var(--border-strong);
-  transition: box-shadow .15s;
-}
-.opt-range::-webkit-slider-thumb:hover {
-  box-shadow: 0 0 0 3px rgba(0,0,0,0.12);
-}
-[data-theme="dark"] .opt-range::-webkit-slider-thumb:hover {
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.15);
-}
-.opt-range::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--fill);
-  cursor: pointer;
-  border: 2px solid var(--bg);
-}
-
-/* ── Canvas noise layer ─────────────────────────────────────────────── */
-.canvas-noise-layer {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  mix-blend-mode: overlay;
-}
-
-/* ── Canvas caption layer ───────────────────────────────────────────── */
-.canvas-caption-layer {
-  position: absolute;
-  left: 0;
-  right: 0;
-  z-index: 5;
-  pointer-events: none;
-}
-
-/* ── Annotation nodes ───────────────────────────────────────────────── */
-.annotation-node {
-  position: absolute;
-  user-select: none;
-  z-index: 20;
-  cursor: grab;
-}
-.annotation-node:active { cursor: grabbing; }
-
-/* ── Collapsible section animation ──────────────────────────────────── */
-@keyframes sectionOpen {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
 }
 

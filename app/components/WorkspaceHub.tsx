@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import TabbedSidebar from "./TabbedSidebar";
 import LivePreviewCanvas, { LivePreviewCanvasHandle } from "./LivePreviewCanvas";
 import PremiumModal from "./PremiumModal";
 import AppHeader from "./AppHeader";
 import UnlockWatermarkModal from "./UnlockWatermarkModal";
+import { useToast } from "./Toast";
 
 // ─── Annotation & Preset Types ────────────────────────────────────────────────
 
@@ -138,6 +140,7 @@ function CanvasToolbar({
   const [isExporting, setIsExporting] = useState(false);
   const [isCopying,   setIsCopying]   = useState(false);
   const [copyStatus,  setCopyStatus]  = useState<"idle" | "ok" | "err">("idle");
+  const { toast } = useToast();
 
   const disabled = !imageSource;
 
@@ -154,8 +157,17 @@ function CanvasToolbar({
       a.href = dataUrl;
       a.click();
       a.remove();
+      toast("PNG exported! Share it on social media", "success", {
+        label: "Share on X",
+        onClick: () => {
+          const text = encodeURIComponent("Just designed this with @BuildrStudio — turn screenshots into social-ready graphics in seconds!\n");
+          const url = encodeURIComponent("https://buildrstudio.in");
+          window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
+        },
+      });
     } catch (e) {
       console.error("Export error:", e);
+      toast("Export failed — please try again", "error");
     } finally {
       setIsExporting(false);
     }
@@ -175,9 +187,11 @@ function CanvasToolbar({
         new ClipboardItem({ "image/png": blobP as unknown as Blob }),
       ]);
       setCopyStatus("ok");
+      toast("Copied to clipboard!", "success");
       setTimeout(() => setCopyStatus("idle"), 2200);
     } catch {
       setCopyStatus("err");
+      toast("Failed to copy — try exporting instead", "error");
       setTimeout(() => setCopyStatus("idle"), 2200);
     } finally {
       setIsCopying(false);
@@ -312,6 +326,7 @@ function Spinner({ light }: { light?: boolean }) {
 // ─── WorkspaceHub ─────────────────────────────────────────────────────────────
 
 export default function WorkspaceHub() {
+  const { data: session } = useSession();
   const [config,      setConfig]      = useState<OptimizationConfig>(DEFAULT_CONFIG);
   const [imageSource, setImageSource] = useState<string | null>(null);
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
@@ -319,8 +334,42 @@ export default function WorkspaceHub() {
   const [isWatermarkUnlocked, setIsWatermarkUnlocked] = useState(false);
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
   const liveRef = useRef<LivePreviewCanvasHandle>(null);
+  const { toast } = useToast();
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (!mod) return;
+      if (e.key === "s") {
+        e.preventDefault();
+        if (!imageSource || !liveRef.current) return;
+        liveRef.current.renderToPng().then((dataUrl) => {
+          const a = document.createElement("a");
+          a.download = `buildrstudio-${Date.now()}.png`;
+          a.href = dataUrl;
+          a.click();
+          a.remove();
+          toast("PNG exported! (⌘S)", "success", {
+            label: "Share on X",
+            onClick: () => {
+              const text = encodeURIComponent("Just designed this with @BuildrStudio — turn screenshots into social-ready graphics in seconds!\n");
+              const url = encodeURIComponent("https://buildrstudio.in");
+              window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
+            },
+          });
+        }).catch(() => toast("Export failed", "error"));
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [imageSource, toast]);
 
   useEffect(() => {
+    if (session?.user?.isPro) {
+      setIsWatermarkUnlocked(true);
+      return;
+    }
     const checkUnlock = () => {
       const untilStr = localStorage.getItem("watermark_unlocked_until");
       if (untilStr) {
@@ -338,7 +387,7 @@ export default function WorkspaceHub() {
     checkUnlock();
     window.addEventListener("focus", checkUnlock);
     return () => window.removeEventListener("focus", checkUnlock);
-  }, []);
+  }, [session?.user?.isPro]);
 
   const handleUnlockWatermark = () => {
     const unlockedUntil = Date.now() + 24 * 60 * 60 * 1000;

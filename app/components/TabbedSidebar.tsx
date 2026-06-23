@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import AICopywriter from "./AICopywriter";
 import {
   OptimizationConfig,
   GRADIENT_PRESETS,
@@ -449,9 +450,16 @@ function TabLayout({ config, update }: { config: OptimizationConfig; update: <K 
 
 // ─── TAB CONTENT: Caption ─────────────────────────────────────────────────────
 
-function TabCaption({ config, update }: { config: OptimizationConfig; update: <K extends keyof OptimizationConfig>(k: K, v: OptimizationConfig[K]) => void }) {
+function TabCaption({ config, update, onOpenPremium }: { config: OptimizationConfig; update: <K extends keyof OptimizationConfig>(k: K, v: OptimizationConfig[K]) => void; onOpenPremium?: () => void }) {
   return (
     <div className="ctrl-section">
+      <AICopywriter
+        onApply={(headline, subtext) => {
+          update("captionTitle", headline);
+          update("captionSubtitle", subtext);
+        }}
+        onUpgrade={onOpenPremium}
+      />
       <div>
         <SectionLabel>Title</SectionLabel>
         <input type="text" className="input-field" placeholder="e.g. Just shipped v2.0 🚀"
@@ -786,7 +794,7 @@ export default function TabbedSidebar({
         {activeTab === "bg"          && <TabBackground    config={config} update={update} />}
         {activeTab === "frame"       && <TabFrame         config={config} update={update} />}
         {activeTab === "layout"      && <TabLayout        config={config} update={update} />}
-        {activeTab === "caption"     && <TabCaption       config={config} update={update} />}
+        {activeTab === "caption"     && <TabCaption       config={config} update={update} onOpenPremium={onOpenPremium} />}
         {activeTab === "image"       && <TabImage         config={config} update={update} />}
         {activeTab === "annotations" && <TabAnnotations   config={config} update={update} />}
         {activeTab === "presets"     && <TabPresets       config={config} setConfig={setConfig} />}

@@ -3,6 +3,8 @@ import { DM_Sans } from "next/font/google";
 import Script from "next/script";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
+import { ToastProvider } from "./components/Toast";
+import AuthProvider from "./components/AuthProvider";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -68,7 +70,11 @@ export default function RootLayout({
         className={dmSans.variable}
         suppressHydrationWarning
       >
-        {children}
+        <AuthProvider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </AuthProvider>
         <SpeedInsights />
         <Analytics />
         <Script

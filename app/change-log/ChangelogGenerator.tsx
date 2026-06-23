@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import Link from "next/link";
 import AppHeader from "../components/AppHeader";
+import { useToast } from "../components/Toast";
 import { ChangelogCard, CARD_W, CARD_H, type CardData, type Template } from "../components/ChangeLogCard";
 
 const TEMPLATES: { id: Template; label: string }[] = [
@@ -42,6 +43,7 @@ const DEFAULT: CardData = {
 export default function ChangelogGenerator() {
   const [data, setData] = useState<CardData>(DEFAULT);
   const [scale, setScale] = useState(0.5);
+  const { toast } = useToast();
   const cardRef = useRef<HTMLDivElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -84,6 +86,7 @@ export default function ChangelogGenerator() {
       a.click();
     } catch (e) {
       console.error(e);
+      toast("Export failed — try again", "error");
     }
   };
 

@@ -9,17 +9,13 @@ import type { DeviceSpec } from "../lib/deviceSpecs";
 
 interface DeviceFrameProps {
   spec: DeviceSpec;
-  /** Screenshot/image rendered inside the frame */
   children: React.ReactNode;
-  /** Whether to apply a drop shadow under the frame */
   shadow?: boolean;
-  /** 3D tilt mode — adds CSS perspective transform */
   tilt3d?: boolean;
-  /** Scale of the screenshot inside the frame: 0.5–1.5 */
+  tiltX?: number;
+  tiltY?: number;
   imageScale?: number;
-  /** Horizontal offset of the screenshot inside the frame (0–100) */
   imageOffsetX?: number;
-  /** Vertical offset of the screenshot inside the frame (0–100) */
   imageOffsetY?: number;
 }
 
@@ -179,7 +175,7 @@ function AndroidTabFrame({ children, shadow, landscape }: { children: React.Reac
 
 // ── Tilt 3D wrapper ────────────────────────────────────────────────────────────
 
-function Tilt3DWrapper({ children, enable }: { children: React.ReactNode; enable: boolean }) {
+function Tilt3DWrapper({ children, enable, tiltX = 4, tiltY = -14 }: { children: React.ReactNode; enable: boolean; tiltX?: number; tiltY?: number }) {
   if (!enable) return <>{children}</>;
   return (
     <div style={{
@@ -189,7 +185,7 @@ function Tilt3DWrapper({ children, enable }: { children: React.ReactNode; enable
       justifyContent: "center",
     }}>
       <div style={{
-        transform: "rotateY(-14deg) rotateX(4deg)",
+        transform: `rotateY(${tiltY}deg) rotateX(${tiltX}deg)`,
         transformStyle: "preserve-3d",
         transition: "transform 0.4s ease",
       }}>
@@ -201,7 +197,7 @@ function Tilt3DWrapper({ children, enable }: { children: React.ReactNode; enable
 
 // ── Main Export ────────────────────────────────────────────────────────────────
 
-export default function DeviceFrame({ spec, children, shadow, tilt3d, imageScale = 1, imageOffsetX = 50, imageOffsetY = 50 }: DeviceFrameProps) {
+export default function DeviceFrame({ spec, children, shadow, tilt3d, tiltX, tiltY, imageScale = 1, imageOffsetX = 50, imageOffsetY = 50 }: DeviceFrameProps) {
   const screenshotContent = (
     <div style={{
       width: "100%",
@@ -261,5 +257,5 @@ export default function DeviceFrame({ spec, children, shadow, tilt3d, imageScale
     }
   })();
 
-  return <Tilt3DWrapper enable={!!tilt3d}>{frame}</Tilt3DWrapper>;
+  return <Tilt3DWrapper enable={!!tilt3d} tiltX={tiltX} tiltY={tiltY}>{frame}</Tilt3DWrapper>;
 }
