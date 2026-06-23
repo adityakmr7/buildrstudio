@@ -116,7 +116,7 @@ function CaptionBlock({
             color: config.headlineColor,
             lineHeight: 1.1,
             letterSpacing: "-0.03em",
-            fontFamily: "var(--font)",
+            fontFamily: config.fontFamily || "var(--font)",
             maxWidth,
             outline: "none",
             cursor: onUpdateConfig ? "text" : "default",
@@ -151,7 +151,7 @@ function CaptionBlock({
             fontWeight: 500,
             color: config.subtextColor,
             lineHeight: 1.4,
-            fontFamily: "var(--font)",
+            fontFamily: config.fontFamily || "var(--font)",
             maxWidth,
             outline: "none",
             cursor: onUpdateConfig ? "text" : "default",
@@ -483,6 +483,7 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
           overflow: "hidden",
           borderRadius: 14,
           boxShadow: "0 12px 48px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.08)",
+          transition: "opacity 0.2s ease",
         }}>
           <InnerCanvas
             config={config}

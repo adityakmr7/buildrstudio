@@ -140,6 +140,35 @@ export default function ScreenshotBuilderHub() {
     return () => window.removeEventListener("focus", checkUnlock);
   }, [session?.user?.isPro]);
 
+  // Load shared deck from URL param
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const shared = params.get("deck");
+    if (shared) {
+      try {
+        const decoded = JSON.parse(atob(shared));
+        if (Array.isArray(decoded) && decoded.length > 0) {
+          setDeck({ screens: decoded.map((s: Partial<BuilderConfig>) => ({ ...DEFAULT_CONFIG, ...s })), activeScreenIndex: 0 });
+          toast("Loaded shared deck!", "success");
+        }
+      } catch { /* ignore invalid */ }
+    }
+  }, []);
+
+  const handleShareDeck = () => {
+    const shareable = deck.screens.map(s => {
+      const { screenshotUrl, ...rest } = s;
+      return rest;
+    });
+    const encoded = btoa(JSON.stringify(shareable));
+    const url = `${window.location.origin}/screenshot-builder?deck=${encoded}`;
+    navigator.clipboard.writeText(url).then(() => {
+      toast("Share link copied to clipboard!", "success");
+    }).catch(() => {
+      toast("Failed to copy link", "error");
+    });
+  };
+
   // Show template gallery on first visit
   useEffect(() => {
     const visited = localStorage.getItem("buildr_sb_visited");
@@ -238,11 +267,37 @@ export default function ScreenshotBuilderHub() {
           screenshotUrl: url,
         };
       }
-      return {
-        ...prev,
-        screens: updated,
-      };
+      return { ...prev, screens: updated };
     });
+
+    // AI auto-layout (fire and forget, non-blocking)
+    if (session?.user?.plan === "ai_pro") {
+      const formData = new FormData();
+      formData.append("screenshot", file);
+      fetch("/api/ai/auto-layout", { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => {
+          if (data.suggestion) {
+            const s = data.suggestion;
+            toast("AI suggested a layout — applied!", "success");
+            setDeck(prev => {
+              const updated = [...prev.screens];
+              const idx = prev.activeScreenIndex;
+              if (updated[idx]) {
+                updated[idx] = {
+                  ...updated[idx],
+                  headline: s.headline || updated[idx].headline,
+                  subtext: s.subtext || updated[idx].subtext,
+                  gradientPreset: s.suggestedGradient || updated[idx].gradientPreset,
+                  textPosition: s.textPosition === "bottom" ? "bottom" : "top",
+                };
+              }
+              return { ...prev, screens: updated };
+            });
+          }
+        })
+        .catch(() => {});
+    }
   };
 
   // Bind global drag-and-drop and paste events
@@ -407,6 +462,7 @@ export default function ScreenshotBuilderHub() {
           "subtextColor",
           "headlineSize",
           "subtextSize",
+          "fontFamily",
           "deviceId",
         ];
 
@@ -608,6 +664,25 @@ export default function ScreenshotBuilderHub() {
                 }}
               >
                 Templates
+              </button>
+              <button
+                type="button"
+                onClick={handleShareDeck}
+                title="Copy share link"
+                style={{
+                  background: "var(--surface-2, var(--surface))",
+                  color: "var(--text-2)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "6px",
+                  padding: "4px 10px",
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
+                Share
               </button>
               <div
                 style={{

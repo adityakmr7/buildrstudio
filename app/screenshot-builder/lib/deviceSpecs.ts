@@ -123,7 +123,7 @@ export function getDevice(id: DeviceId): DeviceSpec {
 export type BgType = "gradient" | "solid" | "mesh";
 export type TextPosition = "top" | "bottom";
 export type FrameMode = "flat" | "tilt3d";
-export type GradDir = "to right" | "to bottom" | "to bottom right" | "135deg" | "45deg";
+export type GradDir = "to right" | "to bottom" | "to bottom right" | "135deg" | "45deg" | "to left" | "to top" | "to top right";
 
 export const GRADIENT_PRESETS: Array<{ name: string; from: string; via?: string; to: string }> = [
   { name: "Indigo Dusk",    from: "#6366f1", via: "#a855f7", to: "#ec4899" },
@@ -134,6 +134,14 @@ export const GRADIENT_PRESETS: Array<{ name: string; from: string; via?: string;
   { name: "Bubblegum",      from: "#f472b6", via: "#e879f9", to: "#a78bfa" },
   { name: "Charcoal",       from: "#111827", via: "#1f2937", to: "#374151" },
   { name: "Arctic White",   from: "#f8fafc", via: "#f1f5f9", to: "#e2e8f0" },
+  { name: "Coral Reef",     from: "#ff6b6b", via: "#ee5a24", to: "#f9ca24" },
+  { name: "Mint Fresh",     from: "#00b894", via: "#55efc4", to: "#81ecec" },
+  { name: "Berry Crush",    from: "#6c5ce7", via: "#a29bfe", to: "#fd79a8" },
+  { name: "Slate Storm",    from: "#2d3436", via: "#636e72", to: "#b2bec3" },
+  { name: "Peach Glow",     from: "#fab1a0", via: "#ff7675", to: "#fd79a8" },
+  { name: "Electric Lime",  from: "#00b09b", via: "#96c93d", to: "#d4fc79" },
+  { name: "Deep Space",     from: "#000428", via: "#004e92", to: "#1a2980" },
+  { name: "Rose Gold",      from: "#f4c4f3", via: "#fc5c7d", to: "#6a82fb" },
 ];
 
 export interface BuilderConfig {
@@ -152,8 +160,9 @@ export interface BuilderConfig {
   textPosition: TextPosition;
   headlineColor: string;
   subtextColor: string;
-  headlineSize: number;     // em-based, e.g. 3.5
+  headlineSize: number;
   subtextSize: number;
+  fontFamily: string;
 
   // Background
   bgType: BgType;
@@ -190,6 +199,7 @@ export const DEFAULT_CONFIG: BuilderConfig = {
   subtextColor: "rgba(255,255,255,0.75)",
   headlineSize: 3.2,
   subtextSize: 1.4,
+  fontFamily: "DM Sans",
   bgType: "gradient",
   gradientPreset: "Indigo Dusk",
   gradientDir: "to bottom",

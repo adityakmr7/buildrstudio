@@ -724,6 +724,30 @@ function TabText({
 
       <div className="ctrl-divider" />
 
+      {/* Font Family */}
+      <div>
+        <SectionLabel>Font Family</SectionLabel>
+        <select
+          className="input-field"
+          value={config.fontFamily || "DM Sans"}
+          onChange={(e) => {
+            update("fontFamily", e.target.value);
+            // Load the font dynamically
+            const link = document.createElement("link");
+            link.href = `https://fonts.googleapis.com/css2?family=${e.target.value.replace(/ /g, "+")}:wght@400;500;700;800&display=swap`;
+            link.rel = "stylesheet";
+            document.head.appendChild(link);
+          }}
+          style={{ fontSize: "12px", padding: "7px 10px", width: "100%" }}
+        >
+          {["DM Sans", "Inter", "Space Grotesk", "Outfit", "Poppins", "Playfair Display", "Sora", "Manrope", "Plus Jakarta Sans", "Bricolage Grotesque"].map((f) => (
+            <option key={f} value={f}>{f}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="ctrl-divider" />
+
       {/* Headline / Subtext alignment position */}
       <div>
         <SectionLabel>Text Position</SectionLabel>
@@ -819,16 +843,36 @@ function TabStyle({
 
           <div>
             <SectionLabel>Gradient Direction</SectionLabel>
-            <SegmentedControl
-              options={[
-                { label: "↓ Bottom", value: "to bottom" },
-                { label: "→ Right", value: "to right" },
-                { label: "↘ Diag", value: "to bottom right" },
-                { label: "45°", value: "45deg" },
-              ]}
-              value={config.gradientDir}
-              onChange={(v) => update("gradientDir", v)}
-            />
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "4px" }}>
+              {([
+                { label: "↗", value: "45deg" },
+                { label: "→", value: "to right" },
+                { label: "↘", value: "to bottom right" },
+                { label: "↓", value: "to bottom" },
+                { label: "↙", value: "135deg" },
+                { label: "←", value: "to left" },
+                { label: "↖", value: "to top right" },
+                { label: "↑", value: "to top" },
+              ] as { label: string; value: GradDir }[]).map((d) => (
+                <button
+                  key={d.value}
+                  type="button"
+                  onClick={() => update("gradientDir", d.value)}
+                  style={{
+                    padding: "6px",
+                    fontSize: "14px",
+                    background: config.gradientDir === d.value ? "var(--fill)" : "var(--surface-2, var(--surface))",
+                    color: config.gradientDir === d.value ? "var(--on-fill, #fff)" : "var(--text-2)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    transition: "all 0.12s",
+                  }}
+                >
+                  {d.label}
+                </button>
+              ))}
+            </div>
           </div>
         </>
       )}

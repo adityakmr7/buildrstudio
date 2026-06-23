@@ -394,15 +394,27 @@ a { color: inherit; text-decoration: none; }
 
 /* ─── RESPONSIVE FALLBACK ─── */
 @media (max-width: 900px) {
-  .workspace-body { flex-direction: column; overflow-y: auto; }
-  .tabbed-sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
-  .sidebar-tab-content { max-height: 360px; }
+  .workspace-body { flex-direction: column-reverse; overflow-y: auto; }
+  .tabbed-sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 50vh;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    border-bottom: none;
+    position: sticky;
+    bottom: 0;
+    z-index: 50;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  }
+  .sidebar-tab-content { max-height: 280px; }
   .canvas-column { height: auto; overflow: visible; }
   .canvas-preview-area { overflow: visible; padding: 16px; }
   .canvas-toolbar { flex-wrap: wrap; height: auto; padding: 10px 16px; gap: 6px; }
 }
 @media (max-width: 600px) {
   .sidebar-tab-grid { grid-template-columns: repeat(5, 1fr); }
+  .sidebar-tab-content { max-height: 220px; }
   .canvas-toolbar { flex-direction: column; align-items: flex-start; }
 }
 
