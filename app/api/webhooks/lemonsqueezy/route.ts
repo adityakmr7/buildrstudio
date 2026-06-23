@@ -4,13 +4,18 @@ import { upsertSubscription, findUserByEmail, initAuthTables } from "@/app/lib/d
 
 function verifySignature(rawBody: string, signature: string): boolean {
   const secret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET;
-  if (!secret) return false;
+  if (!secret || !signature) return false;
 
   const hmac = crypto.createHmac("sha256", secret);
   hmac.update(rawBody);
   const digest = hmac.digest("hex");
 
-  return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(signature));
+  // timingSafeEqual requires equal-length buffers; mismatched lengths would throw
+  const digestBuf = Buffer.from(digest);
+  const sigBuf = Buffer.from(signature);
+  if (digestBuf.length !== sigBuf.length) return false;
+
+  return crypto.timingSafeEqual(digestBuf, sigBuf);
 }
 
 export async function POST(request: NextRequest) {
