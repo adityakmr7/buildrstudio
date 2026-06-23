@@ -73,7 +73,7 @@ export async function getActiveSubscription(userId: string) {
   const sql = getDb();
 
   const rows = await sql`
-    SELECT id, ls_subscription_id, status, current_period_end, cancel_at_period_end
+    SELECT id, ls_subscription_id, ls_variant_id, status, current_period_end, cancel_at_period_end
     FROM subscriptions
     WHERE user_id = ${userId}
       AND status IN ('active', 'on_trial', 'paused')
@@ -129,4 +129,25 @@ export async function findUserByEmail(email: string) {
   const sql = getDb();
   const rows = await sql`SELECT id, email, name, image FROM users WHERE email = ${email} LIMIT 1`;
   return rows.length > 0 ? rows[0] : null;
+}
+
+export async function getAiUsageToday(identifier: string): Promise<number> {
+  const sql = getDb();
+  await sql`
+    CREATE TABLE IF NOT EXISTS ai_usage (
+      id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+      identifier TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT now()
+    )
+  `;
+  const rows = await sql`
+    SELECT COUNT(*)::int AS count FROM ai_usage
+    WHERE identifier = ${identifier} AND created_at > now() - interval '1 day'
+  `;
+  return rows[0]?.count ?? 0;
+}
+
+export async function recordAiUsage(identifier: string) {
+  const sql = getDb();
+  await sql`INSERT INTO ai_usage (identifier) VALUES (${identifier})`;
 }

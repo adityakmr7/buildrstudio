@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import TabbedSidebar from "./TabbedSidebar";
 import LivePreviewCanvas, { LivePreviewCanvasHandle } from "./LivePreviewCanvas";
 import PremiumModal from "./PremiumModal";
@@ -325,6 +326,7 @@ function Spinner({ light }: { light?: boolean }) {
 // ─── WorkspaceHub ─────────────────────────────────────────────────────────────
 
 export default function WorkspaceHub() {
+  const { data: session } = useSession();
   const [config,      setConfig]      = useState<OptimizationConfig>(DEFAULT_CONFIG);
   const [imageSource, setImageSource] = useState<string | null>(null);
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
@@ -364,6 +366,10 @@ export default function WorkspaceHub() {
   }, [imageSource, toast]);
 
   useEffect(() => {
+    if (session?.user?.isPro) {
+      setIsWatermarkUnlocked(true);
+      return;
+    }
     const checkUnlock = () => {
       const untilStr = localStorage.getItem("watermark_unlocked_until");
       if (untilStr) {
@@ -381,7 +387,7 @@ export default function WorkspaceHub() {
     checkUnlock();
     window.addEventListener("focus", checkUnlock);
     return () => window.removeEventListener("focus", checkUnlock);
-  }, []);
+  }, [session?.user?.isPro]);
 
   const handleUnlockWatermark = () => {
     const unlockedUntil = Date.now() + 24 * 60 * 60 * 1000;

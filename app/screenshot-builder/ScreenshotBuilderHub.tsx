@@ -4,7 +4,8 @@
 // The core page manager for the App Store / Play Store Screenshot Builder.
 // Holds state, coordinates export triggers, and renders the header + workspace.
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import type { BuilderConfig } from "./lib/deviceSpecs";
 import { DEFAULT_CONFIG } from "./lib/deviceSpecs";
 import BuilderSidebar from "./components/BuilderSidebar";
@@ -15,6 +16,7 @@ import UnlockWatermarkModal from "../components/UnlockWatermarkModal";
 import { useToast } from "../components/Toast";
 
 export default function ScreenshotBuilderHub() {
+  const { data: session } = useSession();
   const [deck, setDeck] = useState<{
     screens: BuilderConfig[];
     activeScreenIndex: number;
@@ -41,14 +43,62 @@ export default function ScreenshotBuilderHub() {
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
   const [isWatermarkUnlocked, setIsWatermarkUnlocked] = useState(false);
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const canvasRef = useRef<BuilderCanvasHandle>(null);
   const { toast } = useToast();
+
+  // Undo/redo history
+  const historyRef = useRef<{ screens: BuilderConfig[]; activeScreenIndex: number }[]>([]);
+  const futureRef = useRef<{ screens: BuilderConfig[]; activeScreenIndex: number }[]>([]);
+  const lastSnapshotRef = useRef<string>("");
+
+  const pushHistory = useCallback((snapshot: { screens: BuilderConfig[]; activeScreenIndex: number }) => {
+    const key = JSON.stringify(snapshot.screens.map(s => ({ ...s, screenshotUrl: null })));
+    if (key === lastSnapshotRef.current) return;
+    lastSnapshotRef.current = key;
+    historyRef.current.push(snapshot);
+    if (historyRef.current.length > 50) historyRef.current.shift();
+    futureRef.current = [];
+  }, []);
+
+  const undo = useCallback(() => {
+    if (historyRef.current.length === 0) return;
+    const prev = historyRef.current.pop()!;
+    setDeck(current => {
+      futureRef.current.push({ screens: current.screens, activeScreenIndex: current.activeScreenIndex });
+      return prev;
+    });
+    lastSnapshotRef.current = "";
+  }, []);
+
+  const redo = useCallback(() => {
+    if (futureRef.current.length === 0) return;
+    const next = futureRef.current.pop()!;
+    setDeck(current => {
+      historyRef.current.push({ screens: current.screens, activeScreenIndex: current.activeScreenIndex });
+      return next;
+    });
+    lastSnapshotRef.current = "";
+  }, []);
 
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
       if (!mod) return;
+      const tag = (e.target as HTMLElement)?.tagName;
+      const isEditable = tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement)?.isContentEditable;
+      if (e.key === "z" && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+        return;
+      }
+      if ((e.key === "z" && e.shiftKey) || e.key === "y") {
+        e.preventDefault();
+        redo();
+        return;
+      }
+      if (isEditable) return;
       if (e.key === "s") {
         e.preventDefault();
         handleExport();
@@ -63,6 +113,10 @@ export default function ScreenshotBuilderHub() {
   });
 
   useEffect(() => {
+    if (session?.user?.isPro) {
+      setIsWatermarkUnlocked(true);
+      return;
+    }
     const checkUnlock = () => {
       const untilStr = localStorage.getItem("watermark_unlocked_until");
       if (untilStr) {
@@ -80,7 +134,7 @@ export default function ScreenshotBuilderHub() {
     checkUnlock();
     window.addEventListener("focus", checkUnlock);
     return () => window.removeEventListener("focus", checkUnlock);
-  }, []);
+  }, [session?.user?.isPro]);
 
   const handleUnlockWatermark = () => {
     const unlockedUntil = Date.now() + 24 * 60 * 60 * 1000;
@@ -93,20 +147,54 @@ export default function ScreenshotBuilderHub() {
   const activeScreenConfig = screens[activeScreenIndex] || DEFAULT_CONFIG;
 
   const handleExport = () => {
-    if (canvasRef.current) {
-      canvasRef.current.exportPng().then(() => {
-        toast("Screenshot exported!", "success", {
-          label: "Share on X",
-          onClick: () => {
-            const text = encodeURIComponent("Just built these App Store screenshots in seconds with @BuildrStudio!\n");
-            const url = encodeURIComponent("https://buildrstudio.in/screenshot-builder");
-            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
-          },
-        });
-      }).catch((err) => {
-        console.error("Export failed:", err);
-        toast("Export failed — please try again", "error");
+    if (!canvasRef.current || isExporting) return;
+    setIsExporting(true);
+    canvasRef.current.exportPng().then(() => {
+      toast("Screenshot exported!", "success", {
+        label: "Share on X",
+        onClick: () => {
+          const text = encodeURIComponent("Just built these App Store screenshots in seconds with @BuildrStudio!\n");
+          const url = encodeURIComponent("https://buildrstudio.in/screenshot-builder");
+          window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
+        },
       });
+    }).catch((err) => {
+      console.error("Export failed:", err);
+      toast("Export failed — please try again", "error");
+    }).finally(() => setIsExporting(false));
+  };
+
+  const handleExportAll = async () => {
+    if (!canvasRef.current || isExporting) return;
+    setIsExporting(true);
+    try {
+      const JSZip = (await import("jszip")).default;
+      const zip = new JSZip();
+      const originalIdx = deck.activeScreenIndex;
+
+      for (let i = 0; i < deck.screens.length; i++) {
+        setDeck(prev => ({ ...prev, activeScreenIndex: i }));
+        // Wait for canvas to re-render with new config
+        await new Promise(r => setTimeout(r, 300));
+        const dataUrl = await canvasRef.current!.getCapture();
+        const base64 = dataUrl.split(",")[1];
+        zip.file(`screen-${i + 1}.png`, base64, { base64: true });
+        toast(`Exporting screen ${i + 1}/${deck.screens.length}...`, "info");
+      }
+
+      setDeck(prev => ({ ...prev, activeScreenIndex: originalIdx }));
+      const blob = await zip.generateAsync({ type: "blob" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `buildrstudio-screenshots.zip`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      toast(`All ${deck.screens.length} screens exported as ZIP!`, "success");
+    } catch (err) {
+      console.error("Batch export failed:", err);
+      toast("Batch export failed — please try again", "error");
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -270,11 +358,11 @@ export default function ScreenshotBuilderHub() {
     extractColors();
   }, [activeScreenConfig.screenshotUrl, activeScreenIndex]);
 
-  // Wrapper setConfig that intercepts updates and automatically syncs theme props
   const handleSetSingleConfig = (
     updateFnOrVal: React.SetStateAction<BuilderConfig>
   ) => {
     setDeck((prev) => {
+      pushHistory({ screens: prev.screens, activeScreenIndex: prev.activeScreenIndex });
       const updatedScreens = [...prev.screens];
       const activeIdx = prev.activeScreenIndex;
       const current = updatedScreens[activeIdx] || DEFAULT_CONFIG;
@@ -429,7 +517,10 @@ export default function ScreenshotBuilderHub() {
           config={activeScreenConfig}
           setConfig={handleSetSingleConfig}
           onExport={handleExport}
+          onExportAll={handleExportAll}
           onCopy={handleCopy}
+          isExporting={isExporting}
+          screenCount={deck.screens.length}
           isWatermarkUnlocked={isWatermarkUnlocked}
           onOpenUnlockWatermark={() => setIsUnlockModalOpen(true)}
           onOpenPremium={() => setIsPremiumOpen(true)}
@@ -451,12 +542,13 @@ export default function ScreenshotBuilderHub() {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "16px",
-              padding: "12px 24px",
+              gap: "14px",
+              padding: "10px 20px",
               borderBottom: "1.5px solid var(--border)",
               background: "var(--surface)",
               overflowX: "auto",
               flexShrink: 0,
+              scrollbarWidth: "none",
             }}
           >
             <div
@@ -720,8 +812,8 @@ export default function ScreenshotBuilderHub() {
           border-color: var(--border-strong) !important;
         }
         .deck-card-container.active-card {
-          transform: scale(1.02) translateY(-1px);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22) !important;
+          transform: scale(1.05) translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 0 2px var(--fill) !important;
         }
         .deck-card-container:hover .deck-card-actions {
           opacity: 1 !important;

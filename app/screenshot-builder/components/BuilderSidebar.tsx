@@ -5,6 +5,7 @@
 // Offers 5 tabs: Device, Text, Style, Presets, Export.
 
 import React, { useRef, useState } from "react";
+import AICopywriter from "../../components/AICopywriter";
 import type {
   BuilderConfig,
   DeviceId,
@@ -26,7 +27,10 @@ interface BuilderSidebarProps {
   config: BuilderConfig;
   setConfig: React.Dispatch<React.SetStateAction<BuilderConfig>>;
   onExport: () => void;
+  onExportAll: () => void;
   onCopy: () => void;
+  isExporting: boolean;
+  screenCount: number;
   isWatermarkUnlocked: boolean;
   onOpenUnlockWatermark: () => void;
   onOpenPremium: () => void;
@@ -182,6 +186,20 @@ function RangeSlider({
   );
 }
 
+function rgbaToHex(rgba: string): string {
+  const m = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (!m) return "#ffffff";
+  const r = parseInt(m[1]).toString(16).padStart(2, "0");
+  const g = parseInt(m[2]).toString(16).padStart(2, "0");
+  const b = parseInt(m[3]).toString(16).padStart(2, "0");
+  return `#${r}${g}${b}`;
+}
+
+function extractAlpha(val: string): number | null {
+  const m = val.match(/rgba?\([^)]*,\s*([\d.]+)\s*\)/);
+  return m ? parseFloat(m[1]) : null;
+}
+
 function ColorRow({
   label,
   value,
@@ -191,12 +209,27 @@ function ColorRow({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const isRgba = value.startsWith("rgba");
+  const alpha = isRgba ? extractAlpha(value) : null;
+  const pickerValue = isRgba ? rgbaToHex(value) : value;
+
+  const handlePickerChange = (hex: string) => {
+    if (alpha !== null) {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      onChange(`rgba(${r},${g},${b},${alpha})`);
+    } else {
+      onChange(hex);
+    }
+  };
+
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
       <input
         type="color"
-        value={value.startsWith("rgba") ? "#ffffff" : value}
-        onChange={(e) => onChange(e.target.value)}
+        value={pickerValue}
+        onChange={(e) => handlePickerChange(e.target.value)}
         style={{
           width: "26px",
           height: "26px",
@@ -216,7 +249,7 @@ function ColorRow({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         style={{
-          width: "90px",
+          width: "120px",
           fontSize: "10px",
           fontFamily: "monospace",
           background: "var(--surface-2)",
@@ -607,12 +640,22 @@ function TabDevice({
 function TabText({
   config,
   update,
+  onOpenPremium,
 }: {
   config: BuilderConfig;
   update: <K extends keyof BuilderConfig>(k: K, v: BuilderConfig[K]) => void;
+  onOpenPremium?: () => void;
 }) {
   return (
     <div className="ctrl-section">
+      <AICopywriter
+        onApply={(headline, subtext) => {
+          update("headline", headline);
+          update("subtext", subtext);
+        }}
+        onUpgrade={onOpenPremium}
+      />
+
       {/* Title / Headline */}
       <div>
         <SectionLabel>Headline</SectionLabel>
@@ -828,6 +871,30 @@ function TabStyle({
           onChange={(v) => update("frameMode", v)}
         />
       </div>
+
+      {/* 3D Tilt Controls */}
+      {config.frameMode === "tilt3d" && (
+        <>
+          <RangeSlider
+            label="Tilt X (Vertical)"
+            min={-30}
+            max={30}
+            step={1}
+            value={config.tiltX}
+            onChange={(v) => update("tiltX", v)}
+            unit="°"
+          />
+          <RangeSlider
+            label="Tilt Y (Horizontal)"
+            min={-30}
+            max={30}
+            step={1}
+            value={config.tiltY}
+            onChange={(v) => update("tiltY", v)}
+            unit="°"
+          />
+        </>
+      )}
 
       {/* Panoramic Layout Spanning */}
       <div>
@@ -1156,48 +1223,71 @@ function TabPresets({
 
 // ── Tab: Export ────────────────────────────────────────────────────────────────
 
-function TabExport({ onExport, onCopy }: { onExport: () => void; onCopy: () => void }) {
+function TabExport({ onExport, onExportAll, onCopy, isExporting, screenCount }: {
+  onExport: () => void;
+  onExportAll: () => void;
+  onCopy: () => void;
+  isExporting: boolean;
+  screenCount: number;
+}) {
   return (
     <div className="ctrl-section">
-      <SectionLabel>Export Options</SectionLabel>
-      <p style={{ fontSize: "11px", color: "var(--text-3)", margin: 0, lineHeight: 1.5 }}>
-        Export your screenshot at the store's native resolution.
-      </p>
+      <SectionLabel>Export Current Screen</SectionLabel>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "10px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <button
           type="button"
           onClick={onExport}
+          disabled={isExporting}
           className="btn-fill btn-lg"
-          style={{ width: "100%", justifyContent: "center", display: "flex", gap: "8px" }}
+          style={{ width: "100%", justifyContent: "center", display: "flex", gap: "8px", opacity: isExporting ? 0.6 : 1 }}
         >
-          <span>⬇️</span> Download PNG Image
+          {isExporting ? "⏳ Exporting..." : "⬇️ Download PNG"}
         </button>
 
         <button
           type="button"
           onClick={onCopy}
+          disabled={isExporting}
           className="btn-outline btn-lg"
-          style={{ width: "100%", justifyContent: "center", display: "flex", gap: "8px" }}
+          style={{ width: "100%", justifyContent: "center", display: "flex", gap: "8px", opacity: isExporting ? 0.6 : 1 }}
         >
-          <span>📋</span> Copy to Clipboard
+          📋 Copy to Clipboard
         </button>
       </div>
 
-      <div className="ctrl-divider" style={{ margin: "20px 0" }} />
+      <div className="ctrl-divider" style={{ margin: "16px 0" }} />
 
-      <div
+      <SectionLabel>Export All Screens</SectionLabel>
+      <p style={{ fontSize: "11px", color: "var(--text-3)", margin: "0 0 8px" }}>
+        Download all {screenCount} screens as a ZIP file.
+      </p>
+      <button
+        type="button"
+        onClick={onExportAll}
+        disabled={isExporting}
+        className="btn-fill btn-lg"
         style={{
-          padding: "10px 12px",
-          background: "var(--fill-subtle)",
-          border: "1px solid var(--border)",
-          borderRadius: "var(--r-md)",
-          fontSize: "11px",
-          color: "var(--text-2)",
-          lineHeight: 1.4,
+          width: "100%", justifyContent: "center", display: "flex", gap: "8px",
+          background: isExporting ? undefined : "linear-gradient(135deg, #6366f1, #8b5cf6)",
+          opacity: isExporting ? 0.6 : 1,
         }}
       >
-        <strong>Tip:</strong> You can choose either 3D Perspective Tilt or Flat Frame styles from the <strong>Style</strong> tab. Use the maximum resolution settings required directly by the Apple App Store or Google Play Store console.
+        {isExporting ? "⏳ Exporting..." : `📦 Export All as ZIP (${screenCount})`}
+      </button>
+
+      <div className="ctrl-divider" style={{ margin: "16px 0" }} />
+
+      <div style={{
+        padding: "10px 12px",
+        background: "var(--fill-subtle)",
+        border: "1px solid var(--border)",
+        borderRadius: "var(--r-md)",
+        fontSize: "11px",
+        color: "var(--text-2)",
+        lineHeight: 1.4,
+      }}>
+        <strong>Shortcuts:</strong> ⌘S to export, ⌘⇧C to copy, ⌘Z / ⌘⇧Z for undo/redo.
       </div>
     </div>
   );
@@ -1209,7 +1299,10 @@ export default function BuilderSidebar({
   config,
   setConfig,
   onExport,
+  onExportAll,
   onCopy,
+  isExporting,
+  screenCount,
   isWatermarkUnlocked,
   onOpenUnlockWatermark,
   onOpenPremium,
@@ -1242,7 +1335,7 @@ export default function BuilderSidebar({
       {/* Tab content */}
       <div className="sidebar-tab-content" role="tabpanel">
         {activeTab === "device" && <TabDevice config={config} update={update} />}
-        {activeTab === "text" && <TabText config={config} update={update} />}
+        {activeTab === "text" && <TabText config={config} update={update} onOpenPremium={onOpenPremium} />}
         {activeTab === "style" && (
           <TabStyle
             config={config}
@@ -1253,7 +1346,7 @@ export default function BuilderSidebar({
           />
         )}
         {activeTab === "presets" && <TabPresets setConfig={setConfig} />}
-        {activeTab === "export" && <TabExport onExport={onExport} onCopy={onCopy} />}
+        {activeTab === "export" && <TabExport onExport={onExport} onExportAll={onExportAll} onCopy={onCopy} isExporting={isExporting} screenCount={screenCount} />}
       </div>
     </aside>
   );

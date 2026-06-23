@@ -29,6 +29,7 @@ import DeviceFrame from "./DeviceFrame";
 export interface BuilderCanvasHandle {
   exportPng: () => Promise<void>;
   copyToClipboard: () => Promise<void>;
+  getCapture: () => Promise<string>;
 }
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -286,6 +287,8 @@ function InnerCanvas({
               spec={spec}
               shadow={config.frameShadow}
               tilt3d={config.frameMode === "tilt3d"}
+              tiltX={config.tiltX}
+              tiltY={config.tiltY}
               imageScale={config.imageScale}
               imageOffsetX={config.imageOffsetX}
               imageOffsetY={config.imageOffsetY}
@@ -410,9 +413,7 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
       return () => resizeObserver.disconnect();
     }, []);
 
-    // Scale the large canvas to fit the preview column.
-    // We target a display height of ~580px for portrait, ~340px for landscape.
-    const targetH = spec.isLandscape ? 340 : 560;
+    const targetH = spec.isLandscape ? 400 : 640;
     let scale = targetH / spec.canvasH;
 
     // Prevent horizontal overflow on smaller viewports
@@ -441,6 +442,7 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
     }, []);
 
     useImperativeHandle(ref, () => ({
+      getCapture,
       async exportPng() {
         const dataUrl = await getCapture();
         const a = document.createElement("a");
@@ -468,9 +470,11 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
         justifyContent: "center",
         flex: 1,
         minHeight: 0,
-        padding: "24px 32px",
-        gap: 20,
+        padding: "20px 24px",
+        gap: 16,
         overflowY: "auto",
+        backgroundImage: "radial-gradient(circle, var(--border) 0.5px, transparent 0.5px)",
+        backgroundSize: "16px 16px",
       }}>
         {/* Canvas wrapper — shows exact scaled display */}
         <div style={{
@@ -478,8 +482,8 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
           height: displayH,
           position: "relative",
           overflow: "hidden",
-          borderRadius: 12,
-          boxShadow: "0 8px 40px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06)",
+          borderRadius: 14,
+          boxShadow: "0 12px 48px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.08)",
         }}>
           <InnerCanvas
             config={config}

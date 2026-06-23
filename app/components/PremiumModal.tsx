@@ -7,6 +7,7 @@ interface PremiumModalProps {
   isOpen: boolean;
   onClose: () => void;
   feature?: "watermark" | "4k-export" | "3d-tilt" | "brand-presets" | "batch-export";
+  defaultPlan?: "pro" | "ai_pro";
 }
 
 const FEATURE_HEADLINES: Record<string, string> = {
@@ -17,10 +18,11 @@ const FEATURE_HEADLINES: Record<string, string> = {
   "batch-export": "Batch Multi-Device Export — Go Pro",
 };
 
-export default function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
+export default function PremiumModal({ isOpen, onClose, feature, defaultPlan }: PremiumModalProps) {
   const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedPlan, setSelectedPlan] = useState<"pro" | "ai_pro">(defaultPlan ?? "pro");
 
   if (!isOpen) return null;
 
@@ -32,7 +34,11 @@ export default function PremiumModal({ isOpen, onClose, feature }: PremiumModalP
     setError("");
 
     try {
-      const res = await fetch("/api/checkout", { method: "POST" });
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: selectedPlan }),
+      });
       const data = (await res.json()) as { url?: string; error?: string };
 
       if (!res.ok || !data.url) {
@@ -147,50 +153,41 @@ export default function PremiumModal({ isOpen, onClose, feature }: PremiumModalP
                 style={{ fontSize: "22px", letterSpacing: "-0.5px" }}
               >
                 {feature
-                  ? (FEATURE_HEADLINES[feature] ?? "Upgrade to Pro")
-                  : "Upgrade to Pro"}
+                  ? (FEATURE_HEADLINES[feature] ?? "Upgrade Your Plan")
+                  : "Upgrade Your Plan"}
               </h2>
-              <p
-                style={{
-                  fontSize: "28px",
-                  fontWeight: 800,
-                  color: "var(--text-1)",
-                  margin: 0,
-                  letterSpacing: "-1px",
-                }}
-              >
-                $4
-                <span
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--text-3)",
-                  }}
-                >
-                  /mo
-                </span>
-                <span
-                  style={{
-                    fontSize: "13px",
-                    fontWeight: 500,
-                    color: "var(--text-3)",
-                    marginLeft: "8px",
-                    textDecoration: "line-through",
-                  }}
-                >
-                  $8
-                </span>
-                <span
-                  className="badge-dark"
-                  style={{
-                    fontSize: "10px",
-                    marginLeft: "8px",
-                    verticalAlign: "middle",
-                  }}
-                >
-                  50% OFF
-                </span>
-              </p>
+            </div>
+
+            {/* Plan Toggle */}
+            <div style={{ display: "flex", gap: "8px" }}>
+              {(["pro", "ai_pro"] as const).map((plan) => {
+                const active = selectedPlan === plan;
+                const isPro = plan === "pro";
+                return (
+                  <button
+                    key={plan}
+                    type="button"
+                    onClick={() => setSelectedPlan(plan)}
+                    style={{
+                      flex: 1,
+                      padding: "12px 10px",
+                      borderRadius: "var(--r-md)",
+                      border: active ? "2px solid var(--fill)" : "1px solid var(--border)",
+                      background: active ? "var(--fill-subtle)" : "transparent",
+                      cursor: "pointer",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div style={{ fontSize: "20px", fontWeight: 800, color: "var(--text-1)" }}>
+                      {isPro ? "$4" : "$20"}
+                      <span style={{ fontSize: "12px", fontWeight: 500, color: "var(--text-3)" }}>/mo</span>
+                    </div>
+                    <div style={{ fontSize: "12px", fontWeight: 600, color: active ? "var(--fill)" : "var(--text-2)", marginTop: "2px" }}>
+                      {isPro ? "Pro" : "AI Pro"}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Feature List */}
@@ -208,31 +205,33 @@ export default function PremiumModal({ isOpen, onClose, feature }: PremiumModalP
             >
               <div style={{ display: "flex", gap: "8px" }}>
                 <span>✨</span>
-                <span>
-                  <strong>Remove Watermark</strong> (Export clean screenshots)
-                </span>
-              </div>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <span>🎨</span>
-                <span>
-                  <strong>Custom Watermark / Logo</strong> (Add your own brand
-                  badge)
-                </span>
+                <span><strong>Remove Watermark</strong> (Export clean screenshots)</span>
               </div>
               <div style={{ display: "flex", gap: "8px" }}>
                 <span>🖥️</span>
-                <span>
-                  <strong>4K Serialization Rendering</strong> (Highest sharpness
-                  possible)
-                </span>
+                <span><strong>3D Device Tilts & 4K Export</strong></span>
               </div>
               <div style={{ display: "flex", gap: "8px" }}>
-                <span>✍️</span>
-                <span>
-                  <strong>Custom Typography</strong> (Change browser mockup
-                  fonts)
-                </span>
+                <span>📦</span>
+                <span><strong>Batch Multi-Device Export</strong></span>
               </div>
+              {selectedPlan === "ai_pro" && (
+                <>
+                  <div style={{ height: "1px", background: "var(--border)", margin: "4px 0" }} />
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <span>🤖</span>
+                    <span><strong>Unlimited AI Copywriting</strong></span>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <span>🌍</span>
+                    <span><strong>AI Translation (15+ languages)</strong></span>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <span>⚡</span>
+                    <span><strong>Smart Tone & Category Targeting</strong></span>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* CTA */}
@@ -266,7 +265,7 @@ export default function PremiumModal({ isOpen, onClose, feature }: PremiumModalP
                   disabled={isLoading}
                   onClick={handleCheckout}
                 >
-                  {isLoading ? "Redirecting..." : "Get Pro — $4/mo"}
+                  {isLoading ? "Redirecting..." : selectedPlan === "ai_pro" ? "Get AI Pro — $20/mo" : "Get Pro — $4/mo"}
                 </button>
               ) : (
                 <button

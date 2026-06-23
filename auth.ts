@@ -2,6 +2,8 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { findOrCreateUser, getActiveSubscription } from "./app/lib/db";
 
+export type PlanTier = "free" | "pro" | "ai_pro";
+
 declare module "next-auth" {
   interface Session {
     user: {
@@ -10,6 +12,7 @@ declare module "next-auth" {
       email: string;
       image?: string;
       isPro: boolean;
+      plan: PlanTier;
     };
   }
 }
@@ -43,12 +46,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.userId as string;
         try {
           const sub = await getActiveSubscription(token.userId as string);
-          session.user.isPro = !!sub;
+          if (sub) {
+            const aiVariantId = process.env.LEMONSQUEEZY_AI_VARIANT_ID;
+            const isAiPro = aiVariantId && String(sub.ls_variant_id) === aiVariantId;
+            session.user.isPro = true;
+            session.user.plan = isAiPro ? "ai_pro" : "pro";
+          } else {
+            session.user.isPro = false;
+            session.user.plan = "free";
+          }
         } catch {
           session.user.isPro = false;
+          session.user.plan = "free";
         }
       } else {
         session.user.isPro = false;
+        session.user.plan = "free";
       }
       return session;
     },

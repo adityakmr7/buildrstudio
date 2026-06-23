@@ -147,11 +147,15 @@ GOOGLE_CLIENT_SECRET=<google-oauth-client-secret>
 # Required for payments
 LEMONSQUEEZY_API_KEY=<ls-api-key>
 LEMONSQUEEZY_STORE_ID=<ls-store-id>
-LEMONSQUEEZY_VARIANT_ID=<ls-variant-id>   # The $4/mo Pro plan variant
+LEMONSQUEEZY_VARIANT_ID=<ls-variant-id>          # The $4/mo Pro plan variant
+LEMONSQUEEZY_AI_VARIANT_ID=<ls-ai-variant-id>    # The $20/mo AI Pro plan variant
 LEMONSQUEEZY_WEBHOOK_SECRET=<ls-webhook-signing-secret>
 
 # App URL (for checkout redirects)
 NEXT_PUBLIC_APP_URL=https://buildrstudio.in
+
+# AI copywriting (Gemini free tier)
+GEMINI_API_KEY=<google-ai-studio-api-key>
 
 # Optional — blog page
 HASHNODE_GQL_ENDPOINT=https://gql.hashnode.com/    # default

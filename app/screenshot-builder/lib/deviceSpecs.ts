@@ -169,6 +169,8 @@ export interface BuilderConfig {
   frameMode: FrameMode;
   frameVisible: boolean;
   frameShadow: boolean;
+  tiltX: number;
+  tiltY: number;
 
   // Spanning / Deck sync settings
   panoramic: "none" | "left" | "right";
@@ -199,6 +201,8 @@ export const DEFAULT_CONFIG: BuilderConfig = {
   frameMode: "flat",
   frameVisible: true,
   frameShadow: true,
+  tiltX: 4,
+  tiltY: -14,
   panoramic: "none",
   autoSyncTheme: true,
 };

@@ -757,6 +757,37 @@ export default function SaaSLandingPage() {
               Get Pro — $4/mo
             </button>
           </div>
+
+          {/* AI Pro Tier */}
+          <div className="price-card pro" style={{ border: "2px solid var(--fill)", position: "relative" }}>
+            <span className="badge-pro" style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)" }}>Most Popular</span>
+            <h3 className="price-name" style={{ color: "var(--fill)" }}>AI Pro Plan</h3>
+            <div>
+              <span className="price-val">$20</span>
+              <span className="price-period"> /month</span>
+            </div>
+            <p style={{ fontSize: "13px", color: "var(--text-3)", margin: 0 }}>
+              Everything in Pro + unlimited AI-powered copywriting & translation.
+            </p>
+            <ul className="price-features">
+              <li className="price-feature" style={{ fontWeight: 600 }}><span>✦</span> Everything in Pro</li>
+              <li className="price-feature"><span>✦</span> Unlimited AI headline generation</li>
+              <li className="price-feature"><span>✦</span> AI-powered 15+ language translation</li>
+              <li className="price-feature"><span>✦</span> Smart tone & category targeting</li>
+              <li className="price-feature"><span>✦</span> Priority generation speed</li>
+            </ul>
+            <button
+              type="button"
+              onClick={() => setIsPremiumOpen(true)}
+              className="btn-fill btn-md"
+              style={{
+                width: "100%", justifyContent: "center", fontWeight: 700, cursor: "pointer", border: "none",
+                background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+              }}
+            >
+              Get AI Pro — $20/mo
+            </button>
+          </div>
         </div>
       </section>
 
