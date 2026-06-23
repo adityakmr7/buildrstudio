@@ -149,7 +149,79 @@ export default function SaaSLandingPage() {
         .hero-ctas {
           display: flex;
           gap: 16px;
-          margin-bottom: 50px;
+          margin-bottom: 40px;
+        }
+        .hero-visual {
+          width: 100%;
+          max-width: 800px;
+          margin: 0 auto 20px;
+          perspective: 1200px;
+        }
+        .hero-mockup-row {
+          display: flex;
+          gap: 20px;
+          justify-content: center;
+          padding: 0 20px;
+        }
+        .hero-mockup {
+          width: 220px;
+          height: 320px;
+          border-radius: 20px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          padding: 24px 16px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+          animation: heroFloat 3s ease-in-out infinite;
+          flex-shrink: 0;
+        }
+        .hero-mockup:nth-child(2) {
+          transform: translateY(-12px);
+        }
+        .hero-mockup-text {
+          font-size: 16px;
+          font-weight: 800;
+          color: #fff;
+          text-align: center;
+          line-height: 1.2;
+          letter-spacing: -0.3px;
+        }
+        .hero-mockup-phone {
+          width: 100px;
+          height: 180px;
+          background: #0a0a0a;
+          border-radius: 16px;
+          border: 2px solid #333;
+          position: relative;
+          overflow: hidden;
+        }
+        .hero-phone-notch {
+          width: 40px;
+          height: 10px;
+          background: #0a0a0a;
+          border-radius: 0 0 8px 8px;
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 2;
+        }
+        .hero-phone-screen {
+          position: absolute;
+          inset: 4px;
+          border-radius: 12px;
+        }
+        @keyframes heroFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+        .hero-mockup:nth-child(2) {
+          animation-delay: 0.5s;
+        }
+        .hero-mockup:nth-child(3) {
+          animation-delay: 1s;
         }
 
         /* ─── TOOLS SECTOR ─── */
@@ -313,8 +385,9 @@ export default function SaaSLandingPage() {
         }
         .pricing-cards {
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 28px;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+          align-items: start;
         }
         .price-card {
           background: var(--surface);
@@ -448,7 +521,11 @@ export default function SaaSLandingPage() {
         @media (max-width: 900px) {
           .tools-grid { grid-template-columns: 1fr; gap: 20px; }
           .vs-container { grid-template-columns: 1fr; }
-          .pricing-cards { grid-template-columns: 1fr; }
+          .pricing-cards { grid-template-columns: 1fr !important; }
+          .hero-mockup-row { gap: 12px; }
+          .hero-mockup { width: 160px; height: 240px; border-radius: 16px; padding: 16px 12px; gap: 10px; }
+          .hero-mockup-text { font-size: 13px; }
+          .hero-mockup-phone { width: 75px; height: 130px; border-radius: 12px; }
         }
       `}</style>
 
@@ -471,6 +548,33 @@ export default function SaaSLandingPage() {
           <a href="#tools" className="btn-outline btn-lg" style={{ textDecoration: "none" }}>
             Explore Tools
           </a>
+        </div>
+
+        {/* Hero visual — animated product showcase */}
+        <div className="hero-visual">
+          <div className="hero-mockup-row">
+            <div className="hero-mockup" style={{ background: "linear-gradient(135deg, #6366f1, #a855f7, #ec4899)", animationDelay: "0s" }}>
+              <div className="hero-mockup-text">Your App.<br/>Your Story.</div>
+              <div className="hero-mockup-phone">
+                <div className="hero-phone-notch" />
+                <div className="hero-phone-screen" style={{ background: "linear-gradient(180deg, #1e1b4b 0%, #312e81 100%)" }} />
+              </div>
+            </div>
+            <div className="hero-mockup" style={{ background: "linear-gradient(135deg, #0ea5e9, #38bdf8, #7dd3fc)", animationDelay: "0.15s" }}>
+              <div className="hero-mockup-text">Advanced<br/>Features</div>
+              <div className="hero-mockup-phone">
+                <div className="hero-phone-notch" />
+                <div className="hero-phone-screen" style={{ background: "linear-gradient(180deg, #0c4a6e 0%, #075985 100%)" }} />
+              </div>
+            </div>
+            <div className="hero-mockup" style={{ background: "linear-gradient(135deg, #f97316, #fb923c, #fbbf24)", animationDelay: "0.3s" }}>
+              <div className="hero-mockup-text">Beautiful<br/>Mockups</div>
+              <div className="hero-mockup-phone">
+                <div className="hero-phone-notch" />
+                <div className="hero-phone-screen" style={{ background: "linear-gradient(180deg, #431407 0%, #7c2d12 100%)" }} />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -524,11 +628,11 @@ export default function SaaSLandingPage() {
           }}>
             <div style={{ flex: 1, minWidth: "280px" }}>
               <span className="badge-pill" style={{ background: "var(--fill-subtle)", color: "var(--fill)", fontSize: "10px", fontWeight: 700, marginBottom: "10px", display: "inline-block" }}>
-                ✨ Future Research Lab
+                ✨ Now Live
               </span>
-              <h3 style={{ fontSize: "18px", fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.3px" }}>AI-Powered Mockup Engine</h3>
+              <h3 style={{ fontSize: "18px", fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.3px" }}>AI-Powered Copywriter</h3>
               <p style={{ fontSize: "13px", color: "var(--text-2)", margin: 0, lineHeight: 1.5 }}>
-                We are actively exploring AI capabilities to automatically extract color palettes, write high-converting copy headlines, and lay out compliant app submissions from raw developer screenshots.
+                Generate high-converting App Store headlines in 15+ languages. Describe your app, pick a tone, and get 5 ready-to-use copy suggestions powered by AI — built into every tool.
               </p>
             </div>
             <button

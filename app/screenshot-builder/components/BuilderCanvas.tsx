@@ -473,8 +473,7 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
         padding: "20px 24px",
         gap: 16,
         overflowY: "auto",
-        backgroundImage: "radial-gradient(circle, var(--border) 0.5px, transparent 0.5px)",
-        backgroundSize: "16px 16px",
+        background: "var(--surface-2)",
       }}>
         {/* Canvas wrapper — shows exact scaled display */}
         <div style={{
