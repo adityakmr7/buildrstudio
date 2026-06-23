@@ -3,28 +3,33 @@
 import { useEffect, useState } from "react";
 
 export default function ThemeToggle() {
-  const [dark, setDark] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("ink-theme") === "dark";
-    }
-    return false;
-  });
+  const [mounted, setMounted] = useState(false);
+  const [dark, setDark] = useState(false);
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
-  }, [dark]);
+    const isDark = localStorage.getItem("ink-theme") === "dark";
+    setDark(isDark);
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+      localStorage.setItem("ink-theme", dark ? "dark" : "light");
+    }
+  }, [dark, mounted]);
 
   const toggle = () => {
-    const next = !dark;
-    setDark(next);
-    document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
-    localStorage.setItem("ink-theme", next ? "dark" : "light");
+    setDark((prev) => !prev);
   };
 
+  const activeIcon = mounted && dark ? "☀️" : "🌙";
+  const activeText = mounted && dark ? "Light" : "Dark";
+
   return (
-    <button className="theme-toggle-btn" onClick={toggle} aria-label="Toggle theme" suppressHydrationWarning>
-      <span className="theme-toggle-icon">{dark ? "☀️" : "🌙"}</span>
-      <span className="theme-toggle-text">{dark ? "Light" : "Dark"}</span>
+    <button className="theme-toggle-btn" onClick={toggle} aria-label="Toggle theme">
+      <span className="theme-toggle-icon">{activeIcon}</span>
+      <span className="theme-toggle-text">{activeText}</span>
       <style>{`
         .theme-toggle-btn {
           display: inline-flex;
