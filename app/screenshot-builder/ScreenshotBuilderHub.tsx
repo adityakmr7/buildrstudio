@@ -13,6 +13,8 @@ import BuilderCanvas, { BuilderCanvasHandle } from "./components/BuilderCanvas";
 import PremiumModal from "../components/PremiumModal";
 import AppHeader from "../components/AppHeader";
 import UnlockWatermarkModal from "../components/UnlockWatermarkModal";
+import TemplateGallery from "./components/TemplateGallery";
+import OnboardingTour from "../components/OnboardingTour";
 import { useToast } from "../components/Toast";
 
 export default function ScreenshotBuilderHub() {
@@ -44,6 +46,8 @@ export default function ScreenshotBuilderHub() {
   const [isWatermarkUnlocked, setIsWatermarkUnlocked] = useState(false);
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isTemplateOpen, setIsTemplateOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const canvasRef = useRef<BuilderCanvasHandle>(null);
   const { toast } = useToast();
 
@@ -135,6 +139,19 @@ export default function ScreenshotBuilderHub() {
     window.addEventListener("focus", checkUnlock);
     return () => window.removeEventListener("focus", checkUnlock);
   }, [session?.user?.isPro]);
+
+  // Show template gallery on first visit
+  useEffect(() => {
+    const visited = localStorage.getItem("buildr_sb_visited");
+    if (!visited) {
+      setIsTemplateOpen(true);
+      localStorage.setItem("buildr_sb_visited", "1");
+    }
+  }, []);
+
+  const handleApplyTemplate = (screens: BuilderConfig[]) => {
+    setDeck({ screens, activeScreenIndex: 0 });
+  };
 
   const handleUnlockWatermark = () => {
     const unlockedUntil = Date.now() + 24 * 60 * 60 * 1000;
@@ -513,7 +530,7 @@ export default function ScreenshotBuilderHub() {
       {/* ── BODY ── */}
       <div className="workspace-body" style={{ display: "flex", flex: 1, minHeight: 0 }}>
         {/* Left config sidebar */}
-        <BuilderSidebar
+        {!isSidebarCollapsed && <BuilderSidebar
           config={activeScreenConfig}
           setConfig={handleSetSingleConfig}
           onExport={handleExport}
@@ -524,7 +541,7 @@ export default function ScreenshotBuilderHub() {
           isWatermarkUnlocked={isWatermarkUnlocked}
           onOpenUnlockWatermark={() => setIsUnlockModalOpen(true)}
           onOpenPremium={() => setIsPremiumOpen(true)}
-        />
+        />}
 
         {/* Right Column: Deck Navigator Strip + Canvas */}
         <div
@@ -551,17 +568,59 @@ export default function ScreenshotBuilderHub() {
               scrollbarWidth: "none",
             }}
           >
-            <div
-              style={{
-                fontSize: "10px",
-                fontWeight: 700,
-                color: "var(--text-3)",
-                letterSpacing: "1px",
-                textTransform: "uppercase",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Screens ({screens.length})
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+              <button
+                type="button"
+                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                title={isSidebarCollapsed ? "Show sidebar" : "Full-screen canvas"}
+                style={{
+                  background: isSidebarCollapsed ? "var(--fill)" : "var(--surface-2, var(--surface))",
+                  color: isSidebarCollapsed ? "var(--on-fill, #fff)" : "var(--text-2)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "6px",
+                  width: "28px",
+                  height: "28px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  flexShrink: 0,
+                }}
+              >
+                {isSidebarCollapsed ? "◨" : "⛶"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsTemplateOpen(true)}
+                title="Start from template"
+                style={{
+                  background: "var(--surface-2, var(--surface))",
+                  color: "var(--text-2)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "6px",
+                  padding: "4px 10px",
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
+                Templates
+              </button>
+              <div
+                style={{
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  color: "var(--text-3)",
+                  letterSpacing: "1px",
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Screens ({screens.length})
+              </div>
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -789,6 +848,13 @@ export default function ScreenshotBuilderHub() {
         </div>
       </div>
 
+      {/* Template gallery */}
+      <TemplateGallery
+        isOpen={isTemplateOpen}
+        onClose={() => setIsTemplateOpen(false)}
+        onApply={handleApplyTemplate}
+      />
+
       {/* Premium modal */}
       <PremiumModal isOpen={isPremiumOpen} onClose={() => setIsPremiumOpen(false)} />
 
@@ -801,6 +867,8 @@ export default function ScreenshotBuilderHub() {
           setIsPremiumOpen(true);
         }}
       />
+
+      <OnboardingTour storageKey="buildr_sb_onboarding" />
 
       <style>{`
         .deck-card-container {
