@@ -792,6 +792,12 @@ export default function SaaSLandingPage() {
           <Link href="/showcase" className="footer-link">Showcase</Link>
           <Link href="/roadmap" className="footer-link">Roadmap</Link>
           <Link href="/blog" className="footer-link">Blog</Link>
+          <Link href="/pricing" className="footer-link">Pricing</Link>
+        </div>
+        <div className="footer-links" style={{ marginTop: 0 }}>
+          <Link href="/terms" className="footer-link">Terms</Link>
+          <Link href="/privacy" className="footer-link">Privacy</Link>
+          <Link href="/refund" className="footer-link">Refund Policy</Link>
         </div>
         <div style={{ fontSize: "11px", color: "var(--text-3)" }}>
           © {new Date().getFullYear()} BuildrStudio. All rights reserved.
