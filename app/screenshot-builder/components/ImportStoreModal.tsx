@@ -31,14 +31,18 @@ export default function ImportStoreModal({ isOpen, onClose, onImport }: ImportSt
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Import failed");
 
-      const screens: BuilderConfig[] = data.screens.map((s: { headline: string; subtext: string }, i: number) => ({
-        ...DEFAULT_CONFIG,
-        headline: s.headline,
-        subtext: s.subtext,
-        gradientPreset: data.gradient,
-        deviceId: data.platform === "android" ? "android-phone" as const : "iphone-67" as const,
-        screenshotUrl: data.appInfo.screenshots?.[i] || null,
-      }));
+      const screens: BuilderConfig[] = data.screens.map((s: { headline: string; subtext: string }, i: number) => {
+        const rawUrl = data.appInfo.screenshots?.[i];
+        const proxiedUrl = rawUrl ? `/api/proxy-image?url=${encodeURIComponent(rawUrl)}` : null;
+        return {
+          ...DEFAULT_CONFIG,
+          headline: s.headline,
+          subtext: s.subtext,
+          gradientPreset: data.gradient,
+          deviceId: data.platform === "android" ? "android-phone" as const : "iphone-67" as const,
+          screenshotUrl: proxiedUrl,
+        };
+      });
 
       onImport(screens, data.appInfo.screenshots || []);
       onClose();
