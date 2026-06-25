@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s — BuildrStudio",
   },
   description:
-    "BuildrStudio is a suite of free developer tools — turn raw screenshots into stunning social media graphics, track habits with Anchor, and stay focused with Flowzy.",
+    "Free App Store screenshot generator — paste your app URL and get polished mockups with AI-generated marketing copy in seconds. No design skills needed.",
   authors: [{ name: "Aditya Kumar", url: "https://buildrstudio.in" }],
   keywords: [
     "screenshot optimizer",
@@ -36,20 +36,11 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "BuildrStudio",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "BuildrStudio — Developer Tools by Aditya Kumar",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     site: "@adityakmr7",
     creator: "@adityakmr7",
-    images: ["/og-image.png"],
   },
   icons: {
     icon: "/icon.svg",
