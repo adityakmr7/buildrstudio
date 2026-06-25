@@ -5,7 +5,7 @@ import WorkspaceHub from "../components/WorkspaceHub";
 export const metadata: Metadata = {
   title: "Social Media Graphic Optimizer — BuildrStudio",
   description:
-    "Turn raw developer screenshots, terminal outputs, and code captures into beautiful social media images for X/Twitter, LinkedIn, and Instagram. Add backgrounds, frames, and overlays.",
+    "Turn screenshots into stunning social media graphics for Twitter/X and LinkedIn. Add gradients, frames, and captions in seconds. Free, no signup.",
   alternates: {
     canonical: "https://buildrstudio.in/social-optimizer",
   },
@@ -72,9 +72,7 @@ export default function SocialOptimizerPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <h1 style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clip: "rect(0,0,0,0)", border: 0 }}>
-        Social Media Graphic Optimizer for Developer Screenshots — BuildrStudio
-      </h1>
+      <h1 className="sr-only">Free Social Media Screenshot Optimizer — Twitter &amp; LinkedIn Graphics</h1>
       <WorkspaceHub />
     </>
   );

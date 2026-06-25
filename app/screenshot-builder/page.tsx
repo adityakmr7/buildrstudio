@@ -5,7 +5,7 @@ import ScreenshotBuilderHub from "./ScreenshotBuilderHub";
 export const metadata: Metadata = {
   title: "App Store Screenshot Builder — iOS & Play Store Mockups",
   description:
-    "Create professional, submission-ready screenshots for the Apple App Store (iPhone, iPad) and Google Play Store. Add marketing headlines, customized gradients, and 3D device tilts.",
+    "Create App Store & Play Store screenshots in seconds. Paste your app URL, get polished mockups with AI headlines and device frames. Free.",
   alternates: {
     canonical: "https://buildrstudio.in/screenshot-builder",
   },
@@ -81,9 +81,7 @@ export default function ScreenshotBuilderPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <h1 style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clip: "rect(0,0,0,0)", border: 0 }}>
-        App Store &amp; Play Store Screenshot Mockup Builder — BuildrStudio
-      </h1>
+      <h1 className="sr-only">Free App Store Screenshot Builder — Create iOS &amp; Play Store Mockups</h1>
       <ScreenshotBuilderHub />
     </>
   );

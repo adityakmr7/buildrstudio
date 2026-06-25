@@ -7,6 +7,7 @@ import LivePreviewCanvas, { LivePreviewCanvasHandle } from "./LivePreviewCanvas"
 import PremiumModal from "./PremiumModal";
 import AppHeader from "./AppHeader";
 import UnlockWatermarkModal from "./UnlockWatermarkModal";
+import ToolCrossLinks from "./ToolCrossLinks";
 import { useToast } from "./Toast";
 
 // ─── Annotation & Preset Types ────────────────────────────────────────────────
@@ -514,6 +515,8 @@ export default function WorkspaceHub() {
           </div>
         </div>
       </div>
+
+      <ToolCrossLinks current="/social-optimizer" />
 
       <PremiumModal isOpen={isPremiumOpen} onClose={() => setIsPremiumOpen(false)} />
 

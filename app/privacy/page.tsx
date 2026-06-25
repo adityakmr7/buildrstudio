@@ -6,7 +6,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "Privacy policy for BuildrStudio — how we collect, use, and protect your data.",
+    "Privacy policy for BuildrStudio, the free App Store screenshot generator. Learn how we collect, use, and protect your data. GDPR compliant.",
   alternates: { canonical: "https://buildrstudio.in/privacy" },
   openGraph: {
     title: "Privacy Policy — BuildrStudio",

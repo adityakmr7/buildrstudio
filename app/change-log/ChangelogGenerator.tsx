@@ -6,6 +6,7 @@ import Link from "next/link";
 import AppHeader from "../components/AppHeader";
 import { useToast } from "../components/Toast";
 import { ChangelogCard, CARD_W, CARD_H, type CardData, type Template } from "../components/ChangeLogCard";
+import ToolCrossLinks from "../components/ToolCrossLinks";
 
 const TEMPLATES: { id: Template; label: string }[] = [
   { id: "minimal", label: "Minimal" },
@@ -322,6 +323,7 @@ export default function ChangelogGenerator() {
           <ChangelogCard ref={cardRef} data={data} />
         </div>
       </main>
+      <ToolCrossLinks current="/change-log" />
     </div>
   );
 }
