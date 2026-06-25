@@ -149,7 +149,79 @@ export default function SaaSLandingPage() {
         .hero-ctas {
           display: flex;
           gap: 16px;
-          margin-bottom: 50px;
+          margin-bottom: 40px;
+        }
+        .hero-visual {
+          width: 100%;
+          max-width: 800px;
+          margin: 0 auto 20px;
+          perspective: 1200px;
+        }
+        .hero-mockup-row {
+          display: flex;
+          gap: 20px;
+          justify-content: center;
+          padding: 0 20px;
+        }
+        .hero-mockup {
+          width: 220px;
+          height: 320px;
+          border-radius: 20px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          padding: 24px 16px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+          animation: heroFloat 3s ease-in-out infinite;
+          flex-shrink: 0;
+        }
+        .hero-mockup:nth-child(2) {
+          transform: translateY(-12px);
+        }
+        .hero-mockup-text {
+          font-size: 16px;
+          font-weight: 800;
+          color: #fff;
+          text-align: center;
+          line-height: 1.2;
+          letter-spacing: -0.3px;
+        }
+        .hero-mockup-phone {
+          width: 100px;
+          height: 180px;
+          background: #0a0a0a;
+          border-radius: 16px;
+          border: 2px solid #333;
+          position: relative;
+          overflow: hidden;
+        }
+        .hero-phone-notch {
+          width: 40px;
+          height: 10px;
+          background: #0a0a0a;
+          border-radius: 0 0 8px 8px;
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 2;
+        }
+        .hero-phone-screen {
+          position: absolute;
+          inset: 4px;
+          border-radius: 12px;
+        }
+        @keyframes heroFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+        .hero-mockup:nth-child(2) {
+          animation-delay: 0.5s;
+        }
+        .hero-mockup:nth-child(3) {
+          animation-delay: 1s;
         }
 
         /* ─── TOOLS SECTOR ─── */
@@ -313,8 +385,9 @@ export default function SaaSLandingPage() {
         }
         .pricing-cards {
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 28px;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+          align-items: start;
         }
         .price-card {
           background: var(--surface);
@@ -448,7 +521,11 @@ export default function SaaSLandingPage() {
         @media (max-width: 900px) {
           .tools-grid { grid-template-columns: 1fr; gap: 20px; }
           .vs-container { grid-template-columns: 1fr; }
-          .pricing-cards { grid-template-columns: 1fr; }
+          .pricing-cards { grid-template-columns: 1fr !important; }
+          .hero-mockup-row { gap: 12px; }
+          .hero-mockup { width: 160px; height: 240px; border-radius: 16px; padding: 16px 12px; gap: 10px; }
+          .hero-mockup-text { font-size: 13px; }
+          .hero-mockup-phone { width: 75px; height: 130px; border-radius: 12px; }
         }
       `}</style>
 
@@ -471,6 +548,33 @@ export default function SaaSLandingPage() {
           <a href="#tools" className="btn-outline btn-lg" style={{ textDecoration: "none" }}>
             Explore Tools
           </a>
+        </div>
+
+        {/* Hero visual — animated product showcase */}
+        <div className="hero-visual">
+          <div className="hero-mockup-row">
+            <div className="hero-mockup" style={{ background: "linear-gradient(135deg, #6366f1, #a855f7, #ec4899)", animationDelay: "0s" }}>
+              <div className="hero-mockup-text">Your App.<br/>Your Story.</div>
+              <div className="hero-mockup-phone">
+                <div className="hero-phone-notch" />
+                <div className="hero-phone-screen" style={{ background: "linear-gradient(180deg, #1e1b4b 0%, #312e81 100%)" }} />
+              </div>
+            </div>
+            <div className="hero-mockup" style={{ background: "linear-gradient(135deg, #0ea5e9, #38bdf8, #7dd3fc)", animationDelay: "0.15s" }}>
+              <div className="hero-mockup-text">Advanced<br/>Features</div>
+              <div className="hero-mockup-phone">
+                <div className="hero-phone-notch" />
+                <div className="hero-phone-screen" style={{ background: "linear-gradient(180deg, #0c4a6e 0%, #075985 100%)" }} />
+              </div>
+            </div>
+            <div className="hero-mockup" style={{ background: "linear-gradient(135deg, #f97316, #fb923c, #fbbf24)", animationDelay: "0.3s" }}>
+              <div className="hero-mockup-text">Beautiful<br/>Mockups</div>
+              <div className="hero-mockup-phone">
+                <div className="hero-phone-notch" />
+                <div className="hero-phone-screen" style={{ background: "linear-gradient(180deg, #431407 0%, #7c2d12 100%)" }} />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -524,11 +628,11 @@ export default function SaaSLandingPage() {
           }}>
             <div style={{ flex: 1, minWidth: "280px" }}>
               <span className="badge-pill" style={{ background: "var(--fill-subtle)", color: "var(--fill)", fontSize: "10px", fontWeight: 700, marginBottom: "10px", display: "inline-block" }}>
-                ✨ Future Research Lab
+                ✨ Now Live
               </span>
-              <h3 style={{ fontSize: "18px", fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.3px" }}>AI-Powered Mockup Engine</h3>
+              <h3 style={{ fontSize: "18px", fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.3px" }}>AI-Powered Copywriter</h3>
               <p style={{ fontSize: "13px", color: "var(--text-2)", margin: 0, lineHeight: 1.5 }}>
-                We are actively exploring AI capabilities to automatically extract color palettes, write high-converting copy headlines, and lay out compliant app submissions from raw developer screenshots.
+                Generate high-converting App Store headlines in 15+ languages. Describe your app, pick a tone, and get 5 ready-to-use copy suggestions powered by AI — built into every tool.
               </p>
             </div>
             <button
@@ -543,44 +647,44 @@ export default function SaaSLandingPage() {
         </div>
       </section>
 
-      {/* ── SOCIAL PROOF / EXAMPLES ── */}
+      {/* ── SOCIAL PROOF / BEFORE → AFTER ── */}
       <section style={{ maxWidth: "1200px", margin: "80px auto 0", padding: "0 40px" }}>
         <div className="section-title">
-          <h2>Made with BuildrStudio</h2>
-          <p>Real examples created in under 30 seconds — no design skills required.</p>
+          <h2>Raw Screenshot → Store-Ready in Seconds</h2>
+          <p>See what BuildrStudio does to plain app screenshots.</p>
         </div>
-        <div style={{
+        <div className="examples-grid" style={{
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
-          gap: "20px",
+          gap: "24px",
           marginBottom: "100px",
         }}>
           {[
             {
-              bg: "linear-gradient(135deg, #6366f1, #a855f7, #ec4899)",
-              title: "Anchor — Habit Tracker",
-              subtitle: "Build habits that stick",
-              type: "App Store Screenshot",
+              before: { bg: "#1a1a2e", label: "Raw screenshot" },
+              after: { bg: "linear-gradient(135deg, #6366f1, #a855f7, #ec4899)", title: "Track Every Rep.", subtitle: "Your personal fitness companion." },
+              tool: "App Store Screenshot",
+              time: "12 sec",
             },
             {
-              bg: "linear-gradient(135deg, #0ea5e9, #38bdf8, #7dd3fc)",
-              title: "Ship faster with AI",
-              subtitle: "Terminal output → social graphic",
-              type: "Social Media Post",
+              before: { bg: "#0f172a", label: "Terminal output" },
+              after: { bg: "linear-gradient(135deg, #0ea5e9, #38bdf8, #7dd3fc)", title: "Ship faster with AI", subtitle: "Deploy with confidence." },
+              tool: "Social Media Post",
+              time: "8 sec",
             },
             {
-              bg: "linear-gradient(135deg, #f97316, #fb923c, #fbbf24)",
-              title: "v2.5 — Batch Export",
-              subtitle: "New: multi-device rendering",
-              type: "Changelog Card",
+              before: { bg: "#1e1b4b", label: "Plain text notes" },
+              after: { bg: "linear-gradient(135deg, #f97316, #fb923c, #fbbf24)", title: "v2.5 — Batch Export", subtitle: "New: multi-device rendering" },
+              tool: "Changelog Card",
+              time: "15 sec",
             },
-          ].map((example, idx) => (
+          ].map((item, idx) => (
             <div key={idx} style={{
               borderRadius: "20px",
               overflow: "hidden",
               border: "1px solid var(--border)",
+              background: "var(--surface)",
               transition: "transform 0.25s, box-shadow 0.25s",
-              cursor: "pointer",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "translateY(-4px)";
@@ -591,52 +695,73 @@ export default function SaaSLandingPage() {
               e.currentTarget.style.boxShadow = "none";
             }}
             >
-              <div style={{
-                background: example.bg,
-                aspectRatio: "16/10",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "32px 24px",
-                textAlign: "center",
-                gap: "8px",
-              }}>
+              {/* Before → After visual */}
+              <div style={{ display: "flex", height: "200px" }}>
+                {/* Before side */}
                 <div style={{
-                  width: "60px",
-                  height: "100px",
-                  borderRadius: "12px",
-                  background: "rgba(255,255,255,0.15)",
-                  backdropFilter: "blur(8px)",
-                  border: "1px solid rgba(255,255,255,0.2)",
+                  flex: 1,
+                  background: item.before.bg,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  position: "relative",
+                }}>
+                  <div style={{ width: "40px", height: "70px", borderRadius: "8px", border: "1.5px dashed rgba(255,255,255,0.2)" }} />
+                  <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>{item.before.label}</span>
+                  <span style={{
+                    position: "absolute", top: "8px", left: "8px",
+                    fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.3)",
+                    textTransform: "uppercase", letterSpacing: "0.5px",
+                  }}>Before</span>
+                </div>
+                {/* Arrow divider */}
+                <div style={{
+                  width: "32px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  marginBottom: "8px",
+                  background: "var(--surface)",
+                  fontSize: "16px",
+                  color: "var(--text-3)",
+                  flexShrink: 0,
+                }}>→</div>
+                {/* After side */}
+                <div style={{
+                  flex: 1,
+                  background: item.after.bg,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "6px",
+                  padding: "16px 12px",
+                  textAlign: "center",
+                  position: "relative",
                 }}>
+                  <div style={{ fontSize: "13px", fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>{item.after.title}</div>
+                  <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.8)" }}>{item.after.subtitle}</div>
                   <div style={{
-                    width: "40px",
-                    height: "72px",
-                    borderRadius: "6px",
-                    background: "rgba(255,255,255,0.25)",
+                    width: "32px", height: "56px", borderRadius: "6px",
+                    border: "1.5px solid rgba(255,255,255,0.3)", background: "rgba(0,0,0,0.2)", marginTop: "4px",
                   }} />
-                </div>
-                <div style={{ color: "#fff", fontSize: "18px", fontWeight: 800, letterSpacing: "-0.3px" }}>
-                  {example.title}
-                </div>
-                <div style={{ color: "rgba(255,255,255,0.8)", fontSize: "13px", fontWeight: 500 }}>
-                  {example.subtitle}
+                  <span style={{
+                    position: "absolute", top: "8px", right: "8px",
+                    fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.5)",
+                    textTransform: "uppercase", letterSpacing: "0.5px",
+                  }}>After</span>
                 </div>
               </div>
               <div style={{
-                background: "var(--surface)",
                 padding: "14px 18px",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                borderTop: "1px solid var(--border)",
               }}>
-                <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--text-2)" }}>{example.type}</span>
-                <span style={{ fontSize: "11px", color: "var(--text-3)" }}>30 sec</span>
+                <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--text-2)" }}>{item.tool}</span>
+                <span style={{ fontSize: "11px", color: "var(--fill)", fontWeight: 600 }}>⚡ {item.time}</span>
               </div>
             </div>
           ))}

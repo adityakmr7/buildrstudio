@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { auth } from "@/auth";
-import { getAiUsageToday, recordAiUsage } from "@/app/lib/db";
+import { getAiUsageTotal, recordAiUsage } from "@/app/lib/db";
 
-const FREE_DAILY_LIMIT = 1;
+const FREE_LIFETIME_LIMIT = 1;
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? "");
 
@@ -23,10 +23,10 @@ export async function POST(req: NextRequest) {
 
   if (plan !== "ai_pro") {
     const identifier = session?.user?.id ?? req.headers.get("x-forwarded-for") ?? "anon";
-    const usageToday = await getAiUsageToday(identifier);
-    if (usageToday >= FREE_DAILY_LIMIT) {
+    const usageTotal = await getAiUsageTotal(identifier);
+    if (usageTotal >= FREE_LIFETIME_LIMIT) {
       return NextResponse.json(
-        { error: "Daily AI limit reached. Upgrade to AI Pro for unlimited generations.", limitReached: true },
+        { error: "Free AI generation used. Upgrade to AI Pro for unlimited generations.", limitReached: true },
         { status: 429 },
       );
     }
