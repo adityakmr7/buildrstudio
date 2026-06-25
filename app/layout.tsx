@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
 import Script from "next/script";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -48,6 +48,11 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 export default function RootLayout({
   children,

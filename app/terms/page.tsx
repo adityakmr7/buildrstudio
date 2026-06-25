@@ -6,7 +6,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Terms and Conditions",
   description:
-    "Terms and conditions for using BuildrStudio — a suite of free and premium browser-based developer tools.",
+    "Terms and conditions for BuildrStudio, the free App Store screenshot generator and social media mockup tool. Usage rules, subscriptions, and IP.",
   alternates: { canonical: "https://buildrstudio.in/terms" },
   openGraph: {
     title: "Terms and Conditions — BuildrStudio",
@@ -14,6 +14,7 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://buildrstudio.in/terms",
   },
+  twitter: { card: "summary", title: "Terms — BuildrStudio" },
 };
 
 export default function TermsPage() {

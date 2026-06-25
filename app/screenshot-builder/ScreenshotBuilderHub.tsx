@@ -16,6 +16,7 @@ import UnlockWatermarkModal from "../components/UnlockWatermarkModal";
 import TemplateGallery from "./components/TemplateGallery";
 import ImportStoreModal from "./components/ImportStoreModal";
 import OnboardingTour from "../components/OnboardingTour";
+import ToolCrossLinks from "../components/ToolCrossLinks";
 import { useToast } from "../components/Toast";
 
 export default function ScreenshotBuilderHub() {
@@ -1174,6 +1175,7 @@ export default function ScreenshotBuilderHub() {
         }}
       />
 
+      <ToolCrossLinks current="/screenshot-builder" />
       <OnboardingTour storageKey="buildr_sb_onboarding" />
 
       <style>{`

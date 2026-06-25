@@ -6,25 +6,51 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "BuildrStudio pricing — free tools for everyone, Pro for power users at $4/month with no watermark, 4K exports, and more.",
+    "BuildrStudio pricing — free tools for everyone. Pro at $4/mo for watermark-free exports. AI Pro at $20/mo for unlimited AI copywriting.",
   alternates: { canonical: "https://buildrstudio.in/pricing" },
   openGraph: {
     title: "Pricing — BuildrStudio",
-    description:
-      "Free tools for everyone. Pro for power users at $4/month.",
+    description: "Free, Pro ($4/mo), and AI Pro ($20/mo). No watermarks, smart resize, AI headlines.",
     type: "website",
     url: "https://buildrstudio.in/pricing",
-    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pricing — BuildrStudio",
+    description: "Free, Pro ($4/mo), and AI Pro ($20/mo) plans for App Store screenshot generation.",
   },
 };
 
 export default function PricingPage() {
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://buildrstudio.in" },
-      { "@type": "ListItem", position: 2, name: "Pricing", item: "https://buildrstudio.in/pricing" },
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: "https://buildrstudio.in" },
+          { "@type": "ListItem", position: 2, name: "Pricing", item: "https://buildrstudio.in/pricing" },
+        ],
+      },
+      {
+        "@type": "SoftwareApplication",
+        name: "BuildrStudio",
+        applicationCategory: "DeveloperApplication",
+        operatingSystem: "All",
+        offers: {
+          "@type": "AggregateOffer",
+          lowPrice: "0",
+          highPrice: "20",
+          priceCurrency: "USD",
+          offerCount: 3,
+          offers: [
+            { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD" },
+            { "@type": "Offer", name: "Pro", price: "4", priceCurrency: "USD", billingIncrement: "P1M" },
+            { "@type": "Offer", name: "AI Pro", price: "20", priceCurrency: "USD", billingIncrement: "P1M" },
+          ],
+        },
+      },
     ],
   };
 

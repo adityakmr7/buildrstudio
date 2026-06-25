@@ -7,7 +7,7 @@ import AppHeader from "../components/AppHeader";
 export const metadata: Metadata = {
   title: "Product Roadmap — Vote on What We Build Next",
   description:
-    "Vote on upcoming BuildrStudio tools: launch asset generators, content cards, carousels, README visuals, app store screenshots, and more. Your vote shapes what ships next.",
+    "Vote on upcoming BuildrStudio features: asset generators, content cards, app store screenshots, and more. Your vote shapes what ships next.",
   alternates: {
     canonical: "https://buildrstudio.in/roadmap",
   },
