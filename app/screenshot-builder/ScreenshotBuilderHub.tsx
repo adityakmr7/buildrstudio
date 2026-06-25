@@ -905,6 +905,25 @@ export default function ScreenshotBuilderHub() {
                       overflow: "hidden",
                     }}
                   >
+                    {/* Screenshot thumbnail */}
+                    {scr.screenshotUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={scr.screenshotUrl}
+                        alt=""
+                        style={{
+                          position: "absolute",
+                          bottom: "4px",
+                          right: "4px",
+                          width: "28px",
+                          height: "50px",
+                          objectFit: "cover",
+                          borderRadius: "4px",
+                          border: "1px solid rgba(255,255,255,0.2)",
+                          opacity: 0.85,
+                        }}
+                      />
+                    )}
                     {/* Tiny headline */}
                     <div
                       style={{
