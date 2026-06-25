@@ -151,3 +151,63 @@ export async function recordAiUsage(identifier: string) {
   const sql = getDb();
   await sql`INSERT INTO ai_usage (identifier) VALUES (${identifier})`;
 }
+
+// ── Projects ─────────────────────────────────────────────────────────────────
+
+export async function initProjectsTable() {
+  const sql = getDb();
+  await sql`
+    CREATE TABLE IF NOT EXISTS projects (
+      id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      tool TEXT NOT NULL DEFAULT 'screenshot-builder',
+      config JSONB NOT NULL DEFAULT '{}',
+      created_at TIMESTAMPTZ DEFAULT now(),
+      updated_at TIMESTAMPTZ DEFAULT now()
+    )
+  `;
+}
+
+export async function getUserProjects(userId: string) {
+  const sql = getDb();
+  await initProjectsTable();
+  return sql`
+    SELECT id, name, tool, config, created_at, updated_at
+    FROM projects WHERE user_id = ${userId}
+    ORDER BY updated_at DESC LIMIT 50
+  `;
+}
+
+export async function getProject(projectId: string, userId: string) {
+  const sql = getDb();
+  const rows = await sql`
+    SELECT id, name, tool, config, created_at, updated_at
+    FROM projects WHERE id = ${projectId} AND user_id = ${userId} LIMIT 1
+  `;
+  return rows[0] || null;
+}
+
+export async function createProject(userId: string, name: string, tool: string, config: unknown) {
+  const sql = getDb();
+  await initProjectsTable();
+  const rows = await sql`
+    INSERT INTO projects (user_id, name, tool, config)
+    VALUES (${userId}, ${name}, ${tool}, ${JSON.stringify(config)})
+    RETURNING id, name, tool, created_at, updated_at
+  `;
+  return rows[0];
+}
+
+export async function updateProject(projectId: string, userId: string, name: string, config: unknown) {
+  const sql = getDb();
+  await sql`
+    UPDATE projects SET name = ${name}, config = ${JSON.stringify(config)}, updated_at = now()
+    WHERE id = ${projectId} AND user_id = ${userId}
+  `;
+}
+
+export async function deleteProject(projectId: string, userId: string) {
+  const sql = getDb();
+  await sql`DELETE FROM projects WHERE id = ${projectId} AND user_id = ${userId}`;
+}

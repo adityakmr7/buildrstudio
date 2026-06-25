@@ -28,6 +28,7 @@ interface BuilderSidebarProps {
   setConfig: React.Dispatch<React.SetStateAction<BuilderConfig>>;
   onExport: () => void;
   onExportAll: () => void;
+  onExportAllSizes: () => void;
   onCopy: () => void;
   isExporting: boolean;
   screenCount: number;
@@ -1267,9 +1268,10 @@ function TabPresets({
 
 // ── Tab: Export ────────────────────────────────────────────────────────────────
 
-function TabExport({ onExport, onExportAll, onCopy, isExporting, screenCount }: {
+function TabExport({ onExport, onExportAll, onExportAllSizes, onCopy, isExporting, screenCount }: {
   onExport: () => void;
   onExportAll: () => void;
+  onExportAllSizes: () => void;
   onCopy: () => void;
   isExporting: boolean;
   screenCount: number;
@@ -1322,6 +1324,26 @@ function TabExport({ onExport, onExportAll, onCopy, isExporting, screenCount }: 
 
       <div className="ctrl-divider" style={{ margin: "16px 0" }} />
 
+      <SectionLabel>Smart Resize — All Device Sizes</SectionLabel>
+      <p style={{ fontSize: "11px", color: "var(--text-3)", margin: "0 0 8px", lineHeight: 1.4 }}>
+        Auto-export every screen across all required App Store or Play Store device sizes. One click, store-ready ZIP.
+      </p>
+      <button
+        type="button"
+        onClick={onExportAllSizes}
+        disabled={isExporting}
+        className="btn-fill btn-lg"
+        style={{
+          width: "100%", justifyContent: "center", display: "flex", gap: "8px",
+          background: isExporting ? undefined : "linear-gradient(135deg, #10b981, #059669)",
+          opacity: isExporting ? 0.6 : 1,
+        }}
+      >
+        {isExporting ? "⏳ Exporting..." : "📐 Export All Sizes"}
+      </button>
+
+      <div className="ctrl-divider" style={{ margin: "16px 0" }} />
+
       <div style={{
         padding: "10px 12px",
         background: "var(--fill-subtle)",
@@ -1344,6 +1366,7 @@ export default function BuilderSidebar({
   setConfig,
   onExport,
   onExportAll,
+  onExportAllSizes,
   onCopy,
   isExporting,
   screenCount,
@@ -1390,7 +1413,7 @@ export default function BuilderSidebar({
           />
         )}
         {activeTab === "presets" && <TabPresets setConfig={setConfig} />}
-        {activeTab === "export" && <TabExport onExport={onExport} onExportAll={onExportAll} onCopy={onCopy} isExporting={isExporting} screenCount={screenCount} />}
+        {activeTab === "export" && <TabExport onExport={onExport} onExportAll={onExportAll} onExportAllSizes={onExportAllSizes} onCopy={onCopy} isExporting={isExporting} screenCount={screenCount} />}
       </div>
     </aside>
   );

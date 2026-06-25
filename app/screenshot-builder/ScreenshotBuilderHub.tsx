@@ -6,14 +6,15 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import type { BuilderConfig } from "./lib/deviceSpecs";
-import { DEFAULT_CONFIG } from "./lib/deviceSpecs";
+import type { BuilderConfig, DeviceId } from "./lib/deviceSpecs";
+import { DEFAULT_CONFIG, APPSTORE_DEVICES, PLAYSTORE_DEVICES } from "./lib/deviceSpecs";
 import BuilderSidebar from "./components/BuilderSidebar";
 import BuilderCanvas, { BuilderCanvasHandle } from "./components/BuilderCanvas";
 import PremiumModal from "../components/PremiumModal";
 import AppHeader from "../components/AppHeader";
 import UnlockWatermarkModal from "../components/UnlockWatermarkModal";
 import TemplateGallery from "./components/TemplateGallery";
+import ImportStoreModal from "./components/ImportStoreModal";
 import OnboardingTour from "../components/OnboardingTour";
 import { useToast } from "../components/Toast";
 
@@ -47,7 +48,13 @@ export default function ScreenshotBuilderHub() {
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isTemplateOpen, setIsTemplateOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
+  const [projectName, setProjectName] = useState("Untitled Project");
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedProjects, setSavedProjects] = useState<{ id: string; name: string; updated_at: string }[]>([]);
+  const [showProjectMenu, setShowProjectMenu] = useState(false);
   const canvasRef = useRef<BuilderCanvasHandle>(null);
   const { toast } = useToast();
 
@@ -182,6 +189,71 @@ export default function ScreenshotBuilderHub() {
     setDeck({ screens, activeScreenIndex: 0 });
   };
 
+  const handleStoreImport = (screens: BuilderConfig[]) => {
+    setDeck({ screens, activeScreenIndex: 0 });
+    toast(`Imported ${screens.length} screens from App Store!`, "success");
+  };
+
+  const handleSaveProject = async () => {
+    if (!session?.user?.id) { toast("Sign in to save projects", "info"); return; }
+    setIsSaving(true);
+    const config = deck.screens.map(s => ({ ...s, screenshotUrl: null }));
+    try {
+      if (currentProjectId) {
+        await fetch(`/api/projects/${currentProjectId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: projectName, config }),
+        });
+        toast("Project saved!", "success");
+      } else {
+        const res = await fetch("/api/projects", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: projectName, tool: "screenshot-builder", config }),
+        });
+        const data = await res.json();
+        setCurrentProjectId(data.project.id);
+        toast("Project created!", "success");
+      }
+    } catch { toast("Failed to save", "error"); }
+    finally { setIsSaving(false); }
+  };
+
+  const handleLoadProjects = async () => {
+    if (!session?.user?.id) { toast("Sign in to load projects", "info"); return; }
+    try {
+      const res = await fetch("/api/projects");
+      const data = await res.json();
+      setSavedProjects(data.projects || []);
+      setShowProjectMenu(true);
+    } catch { toast("Failed to load projects", "error"); }
+  };
+
+  const handleOpenProject = async (projectId: string) => {
+    try {
+      const res = await fetch(`/api/projects/${projectId}`);
+      const data = await res.json();
+      if (data.project) {
+        const screens = (data.project.config as BuilderConfig[]).map(s => ({ ...DEFAULT_CONFIG, ...s }));
+        setDeck({ screens, activeScreenIndex: 0 });
+        setCurrentProjectId(data.project.id);
+        setProjectName(data.project.name);
+        setShowProjectMenu(false);
+        toast(`Opened "${data.project.name}"`, "success");
+      }
+    } catch { toast("Failed to open project", "error"); }
+  };
+
+  const handleDeleteProject = async (projectId: string) => {
+    try {
+      await fetch(`/api/projects/${projectId}`, { method: "DELETE" });
+      setSavedProjects(prev => prev.filter(p => p.id !== projectId));
+      if (currentProjectId === projectId) setCurrentProjectId(null);
+      toast("Project deleted", "success");
+    } catch { toast("Failed to delete", "error"); }
+  };
+
   const handleUnlockWatermark = () => {
     const unlockedUntil = Date.now() + 24 * 60 * 60 * 1000;
     localStorage.setItem("watermark_unlocked_until", unlockedUntil.toString());
@@ -210,32 +282,58 @@ export default function ScreenshotBuilderHub() {
     }).finally(() => setIsExporting(false));
   };
 
-  const handleExportAll = async () => {
+  const handleExportAll = async (smartResize = false) => {
     if (!canvasRef.current || isExporting) return;
     setIsExporting(true);
     try {
       const JSZip = (await import("jszip")).default;
       const zip = new JSZip();
       const originalIdx = deck.activeScreenIndex;
+      const originalScreens = [...deck.screens];
 
-      for (let i = 0; i < deck.screens.length; i++) {
-        setDeck(prev => ({ ...prev, activeScreenIndex: i }));
-        // Wait for canvas to re-render with new config
-        await new Promise(r => setTimeout(r, 300));
-        const dataUrl = await canvasRef.current!.getCapture();
-        const base64 = dataUrl.split(",")[1];
-        zip.file(`screen-${i + 1}.png`, base64, { base64: true });
-        toast(`Exporting screen ${i + 1}/${deck.screens.length}...`, "info");
+      const currentPlatform = deck.screens[0]?.deviceId?.startsWith("android") ? "playstore" : "appstore";
+      const deviceSizes: DeviceId[] = smartResize
+        ? (currentPlatform === "appstore"
+          ? APPSTORE_DEVICES.map(d => d.id)
+          : PLAYSTORE_DEVICES.map(d => d.id))
+        : [deck.screens[0]?.deviceId || "iphone-67"];
+
+      for (const deviceId of deviceSizes) {
+        const folder = smartResize ? zip.folder(deviceId)! : zip;
+
+        for (let i = 0; i < originalScreens.length; i++) {
+          setDeck(prev => {
+            const updated = [...prev.screens];
+            updated[i] = { ...originalScreens[i], deviceId };
+            return { screens: updated, activeScreenIndex: i };
+          });
+          await new Promise(r => setTimeout(r, 400));
+          const dataUrl = await canvasRef.current!.getCapture();
+          const base64 = dataUrl.split(",")[1];
+          const filename = smartResize
+            ? `screen-${i + 1}.png`
+            : `screen-${i + 1}.png`;
+          folder.file(filename, base64, { base64: true });
+        }
+        if (smartResize) {
+          toast(`Exported ${deviceId}...`, "info");
+        }
       }
 
-      setDeck(prev => ({ ...prev, activeScreenIndex: originalIdx }));
+      setDeck({ screens: originalScreens, activeScreenIndex: originalIdx });
       const blob = await zip.generateAsync({ type: "blob" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `buildrstudio-screenshots.zip`;
+      a.download = smartResize
+        ? `buildrstudio-all-sizes.zip`
+        : `buildrstudio-screenshots.zip`;
       a.click();
       URL.revokeObjectURL(a.href);
-      toast(`All ${deck.screens.length} screens exported as ZIP!`, "success");
+
+      const totalFiles = smartResize
+        ? deviceSizes.length * originalScreens.length
+        : originalScreens.length;
+      toast(`${totalFiles} screenshots exported as ZIP!`, "success");
     } catch (err) {
       console.error("Batch export failed:", err);
       toast("Batch export failed — please try again", "error");
@@ -590,7 +688,8 @@ export default function ScreenshotBuilderHub() {
           config={activeScreenConfig}
           setConfig={handleSetSingleConfig}
           onExport={handleExport}
-          onExportAll={handleExportAll}
+          onExportAll={() => handleExportAll(false)}
+          onExportAllSizes={() => handleExportAll(true)}
           onCopy={handleCopy}
           isExporting={isExporting}
           screenCount={deck.screens.length}
@@ -667,6 +766,25 @@ export default function ScreenshotBuilderHub() {
               </button>
               <button
                 type="button"
+                onClick={() => setIsImportOpen(true)}
+                title="Import from App Store / Play Store"
+                style={{
+                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: "4px 10px",
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
+                Import App
+              </button>
+              <button
+                type="button"
                 onClick={handleShareDeck}
                 title="Copy share link"
                 style={{
@@ -683,6 +801,46 @@ export default function ScreenshotBuilderHub() {
                 }}
               >
                 Share
+              </button>
+              <div style={{ height: "20px", width: "1px", background: "var(--border)", flexShrink: 0 }} />
+              <input
+                type="text"
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+                style={{
+                  background: "transparent", border: "none", fontSize: "11px", fontWeight: 600,
+                  color: "var(--text-1)", width: "120px", padding: "4px 6px",
+                  borderRadius: "4px", outline: "none",
+                }}
+                onFocus={(e) => { e.currentTarget.style.background = "var(--surface-2, var(--surface))"; }}
+                onBlur={(e) => { e.currentTarget.style.background = "transparent"; }}
+              />
+              <button
+                type="button"
+                onClick={handleSaveProject}
+                disabled={isSaving}
+                title="Save project"
+                style={{
+                  background: "var(--surface-2, var(--surface))", color: "var(--text-2)",
+                  border: "1px solid var(--border)", borderRadius: "6px",
+                  padding: "4px 10px", fontSize: "11px", fontWeight: 600,
+                  cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
+                }}
+              >
+                {isSaving ? "Saving..." : currentProjectId ? "Save" : "Save New"}
+              </button>
+              <button
+                type="button"
+                onClick={handleLoadProjects}
+                title="Open saved project"
+                style={{
+                  background: "var(--surface-2, var(--surface))", color: "var(--text-2)",
+                  border: "1px solid var(--border)", borderRadius: "6px",
+                  padding: "4px 10px", fontSize: "11px", fontWeight: 600,
+                  cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
+                }}
+              >
+                Open
               </button>
               <div
                 style={{
@@ -922,6 +1080,60 @@ export default function ScreenshotBuilderHub() {
           />
         </div>
       </div>
+
+      {/* Saved projects dropdown */}
+      {showProjectMenu && (
+        <div
+          style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(10,10,10,0.4)", backdropFilter: "blur(4px)" }}
+          onClick={() => setShowProjectMenu(false)}
+        >
+          <div
+            className="card-default"
+            style={{
+              position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)",
+              width: "90%", maxWidth: "400px", maxHeight: "60vh", overflow: "auto",
+              padding: "24px", display: "flex", flexDirection: "column", gap: "12px",
+              boxShadow: "0 24px 80px rgba(0,0,0,0.25)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700 }}>Saved Projects</h3>
+            {savedProjects.length === 0 ? (
+              <p style={{ fontSize: "13px", color: "var(--text-3)", margin: 0 }}>No saved projects yet. Create your first one!</p>
+            ) : (
+              savedProjects.map((p) => (
+                <div key={p.id} style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  padding: "10px 12px", border: "1px solid var(--border)", borderRadius: "10px",
+                  background: p.id === currentProjectId ? "var(--fill-subtle)" : "var(--surface)",
+                }}>
+                  <button
+                    onClick={() => handleOpenProject(p.id)}
+                    style={{ background: "none", border: "none", cursor: "pointer", textAlign: "left", flex: 1, padding: 0 }}
+                  >
+                    <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-1)" }}>{p.name}</div>
+                    <div style={{ fontSize: "11px", color: "var(--text-3)" }}>{new Date(p.updated_at).toLocaleDateString()}</div>
+                  </button>
+                  <button
+                    onClick={() => handleDeleteProject(p.id)}
+                    style={{ background: "none", border: "none", cursor: "pointer", fontSize: "14px", color: "var(--text-3)", padding: "4px" }}
+                    title="Delete"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Import from store */}
+      <ImportStoreModal
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        onImport={handleStoreImport}
+      />
 
       {/* Template gallery */}
       <TemplateGallery
