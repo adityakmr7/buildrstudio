@@ -131,7 +131,7 @@ export async function findUserByEmail(email: string) {
   return rows.length > 0 ? rows[0] : null;
 }
 
-export async function getAiUsageToday(identifier: string): Promise<number> {
+export async function getAiUsageTotal(identifier: string): Promise<number> {
   const sql = getDb();
   await sql`
     CREATE TABLE IF NOT EXISTS ai_usage (
@@ -142,7 +142,7 @@ export async function getAiUsageToday(identifier: string): Promise<number> {
   `;
   const rows = await sql`
     SELECT COUNT(*)::int AS count FROM ai_usage
-    WHERE identifier = ${identifier} AND created_at > now() - interval '1 day'
+    WHERE identifier = ${identifier}
   `;
   return rows[0]?.count ?? 0;
 }

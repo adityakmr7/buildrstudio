@@ -48,7 +48,7 @@ export default function AICopywriter({ onApply, onUpgrade }: AICopywriterProps) 
     } catch (e: unknown) {
       const data = e instanceof Error ? e.message : "Generation failed";
       setError(data);
-      if (data.includes("Daily AI limit")) setLimitReached(true);
+      if (data.includes("limit") || data.includes("Upgrade")) setLimitReached(true);
     } finally {
       setLoading(false);
     }

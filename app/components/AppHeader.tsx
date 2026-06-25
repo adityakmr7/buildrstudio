@@ -495,6 +495,9 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
           <Link href="/roadmap" className={`hdr-link ${activeRoute === "roadmap" ? "active" : ""}`}>
             Roadmap
           </Link>
+          <Link href="/about" className="hdr-link">
+            About
+          </Link>
         </nav>
 
         {/* Right: Actions */}
@@ -600,6 +603,10 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
             >
               <span>🗺️</span>
               <span>Product Roadmap</span>
+            </Link>
+            <Link href="/about" className="mobile-link">
+              <span>👤</span>
+              <span>About Me</span>
             </Link>
           </div>
         </div>
