@@ -5,7 +5,7 @@ import ScreenshotBuilderHub from "./ScreenshotBuilderHub";
 export const metadata: Metadata = {
   title: "App Store Screenshot Builder — iOS & Play Store Mockups",
   description:
-    "Create professional, submission-ready screenshots for the Apple App Store (iPhone, iPad) and Google Play Store. Add marketing headlines, customized gradients, and 3D device tilts.",
+    "Create App Store & Play Store screenshots in seconds. Paste your app URL, get polished mockups with AI headlines and device frames. Free.",
   alternates: {
     canonical: "https://buildrstudio.in/screenshot-builder",
   },

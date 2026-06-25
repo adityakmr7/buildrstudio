@@ -16,22 +16,22 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL("https://buildrstudio.in"),
   title: {
-    default: "BuildrStudio — Developer Tools by Aditya Kumar",
+    default: "BuildrStudio — Free App Store Screenshot Generator",
     template: "%s — BuildrStudio",
   },
   description:
     "Free App Store screenshot generator — paste your app URL and get polished mockups with AI-generated marketing copy in seconds. No design skills needed.",
   authors: [{ name: "Aditya Kumar", url: "https://buildrstudio.in" }],
   keywords: [
-    "screenshot optimizer",
+    "app store screenshot generator",
+    "app store mockup",
+    "screenshot builder",
+    "play store screenshot maker",
     "social media graphics",
     "developer tools",
-    "screenshot to social",
-    "habit tracker",
-    "focus timer",
-    "pomodoro",
+    "app store optimization",
+    "ASO screenshots",
     "BuildrStudio",
-    "Aditya Kumar",
   ],
   openGraph: {
     type: "website",

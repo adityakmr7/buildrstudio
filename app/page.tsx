@@ -65,6 +65,31 @@ const jsonLd = {
       "description":
         "Instant design asset generator for product builders. Create App Store mockups, social media optimized screenshots, and release changelog graphics.",
     },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Do I need a credit card to get started?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No! You can use all core features of BuildrStudio completely free without entering any billing details." },
+        },
+        {
+          "@type": "Question",
+          "name": "How does the Batch Store Exporter work?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Under the Pro plan, you can upload a single screenshot, and our system automatically renders and packs it in all canonical resolutions required by Apple and Google. You get a clean ZIP file instantly." },
+        },
+        {
+          "@type": "Question",
+          "name": "Can I save my custom brand colors and gradients?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes! The Pro tier includes a Brand Presets kit where you can lock in your exact hex codes, brand fonts, and custom watermark text for automatic use on any tool." },
+        },
+        {
+          "@type": "Question",
+          "name": "Does BuildrStudio have AI features?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes! BuildrStudio includes an AI-powered copywriter that generates marketing headlines in 15+ languages, and AI auto-layout that suggests gradients and text positioning when you upload a screenshot." },
+        },
+      ],
+    },
   ],
 };
 
