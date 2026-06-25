@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import TerminalQuest from "./TerminalQuest";
 
 // ── GAME DATA ────────────────────────────────────────────────────────────────
 
@@ -434,6 +435,21 @@ export default function AboutClient() {
               </div>
             </Link>
           ))}
+        </section>
+
+        {/* ── MINI GAMES ── */}
+        <section>
+          <div className="section-bar">
+            <div className="section-icon" style={{ background: "rgba(99,102,241,0.1)" }}>🎮</div>
+            <span className="section-title">Play to Learn</span>
+            <span className="section-sub">Interactive exploration</span>
+          </div>
+
+          <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-1)", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ padding: "2px 8px", borderRadius: "6px", background: "rgba(126,231,135,0.1)", color: "#7ee787", fontSize: "11px", fontWeight: 700 }}>Terminal</span>
+            Type commands to explore my profile
+          </div>
+          <TerminalQuest />
         </section>
 
         {/* ── EXPERIENCE LOG ── */}
