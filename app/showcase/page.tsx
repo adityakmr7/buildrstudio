@@ -16,21 +16,12 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://buildrstudio.in/showcase",
     locale: "en_US",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "BuildrStudio App Showcase",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "App Showcase — Anchor & Flowzy | BuildrStudio",
     description:
       "Anchor (habit tracker) and Flowzy (Pomodoro focus timer) — free iOS apps by Aditya Kumar.",
-    images: ["/og-image.png"],
   },
 };
 

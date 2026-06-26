@@ -16,21 +16,12 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://buildrstudio.in/social-optimizer",
     locale: "en_US",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "BuildrStudio Social Graphic Optimizer",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Social Media Graphic Optimizer — BuildrStudio",
     description:
       "Turn raw developer screenshots into beautiful social media images with gradients, frames, and captions.",
-    images: ["/og-image.png"],
   },
 };
 

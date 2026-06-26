@@ -16,21 +16,12 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://buildrstudio.in/screenshot-builder",
     locale: "en_US",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "BuildrStudio App Store Screenshot Builder",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "App Store Screenshot Builder — BuildrStudio",
     description:
       "Generate beautiful, store-compliant app screenshots for iOS and Play Store in seconds.",
-    images: ["/og-image.png"],
   },
 };
 
