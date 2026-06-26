@@ -16,21 +16,12 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://buildrstudio.in/change-log",
     locale: "en_US",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "BuildrStudio Changelog Card Generator",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Changelog Card Generator — BuildrStudio",
     description:
       "Turn changelog entries into beautiful social cards. Announce product updates on X/Twitter and LinkedIn in seconds.",
-    images: ["/og-image.png"],
   },
 };
 

@@ -19,21 +19,12 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://buildrstudio.in/blog",
     locale: "en_US",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "BuildrStudio Blog",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "BuildrStudio Blog — Frontend, React Native & Product Building",
     description:
       "Notes on frontend architecture, React Native patterns, and the systems behind focused apps. By Aditya Kumar.",
-    images: ["/og-image.png"],
   },
 };
 

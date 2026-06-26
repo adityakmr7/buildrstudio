@@ -16,21 +16,12 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://buildrstudio.in",
     locale: "en_US",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "BuildrStudio Creative Suite",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "BuildrStudio — Beautiful Launch Visuals",
     description:
       "Design high-converting App Store mockups, social graphics, and release changelog cards in seconds.",
-    images: ["/og-image.png"],
   },
 };
 

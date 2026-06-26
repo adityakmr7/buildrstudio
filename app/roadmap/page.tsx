@@ -18,21 +18,12 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://buildrstudio.in/roadmap",
     locale: "en_US",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "BuildrStudio Product Roadmap",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Product Roadmap — BuildrStudio",
     description:
       "Vote on what BuildrStudio builds next — launch assets, content cards, app store screenshots, and more.",
-    images: ["/og-image.png"],
   },
 };
 
