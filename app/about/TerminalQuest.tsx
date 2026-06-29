@@ -59,6 +59,11 @@ GraphQL     ████████████████░░░░ 82`,
    Stack: Next.js, Gemini API, PostgreSQL
    XP: +2,500
 
+## 💬 AI Customer Support Chatbot [COMPLETE]
+   24/7 AI support agent with human escalation
+   Stack: Next.js 16, Gemini, Vercel AI SDK
+   XP: +1,600
+
 ## 🤖 AI Resume Assistant [COMPLETE]
    RAG pipeline for resume-job matching
    Stack: React, Node.js, LLM APIs
@@ -80,6 +85,11 @@ GraphQL     ████████████████░░░░ 82`,
    AI-powered screenshot generator for indie devs
    Stack: Next.js, Gemini API, PostgreSQL
    XP: +2,500
+
+## 💬 AI Customer Support Chatbot [COMPLETE]
+   24/7 AI support agent with human escalation
+   Stack: Next.js 16, Gemini, Vercel AI SDK
+   XP: +1,600
 
 ## 🤖 AI Resume Assistant [COMPLETE]
    RAG pipeline for resume-job matching
