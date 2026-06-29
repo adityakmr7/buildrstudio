@@ -69,6 +69,7 @@ const ACHIEVEMENTS = [
   { icon: "🤖", title: "AI Whisperer", desc: "Integrated LLM APIs into production apps", rarity: "Rare" },
   { icon: "📦", title: "Open Source Creator", desc: "Published npm package with community adoption", rarity: "Rare" },
   { icon: "⚡", title: "Performance Slayer", desc: "Reduced UI latency by 40% in production", rarity: "Epic" },
+  { icon: "💬", title: "AI Agent Builder", desc: "Built autonomous AI chatbot with human escalation", rarity: "Rare" },
 ];
 
 const QUESTS = [
@@ -81,6 +82,16 @@ const QUESTS = [
     status: "Active",
     color: "#6366f1",
     xp: 2500,
+  },
+  {
+    name: "AI Customer Support Chatbot",
+    role: "Full-Stack AI Engineer",
+    desc: "Intelligent support agent that answers pricing, features, and account questions 24/7. Built with Vercel AI SDK, Gemini, and streaming chat UI with auto-escalation to humans.",
+    tags: ["Next.js 16", "Gemini API", "Vercel AI SDK", "Zod"],
+    href: "https://github.com/adityakmr7/ai-projects/tree/main/customer-support-chatbot",
+    status: "Complete",
+    color: "#8b5cf6",
+    xp: 1600,
   },
   {
     name: "AI Resume Assistant",
