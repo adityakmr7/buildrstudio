@@ -368,6 +368,7 @@ export default function WorkspaceHub() {
 
   useEffect(() => {
     if (session?.user?.isPro) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsWatermarkUnlocked(true);
       return;
     }

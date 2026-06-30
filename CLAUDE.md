@@ -43,7 +43,6 @@ app/
   api/interest/route.ts         # POST endpoint — saves waitlist/interest emails to Neon
   lib/
     interest.ts                 # Neon DB helper for waitlist_requests table
-    hashnode.ts                 # GraphQL client for fetching blog posts from Hashnode
   components/
     AppHeader.tsx               # Shared sticky header with nav dropdown, mobile drawer, theme toggle
     SaaSLandingPage.tsx         # Marketing landing page (hero, tools grid, pricing, FAQs)
@@ -69,9 +68,7 @@ app/
   change-log/
     page.tsx                    # Route: /change-log
     ChangelogGenerator.tsx      # Changelog card editor
-  blog/page.tsx                 # Route: /blog — SSR page fetching from Hashnode GraphQL
   roadmap/page.tsx              # Route: /roadmap — feature voting page
-  showcase/page.tsx             # Route: /showcase — Anchor & Flowzy app showcase
   anchor/                       # Privacy policy & support pages for Anchor app
   flowzy/                       # Privacy, support, terms pages for Flowzy app
   sitemap.ts                    # Dynamic sitemap generation
@@ -156,10 +153,6 @@ NEXT_PUBLIC_APP_URL=https://buildrstudio.in
 
 # AI copywriting (Gemini free tier)
 GEMINI_API_KEY=<google-ai-studio-api-key>
-
-# Optional — blog page
-HASHNODE_GQL_ENDPOINT=https://gql.hashnode.com/    # default
-HASHNODE_PUBLICATION_HOST=adityakmr.hashnode.dev    # default
 ```
 
 ## Database

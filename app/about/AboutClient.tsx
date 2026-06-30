@@ -139,10 +139,15 @@ export default function AboutClient() {
   const [copied, setCopied] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [activeSkillTree, setActiveSkillTree] = useState(0);
-  const [visibleSkills, setVisibleSkills] = useState<boolean[]>([]);
+  const [visibleSkills, setVisibleSkills] = useState<boolean[]>(() => SKILL_TREES[0].skills.map(() => false));
   const skillsRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    const handle = requestAnimationFrame(() => {
+      setMounted(true);
+    });
+    return () => cancelAnimationFrame(handle);
+  }, []);
 
   useEffect(() => {
     if (!skillsRef.current) return;
@@ -163,7 +168,6 @@ export default function AboutClient() {
   }, [activeSkillTree]);
 
   useEffect(() => {
-    setVisibleSkills(SKILL_TREES[activeSkillTree].skills.map(() => false));
     const timer = setTimeout(() => {
       SKILL_TREES[activeSkillTree].skills.forEach((_, i) => {
         setTimeout(() => {
@@ -340,6 +344,7 @@ export default function AboutClient() {
 
             <div className="char-socials">
               <a href="https://linkedin.com/in/adityakmr7" target="_blank" rel="noopener noreferrer" className="char-social">💼 LinkedIn</a>
+              <a href="https://substack.com/@adityakmr7" target="_blank" rel="noopener noreferrer" className="char-social">✍️ Substack</a>
               <span className="char-social">🕐 IST (UTC+5:30)</span>
               <span className="char-social">🏢 Groww</span>
             </div>
@@ -362,7 +367,10 @@ export default function AboutClient() {
                 key={tree.category}
                 className={`skill-tab${activeSkillTree === i ? " active" : ""}`}
                 style={activeSkillTree === i ? { color: tree.color, borderColor: tree.color, background: `${tree.color}10` } : {}}
-                onClick={() => setActiveSkillTree(i)}
+                onClick={() => {
+                  setActiveSkillTree(i);
+                  setVisibleSkills(SKILL_TREES[i].skills.map(() => false));
+                }}
               >
                 {tree.category}
               </button>
@@ -501,6 +509,9 @@ export default function AboutClient() {
                 </a>
                 <a href="https://github.com/adityakmr7" target="_blank" rel="noopener noreferrer" className="char-btn char-btn-outline" style={{ padding: "12px 28px", fontSize: "15px" }}>
                   GitHub
+                </a>
+                <a href="https://substack.com/@adityakmr7" target="_blank" rel="noopener noreferrer" className="char-btn char-btn-outline" style={{ padding: "12px 28px", fontSize: "15px" }}>
+                  ✍️ Substack
                 </a>
               </div>
             </div>

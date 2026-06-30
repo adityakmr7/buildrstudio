@@ -299,6 +299,118 @@ export default function SaaSLandingPage() {
           gap: 4px;
         }
 
+        /* ─── MAIN PRODUCT CARD ─── */
+        .main-product-card {
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          align-items: center;
+          gap: 32px;
+          max-width: 1200px;
+          margin: 0 auto 28px;
+          padding: 40px 44px;
+          background: linear-gradient(135deg, rgba(99,102,241,0.04) 0%, rgba(168,85,247,0.03) 100%);
+          border: 1.5px solid var(--border-strong);
+          border-radius: 24px;
+          text-decoration: none;
+          color: inherit;
+          transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+        }
+        .main-product-card:hover {
+          transform: translateY(-4px);
+          border-color: var(--fill);
+          box-shadow: 0 20px 48px rgba(99,102,241,0.12);
+        }
+        .main-product-icon {
+          width: 80px;
+          height: 80px;
+          border-radius: 20px;
+          background: linear-gradient(135deg, #6366f1, #a855f7);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 38px;
+          flex-shrink: 0;
+          box-shadow: 0 12px 28px rgba(99,102,241,0.3);
+        }
+        .main-product-title {
+          font-size: 26px;
+          font-weight: 800;
+          letter-spacing: -0.6px;
+          margin: 0 0 8px;
+        }
+        .main-product-desc {
+          font-size: 14px;
+          color: var(--text-2);
+          line-height: 1.6;
+          margin: 0 0 16px;
+          max-width: 620px;
+        }
+        .main-product-features {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 6px 20px;
+          font-size: 13px;
+          color: var(--text-2);
+          font-weight: 500;
+        }
+        .main-product-arrow {
+          font-size: 14px;
+          font-weight: 700;
+          color: var(--fill);
+          white-space: nowrap;
+        }
+        .secondary-tools-label {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 40px;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--text-3);
+        }
+        .secondary-tools-row {
+          display: flex;
+          gap: 16px;
+          max-width: 1200px;
+          margin: 12px auto 100px;
+          padding: 0 40px;
+        }
+        .secondary-tool {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex: 1;
+          padding: 16px 20px;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 14px;
+          text-decoration: none;
+          color: var(--text-1);
+          transition: border-color 0.2s, transform 0.2s;
+        }
+        .secondary-tool:hover {
+          border-color: var(--text-2);
+          transform: translateY(-2px);
+        }
+        .secondary-tool-icon {
+          font-size: 20px;
+        }
+        .secondary-tool strong {
+          display: block;
+          font-size: 14px;
+          font-weight: 700;
+        }
+        .secondary-tool-desc {
+          display: block;
+          font-size: 12px;
+          color: var(--text-3);
+          font-weight: 500;
+        }
+
         /* ─── FIGMA VS BUILDRSTUDIO ─── */
         .vs-section {
           background: var(--surface-2);
@@ -526,6 +638,11 @@ export default function SaaSLandingPage() {
           .hero-mockup { width: 160px; height: 240px; border-radius: 16px; padding: 16px 12px; gap: 10px; }
           .hero-mockup-text { font-size: 13px; }
           .hero-mockup-phone { width: 75px; height: 130px; border-radius: 12px; }
+          .main-product-card { grid-template-columns: 1fr; text-align: center; padding: 32px 24px; }
+          .main-product-icon { margin: 0 auto; }
+          .main-product-desc { max-width: 100%; }
+          .main-product-features { grid-template-columns: 1fr; text-align: left; }
+          .secondary-tools-row { flex-direction: column; }
         }
       `}</style>
 
@@ -535,19 +652,19 @@ export default function SaaSLandingPage() {
       {/* ── HERO ── */}
       <section className="hero">
         <div className="hero-badge">
-          <span>🚀 BuildrStudio Suite v2.5</span>
+          <span>📱 Free App Store Screenshot Generator</span>
         </div>
-        <h1 className="hero-title">Design Assets That Sell Your Software</h1>
+        <h1 className="hero-title">App Store Screenshots That Actually Convert</h1>
         <p className="hero-desc">
-          Generate gorgeous App Store mockups, high-converting social graphics, and changelog cards in seconds. Built for speed and visual excellence.
+          Paste your App Store URL or upload a screenshot — get polished, submission-ready mockups for iOS and Google Play in seconds. No design skills needed.
         </p>
         <div className="hero-ctas">
-          <Link href="/social-optimizer" className="btn-fill btn-lg" style={{ textDecoration: "none" }}>
-            Get Started Free
+          <Link href="/screenshot-builder" className="btn-fill btn-lg" style={{ textDecoration: "none" }}>
+            Create Screenshots Free
           </Link>
-          <a href="#tools" className="btn-outline btn-lg" style={{ textDecoration: "none" }}>
-            Explore Tools
-          </a>
+          <Link href="/screenshot-builder#templates" className="btn-outline btn-lg" style={{ textDecoration: "none" }}>
+            See Templates
+          </Link>
         </div>
 
         {/* Hero visual — animated product showcase */}
@@ -578,38 +695,45 @@ export default function SaaSLandingPage() {
         </div>
       </section>
 
-      {/* ── TOOLS SECTOR ── */}
+      {/* ── MAIN PRODUCT: SCREENSHOT BUILDER ── */}
       <section id="tools">
         <div className="section-title">
-          <h2>Creative Tool Suite</h2>
-          <p>Click below to launch your editor workspace of choice.</p>
+          <h2>The App Store Screenshot Builder</h2>
+          <p>Everything you need to ship store-ready visuals, in one workspace.</p>
         </div>
-        <div className="tools-grid">
-          <Link href="/social-optimizer" className="tool-card">
-            <div className="tool-icon">🎨</div>
-            <h3 className="tool-name">Social Optimizer</h3>
-            <p className="tool-desc">
-              Transform developer screenshots, terminal logs, or clean code captures into beautiful graphics optimized for Twitter/X and LinkedIn.
-            </p>
-            <span className="tool-arrow">Launch Optimizer →</span>
-          </Link>
 
-          <Link href="/screenshot-builder" className="tool-card">
-            <div className="tool-icon">📱</div>
-            <h3 className="tool-name">Screenshot Builder</h3>
-            <p className="tool-desc">
-              Generate submission-ready app screenshots for iOS App Store and Google Play. Custom gradient presets, 3D tilts, and flat frames.
+        <Link href="/screenshot-builder" className="main-product-card">
+          <div className="main-product-icon">📱</div>
+          <div className="main-product-body">
+            <h3 className="main-product-title">Screenshot Builder</h3>
+            <p className="main-product-desc">
+              Paste your App Store URL to auto-import screenshots and copy, or upload your own. Pick a device frame, gradient, and headline — export submission-ready PNGs for iOS App Store and Google Play in every required size.
             </p>
-            <span className="tool-arrow">Launch Builder →</span>
-          </Link>
+            <ul className="main-product-features">
+              <li>✓ Auto-import from App Store / Play Store URL</li>
+              <li>✓ AI-generated headlines in 15+ languages</li>
+              <li>✓ Smart resize across all required device sizes</li>
+              <li>✓ 3D device tilts, flat frames, 16+ gradients</li>
+            </ul>
+          </div>
+          <span className="main-product-arrow">Start Building →</span>
+        </Link>
 
-          <Link href="/change-log" className="tool-card">
-            <div className="tool-icon">⚡</div>
-            <h3 className="tool-name">Changelog Generator</h3>
-            <p className="tool-desc">
-              Announce new features with design flair. Generate release social cards instantly using brackets, minimalist layouts, or warm gradients.
-            </p>
-            <span className="tool-arrow">Launch Generator →</span>
+        <div className="secondary-tools-label">Also available</div>
+        <div className="secondary-tools-row">
+          <Link href="/social-optimizer" className="secondary-tool">
+            <span className="secondary-tool-icon">🎨</span>
+            <span>
+              <strong>Social Optimizer</strong>
+              <span className="secondary-tool-desc">Screenshots → social graphics</span>
+            </span>
+          </Link>
+          <Link href="/change-log" className="secondary-tool">
+            <span className="secondary-tool-icon">⚡</span>
+            <span>
+              <strong>Changelog Generator</strong>
+              <span className="secondary-tool-desc">Release cards for X/LinkedIn</span>
+            </span>
           </Link>
         </div>
 
@@ -847,7 +971,7 @@ export default function SaaSLandingPage() {
               <li className="price-feature"><span>✓</span> Interactive caption overlays</li>
             </ul>
             <Link
-              href="/social-optimizer"
+              href="/screenshot-builder"
               className="btn-outline btn-md"
               style={{ textAlign: "center", textDecoration: "none" }}
             >
@@ -942,12 +1066,10 @@ export default function SaaSLandingPage() {
           Craft beautiful launch visual assets for your apps, Twitter accounts, and store consoles in minutes.
         </p>
         <div className="footer-links">
-          <Link href="/social-optimizer" className="footer-link">Optimizer</Link>
           <Link href="/screenshot-builder" className="footer-link">Screenshot Builder</Link>
+          <Link href="/social-optimizer" className="footer-link">Optimizer</Link>
           <Link href="/change-log" className="footer-link">Changelog</Link>
-          <Link href="/showcase" className="footer-link">Showcase</Link>
           <Link href="/roadmap" className="footer-link">Roadmap</Link>
-          <Link href="/blog" className="footer-link">Blog</Link>
           <Link href="/pricing" className="footer-link">Pricing</Link>
         </div>
         <div className="footer-links" style={{ marginTop: 0 }}>

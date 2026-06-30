@@ -3,25 +3,25 @@ import Script from "next/script";
 import SaaSLandingPage from "./components/SaaSLandingPage";
 
 export const metadata: Metadata = {
-  title: "BuildrStudio — Beautiful Launch Assets for Developers & Indie Hackers",
+  title: "BuildrStudio — Free App Store Screenshot Generator",
   description:
-    "Design high-converting App Store screenshot mockups, social graphics, and release changelog cards in seconds. Built for speed and visual excellence.",
+    "Create App Store & Play Store screenshots in seconds. Paste your app URL, get polished mockups with AI headlines and device frames. Free.",
   alternates: {
     canonical: "https://buildrstudio.in",
   },
   openGraph: {
-    title: "BuildrStudio — Beautiful Launch Visuals",
+    title: "BuildrStudio — App Store Screenshots That Convert",
     description:
-      "Design high-converting App Store mockups, social graphics, and release changelog cards in seconds.",
+      "Paste your App Store URL and get polished, submission-ready screenshots in seconds. Free, no design skills needed.",
     type: "website",
     url: "https://buildrstudio.in",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "BuildrStudio — Beautiful Launch Visuals",
+    title: "BuildrStudio — App Store Screenshots That Convert",
     description:
-      "Design high-converting App Store mockups, social graphics, and release changelog cards in seconds.",
+      "Paste your App Store URL and get polished, submission-ready screenshots in seconds.",
   },
 };
 
@@ -34,7 +34,7 @@ const jsonLd = {
       "url": "https://buildrstudio.in",
       "name": "BuildrStudio",
       "description":
-        "Creative asset generation suite for developer screenshots, social graphic optimization, and App Store mockups.",
+        "Free App Store & Google Play screenshot generator. Paste your app URL or upload a screenshot, get submission-ready mockups in seconds.",
       "publisher": {
         "@type": "Person",
         "name": "Aditya Kumar",
@@ -43,8 +43,8 @@ const jsonLd = {
     {
       "@type": "WebApplication",
       "@id": "https://buildrstudio.in/#webapp",
-      "url": "https://buildrstudio.in",
-      "name": "BuildrStudio Creative Suite",
+      "url": "https://buildrstudio.in/screenshot-builder",
+      "name": "BuildrStudio App Store Screenshot Builder",
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "All",
       "browserRequirements": "Requires CSS3/HTML5",
@@ -54,7 +54,7 @@ const jsonLd = {
         "priceCurrency": "USD",
       },
       "description":
-        "Instant design asset generator for product builders. Create App Store mockups, social media optimized screenshots, and release changelog graphics.",
+        "Create submission-ready App Store and Google Play screenshots in seconds. Auto-import from your App Store URL, AI headlines, smart device-size resize.",
     },
     {
       "@type": "FAQPage",

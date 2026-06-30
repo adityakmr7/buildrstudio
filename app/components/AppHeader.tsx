@@ -14,7 +14,7 @@ import AuthModal from "./AuthModal";
 import UserMenu from "./UserMenu";
 
 interface AppHeaderProps {
-  activeRoute?: "social-optimizer" | "screenshot-builder" | "showcase" | "blog" | "roadmap" | "change-log" | "home";
+  activeRoute?: "social-optimizer" | "screenshot-builder" | "roadmap" | "change-log" | "home";
   onOpenPremium?: () => void;
 }
 
@@ -22,11 +22,12 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [prevRoute, setPrevRoute] = useState(activeRoute);
 
-  // Close menus when location changes
-  useEffect(() => {
+  if (activeRoute !== prevRoute) {
+    setPrevRoute(activeRoute);
     setMobileMenuOpen(false);
-  }, [activeRoute]);
+  }
 
   const handleProClick = () => {
     if (onOpenPremium) {
@@ -460,19 +461,19 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
             </button>
 
             <div className="hdr-dropdown-menu">
-              <Link href="/social-optimizer" className="dropdown-item">
-                <div className="dropdown-item-icon-wrap icon-social">🎨</div>
-                <div className="dropdown-item-info">
-                  <span className="dropdown-item-title">Social Optimizer</span>
-                  <span className="dropdown-item-desc">Screenshots to viral social posts</span>
-                </div>
-              </Link>
-
               <Link href="/screenshot-builder" className="dropdown-item">
                 <div className="dropdown-item-icon-wrap icon-screens">📱</div>
                 <div className="dropdown-item-info">
                   <span className="dropdown-item-title">Screenshot Builder</span>
-                  <span className="dropdown-item-desc">iOS & Play Store console mockups</span>
+                  <span className="dropdown-item-desc">iOS & Play Store mockups · Main tool</span>
+                </div>
+              </Link>
+
+              <Link href="/social-optimizer" className="dropdown-item">
+                <div className="dropdown-item-icon-wrap icon-social">🎨</div>
+                <div className="dropdown-item-info">
+                  <span className="dropdown-item-title">Social Optimizer</span>
+                  <span className="dropdown-item-desc">Screenshots to social posts</span>
                 </div>
               </Link>
 
@@ -486,12 +487,6 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
             </div>
           </div>
 
-          <Link href="/showcase" className={`hdr-link ${activeRoute === "showcase" ? "active" : ""}`}>
-            Showcase
-          </Link>
-          <Link href="/blog" className={`hdr-link ${activeRoute === "blog" ? "active" : ""}`}>
-            Blog
-          </Link>
           <Link href="/roadmap" className={`hdr-link ${activeRoute === "roadmap" ? "active" : ""}`}>
             Roadmap
           </Link>
@@ -586,17 +581,6 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
         <div>
           <span className="mobile-section-label">General</span>
           <div className="mobile-grid">
-            <Link
-              href="/showcase"
-              className={`mobile-link ${activeRoute === "showcase" ? "active" : ""}`}
-            >
-              <span>⭐</span>
-              <span>Showcase Gallery</span>
-            </Link>
-            <Link href="/blog" className={`mobile-link ${activeRoute === "blog" ? "active" : ""}`}>
-              <span>📝</span>
-              <span>Blog Publication</span>
-            </Link>
             <Link
               href="/roadmap"
               className={`mobile-link ${activeRoute === "roadmap" ? "active" : ""}`}

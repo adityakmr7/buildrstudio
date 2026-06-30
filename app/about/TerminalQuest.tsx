@@ -110,6 +110,7 @@ GraphQL     ████████████████░░░░ 82`,
 🐙 GitHub: github.com/adityakmr7
 𝕏 Twitter: x.com/adityakmr7
 💼 LinkedIn: linkedin.com/in/adityakmr7
+✍️ Substack: substack.com/@adityakmr7
 
 💡 Currently open to:
   → Senior Full-Stack roles (remote or Bengaluru)
@@ -120,6 +121,7 @@ GraphQL     ████████████████░░░░ 82`,
 🐙 GitHub: github.com/adityakmr7
 𝕏 Twitter: x.com/adityakmr7
 💼 LinkedIn: linkedin.com/in/adityakmr7
+✍️ Substack: substack.com/@adityakmr7
 
 💡 Currently open to:
   → Senior Full-Stack roles (remote or Bengaluru)
