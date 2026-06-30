@@ -8,6 +8,7 @@ export default function ThemeToggle() {
 
   useEffect(() => {
     const isDark = localStorage.getItem("ink-theme") === "dark";
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDark(isDark);
     setMounted(true);
   }, []);

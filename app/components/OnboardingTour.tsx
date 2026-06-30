@@ -18,6 +18,7 @@ export default function OnboardingTour({ storageKey }: OnboardingTourProps) {
 
   useEffect(() => {
     const seen = localStorage.getItem(storageKey);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!seen) setStep(0);
   }, [storageKey]);
 

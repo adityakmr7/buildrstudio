@@ -945,9 +945,7 @@ export default function SaaSLandingPage() {
           <Link href="/social-optimizer" className="footer-link">Optimizer</Link>
           <Link href="/screenshot-builder" className="footer-link">Screenshot Builder</Link>
           <Link href="/change-log" className="footer-link">Changelog</Link>
-          <Link href="/showcase" className="footer-link">Showcase</Link>
           <Link href="/roadmap" className="footer-link">Roadmap</Link>
-          <Link href="/blog" className="footer-link">Blog</Link>
           <Link href="/pricing" className="footer-link">Pricing</Link>
         </div>
         <div className="footer-links" style={{ marginTop: 0 }}>
