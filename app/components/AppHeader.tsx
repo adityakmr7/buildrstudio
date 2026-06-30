@@ -461,19 +461,19 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
             </button>
 
             <div className="hdr-dropdown-menu">
-              <Link href="/social-optimizer" className="dropdown-item">
-                <div className="dropdown-item-icon-wrap icon-social">🎨</div>
-                <div className="dropdown-item-info">
-                  <span className="dropdown-item-title">Social Optimizer</span>
-                  <span className="dropdown-item-desc">Screenshots to viral social posts</span>
-                </div>
-              </Link>
-
               <Link href="/screenshot-builder" className="dropdown-item">
                 <div className="dropdown-item-icon-wrap icon-screens">📱</div>
                 <div className="dropdown-item-info">
                   <span className="dropdown-item-title">Screenshot Builder</span>
-                  <span className="dropdown-item-desc">iOS & Play Store console mockups</span>
+                  <span className="dropdown-item-desc">iOS & Play Store mockups · Main tool</span>
+                </div>
+              </Link>
+
+              <Link href="/social-optimizer" className="dropdown-item">
+                <div className="dropdown-item-icon-wrap icon-social">🎨</div>
+                <div className="dropdown-item-info">
+                  <span className="dropdown-item-title">Social Optimizer</span>
+                  <span className="dropdown-item-desc">Screenshots to social posts</span>
                 </div>
               </Link>
 
