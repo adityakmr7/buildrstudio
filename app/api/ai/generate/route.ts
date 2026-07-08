@@ -8,7 +8,7 @@ const FREE_LIFETIME_LIMIT = 1;
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? "");
 
 export async function POST(req: NextRequest) {
-  const { appName, appDescription, category, tone, language } = await req.json();
+  const { appName, appDescription, category, tone, language, brandVoice } = await req.json();
 
   if (!appDescription || typeof appDescription !== "string") {
     return NextResponse.json({ error: "appDescription is required" }, { status: 400 });
@@ -38,6 +38,16 @@ export async function POST(req: NextRequest) {
     ? `Write ALL output in language code "${language}". Do not include English translations.`
     : "Write in English.";
 
+  const brandVoiceSection = brandVoice?.keyBenefit || brandVoice?.targetUser || brandVoice?.avoidWords
+    ? `
+Brand voice constraints (treat these as hard rules, not suggestions):
+${brandVoice.keyBenefit ? `- Core benefit to emphasize (in the product's own words): "${brandVoice.keyBenefit}"` : ""}
+${brandVoice.targetUser ? `- Who this is for: "${brandVoice.targetUser}"` : ""}
+${brandVoice.avoidWords ? `- Words/phrases to never use: "${brandVoice.avoidWords}"` : ""}
+
+The copy must sound like it came from the product team, not a generic marketer. Use the brand's terminology, not synonyms.`
+    : "";
+
   const prompt = `You are an expert App Store / Play Store marketing copywriter.
 
 Given this app info:
@@ -45,7 +55,7 @@ Given this app info:
 - Description: ${appDescription}
 - Category: ${category || "General"}
 - Tone: ${tone || "Professional"}
-
+${brandVoiceSection}
 Generate exactly 5 screenshot copy variations. Each variation has a headline (max 6 words, punchy, benefit-driven) and a subtext (max 12 words, supporting detail).
 
 ${langInstruction}
