@@ -38,26 +38,27 @@ export async function POST(req: NextRequest) {
     ? `Write ALL output in language code "${language}". Do not include English translations.`
     : "Write in English.";
 
-  const brandVoiceSection = brandVoice?.keyBenefit || brandVoice?.targetUser || brandVoice?.avoidWords
-    ? `
-Brand voice constraints (treat these as hard rules, not suggestions):
-${brandVoice.keyBenefit ? `- Core benefit to emphasize (in the product's own words): "${brandVoice.keyBenefit}"` : ""}
-${brandVoice.targetUser ? `- Who this is for: "${brandVoice.targetUser}"` : ""}
-${brandVoice.avoidWords ? `- Words/phrases to never use: "${brandVoice.avoidWords}"` : ""}
-
-The copy must sound like it came from the product team, not a generic marketer. Use the brand's terminology, not synonyms.`
-    : "";
+  const hasBrandVoice = brandVoice?.keyBenefit || brandVoice?.targetUser || brandVoice?.avoidWords;
 
   const prompt = `You are an expert App Store / Play Store marketing copywriter.
 
-Given this app info:
+## Step 1 — Understand the product
+From the description below, derive what the app does and what problem it solves. Do not use this step to write copy yet.
+
 - Name: ${appName || "Unknown"}
 - Description: ${appDescription}
 - Category: ${category || "General"}
 - Tone: ${tone || "Professional"}
-${brandVoiceSection}
-Generate exactly 5 screenshot copy variations. Each variation has a headline (max 6 words, punchy, benefit-driven) and a subtext (max 12 words, supporting detail).
 
+## Step 2 — Generate copy
+Write exactly 5 screenshot copy variations. Each has a headline (max 6 words, punchy, benefit-driven) and a subtext (max 12 words, supporting detail).
+${hasBrandVoice ? `
+## Step 3 — Apply brand constraints (these are hard rules, applied after generation)
+Rewrite any copy that violates these constraints. The brief corrects vocabulary and claims — it does not change what the product does.
+${brandVoice.keyBenefit ? `- Use this exact framing for the core benefit: "${brandVoice.keyBenefit}"` : ""}
+${brandVoice.targetUser ? `- Written for this specific audience: "${brandVoice.targetUser}" — no broader claims` : ""}
+${brandVoice.avoidWords ? `- Never use these words or phrases: "${brandVoice.avoidWords}"` : ""}
+` : ""}
 ${langInstruction}
 
 Respond ONLY with valid JSON — no markdown, no code fences:
