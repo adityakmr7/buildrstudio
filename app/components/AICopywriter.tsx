@@ -22,6 +22,10 @@ export default function AICopywriter({ onApply, onUpgrade }: AICopywriterProps) 
   const [category, setCategory] = useState("General");
   const [tone, setTone] = useState("Professional");
   const [language, setLanguage] = useState("en");
+  const [keyBenefit, setKeyBenefit] = useState("");
+  const [targetUser, setTargetUser] = useState("");
+  const [avoidWords, setAvoidWords] = useState("");
+  const [showBrandVoice, setShowBrandVoice] = useState(false);
   const [suggestions, setSuggestions] = useState<{ headline: string; subtext: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -33,11 +37,14 @@ export default function AICopywriter({ onApply, onUpgrade }: AICopywriterProps) 
     setLoading(true);
     setError("");
     setSuggestions([]);
+    const brandVoice = (keyBenefit || targetUser || avoidWords)
+      ? { keyBenefit, targetUser, avoidWords }
+      : undefined;
     try {
       const res = await fetch("/api/ai/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ appDescription: appDesc, category, tone, language }),
+        body: JSON.stringify({ appDescription: appDesc, category, tone, language, brandVoice }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -119,6 +126,68 @@ export default function AICopywriter({ onApply, onUpgrade }: AICopywriterProps) 
               <option key={l.code} value={l.code}>{l.label}</option>
             ))}
           </select>
+          {/* Brand Voice */}
+          <button
+            onClick={() => setShowBrandVoice(!showBrandVoice)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              background: "none",
+              border: "none",
+              padding: "2px 0",
+              fontSize: "11px",
+              fontWeight: 600,
+              color: showBrandVoice ? "var(--fill)" : "var(--text-3)",
+              cursor: "pointer",
+            }}
+          >
+            <span>{showBrandVoice ? "▾" : "▸"}</span>
+            Brand Voice
+            <span style={{ fontWeight: 400, opacity: 0.6 }}>(optional)</span>
+          </button>
+
+          {showBrandVoice && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px", padding: "10px", background: "var(--surface-2, var(--surface))", borderRadius: "8px", border: "1px solid var(--border)" }}>
+              <div>
+                <label style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "4px" }}>
+                  Core benefit — in your words
+                </label>
+                <input
+                  className="input-field"
+                  value={keyBenefit}
+                  onChange={(e) => setKeyBenefit(e.target.value)}
+                  placeholder='e.g. "ship faster without the config hell"'
+                  style={{ fontSize: "11px", padding: "6px 8px", width: "100%" }}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "4px" }}>
+                  Who it&apos;s for
+                </label>
+                <input
+                  className="input-field"
+                  value={targetUser}
+                  onChange={(e) => setTargetUser(e.target.value)}
+                  placeholder='e.g. "solo devs who hate ops"'
+                  style={{ fontSize: "11px", padding: "6px 8px", width: "100%" }}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "4px" }}>
+                  Words to avoid
+                </label>
+                <input
+                  className="input-field"
+                  value={avoidWords}
+                  onChange={(e) => setAvoidWords(e.target.value)}
+                  placeholder='e.g. "seamless, powerful, robust"'
+                  style={{ fontSize: "11px", padding: "6px 8px", width: "100%" }}
+                />
+              </div>
+            </div>
+          )}
+
           <button
             onClick={generate}
             disabled={loading || !appDesc.trim()}
