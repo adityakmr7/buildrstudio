@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, lazy, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import TerminalQuest from "./TerminalQuest";
+const TerminalQuest = lazy(() => import("./TerminalQuest"));
 
 // ── GAME DATA ────────────────────────────────────────────────────────────────
 
@@ -468,7 +468,9 @@ export default function AboutClient() {
             <span style={{ padding: "2px 8px", borderRadius: "6px", background: "rgba(126,231,135,0.1)", color: "#7ee787", fontSize: "11px", fontWeight: 700 }}>Terminal</span>
             Type commands to explore my profile
           </div>
-          <TerminalQuest />
+          <Suspense fallback={<div style={{ height: 320, background: "var(--surface-2,var(--surface))", borderRadius: 12 }} />}>
+            <TerminalQuest />
+          </Suspense>
         </section>
 
         {/* ── EXPERIENCE LOG ── */}
@@ -489,6 +491,30 @@ export default function AboutClient() {
               <span className="exp-xp" style={{ color: exp.color }}>{exp.xp}</span>
             </div>
           ))}
+        </section>
+
+        {/* ── TRY THE TOOL ── */}
+        <section>
+          <div style={{
+            background: "linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08))",
+            border: "1px solid rgba(99,102,241,0.2)",
+            borderRadius: "16px",
+            padding: "28px 32px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "20px",
+            flexWrap: "wrap",
+          }}>
+            <div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "#6366f1", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Built by me</div>
+              <div style={{ fontSize: "18px", fontWeight: 800, color: "var(--text-1)", marginBottom: "4px" }}>BuildrStudio — App Store Screenshot Generator</div>
+              <div style={{ fontSize: "13px", color: "var(--text-2)" }}>Paste your App Store URL → device frames + AI headlines → export in seconds. Free.</div>
+            </div>
+            <Link href="/screenshot-builder" className="char-btn char-btn-primary" style={{ padding: "12px 24px", fontSize: "14px", whiteSpace: "nowrap", textDecoration: "none" }}>
+              Try the tool →
+            </Link>
+          </div>
         </section>
 
         {/* ── CONTACT (Boss Fight) ── */}
