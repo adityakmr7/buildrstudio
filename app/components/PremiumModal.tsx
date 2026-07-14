@@ -11,18 +11,17 @@ interface PremiumModalProps {
 }
 
 const FEATURE_HEADLINES: Record<string, string> = {
-  watermark: "Remove Watermark — Go Pro",
-  "4k-export": "Unlock 4K Exports — Go Pro",
-  "3d-tilt": "Unlock 3D Device Tilts — Go Pro",
-  "brand-presets": "Save Brand Presets — Go Pro",
-  "batch-export": "Batch Multi-Device Export — Go Pro",
+  watermark: "Remove the watermark",
+  "4k-export": "Unlock 4K exports",
+  "3d-tilt": "Unlock 3D device tilts",
+  "brand-presets": "Save brand presets",
+  "batch-export": "Batch multi-device export",
 };
 
-export default function PremiumModal({ isOpen, onClose, feature, defaultPlan }: PremiumModalProps) {
+export default function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [selectedPlan, setSelectedPlan] = useState<"pro" | "ai_pro">(defaultPlan ?? "pro");
 
   if (!isOpen) return null;
 
@@ -37,7 +36,7 @@ export default function PremiumModal({ isOpen, onClose, feature, defaultPlan }: 
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: selectedPlan }),
+        body: JSON.stringify({ plan: "ai_pro" }),
       });
       const data = (await res.json()) as { url?: string; error?: string };
 
@@ -139,55 +138,17 @@ export default function PremiumModal({ isOpen, onClose, feature, defaultPlan }: 
         ) : (
           <>
             {/* Modal Header */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "8px",
-                textAlign: "center",
-              }}
-            >
-              <div style={{ fontSize: "36px", marginBottom: "4px" }}>👑</div>
-              <h2
-                className="ink-title"
-                style={{ fontSize: "22px", letterSpacing: "-0.5px" }}
-              >
-                {feature
-                  ? (FEATURE_HEADLINES[feature] ?? "Upgrade Your Plan")
-                  : "Upgrade Your Plan"}
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px", textAlign: "center" }}>
+              <h2 className="ink-title" style={{ fontSize: "22px", letterSpacing: "-0.5px" }}>
+                {feature ? (FEATURE_HEADLINES[feature] ?? "Go Pro") : "Go Pro"}
               </h2>
-            </div>
-
-            {/* Plan Toggle */}
-            <div style={{ display: "flex", gap: "8px" }}>
-              {(["pro", "ai_pro"] as const).map((plan) => {
-                const active = selectedPlan === plan;
-                const isPro = plan === "pro";
-                return (
-                  <button
-                    key={plan}
-                    type="button"
-                    onClick={() => setSelectedPlan(plan)}
-                    style={{
-                      flex: 1,
-                      padding: "12px 10px",
-                      borderRadius: "var(--r-md)",
-                      border: active ? "2px solid var(--fill)" : "1px solid var(--border)",
-                      background: active ? "var(--fill-subtle)" : "transparent",
-                      cursor: "pointer",
-                      textAlign: "center",
-                    }}
-                  >
-                    <div style={{ fontSize: "20px", fontWeight: 800, color: "var(--text-1)" }}>
-                      {isPro ? "$4" : "$20"}
-                      <span style={{ fontSize: "12px", fontWeight: 500, color: "var(--text-3)" }}>/mo</span>
-                    </div>
-                    <div style={{ fontSize: "12px", fontWeight: 600, color: active ? "var(--fill)" : "var(--text-2)", marginTop: "2px" }}>
-                      {isPro ? "Pro" : "AI Pro"}
-                    </div>
-                  </button>
-                );
-              })}
+              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: "4px" }}>
+                <span style={{ fontSize: "36px", fontWeight: 800, letterSpacing: "-1px", color: "var(--text-1)" }}>$9</span>
+                <span style={{ fontSize: "14px", color: "var(--text-3)" }}>/month</span>
+              </div>
+              <p style={{ fontSize: "13px", color: "var(--text-3)", margin: 0 }}>
+                Everything included. Cancel anytime.
+              </p>
             </div>
 
             {/* Feature List */}
@@ -196,52 +157,34 @@ export default function PremiumModal({ isOpen, onClose, feature, defaultPlan }: 
                 background: "var(--fill-subtle)",
                 borderRadius: "var(--r-md)",
                 padding: "14px 18px",
-                fontSize: "12px",
+                fontSize: "13px",
                 display: "flex",
                 flexDirection: "column",
-                gap: "8px",
+                gap: "10px",
                 color: "var(--text-2)",
               }}
             >
-              <div style={{ display: "flex", gap: "8px" }}>
-                <span>✨</span>
-                <span><strong>Remove Watermark</strong> (Export clean screenshots)</span>
-              </div>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <span>🖥️</span>
-                <span><strong>3D Device Tilts & 4K Export</strong></span>
-              </div>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <span>📦</span>
-                <span><strong>Batch Multi-Device Export</strong></span>
-              </div>
-              {selectedPlan === "ai_pro" && (
-                <>
-                  <div style={{ height: "1px", background: "var(--border)", margin: "4px 0" }} />
-                  <div style={{ display: "flex", gap: "8px" }}>
-                    <span>🤖</span>
-                    <span><strong>Unlimited AI Copywriting</strong></span>
-                  </div>
-                  <div style={{ display: "flex", gap: "8px" }}>
-                    <span>🌍</span>
-                    <span><strong>AI Translation (15+ languages)</strong></span>
-                  </div>
-                  <div style={{ display: "flex", gap: "8px" }}>
-                    <span>⚡</span>
-                    <span><strong>Smart Tone & Category Targeting</strong></span>
-                  </div>
-                </>
-              )}
+              {[
+                ["Watermark-free exports", true],
+                ["Batch export — all Apple & Google sizes", false],
+                ["Canonical store filenames (ready to upload)", false],
+                ["3D device tilts & 4K PNG", false],
+                ["Unlimited AI headline generation", true],
+                ["AI translation — 15+ languages", false],
+                ["Custom brand presets & swatches", false],
+              ].map(([label, bold]) => (
+                <div key={label as string} style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, color: "var(--fill)" }}>
+                    <circle cx="7" cy="7" r="7" fill="currentColor" opacity="0.15"/>
+                    <path d="M4 7l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <span style={bold ? { fontWeight: 600 } : {}}>{label as string}</span>
+                </div>
+              ))}
             </div>
 
             {/* CTA */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "12px",
-              }}
-            >
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {error && (
                 <div
                   style={{
@@ -265,31 +208,23 @@ export default function PremiumModal({ isOpen, onClose, feature, defaultPlan }: 
                   disabled={isLoading}
                   onClick={handleCheckout}
                 >
-                  {isLoading ? "Redirecting..." : selectedPlan === "ai_pro" ? "Get AI Pro — $20/mo" : "Get Pro — $4/mo"}
+                  {isLoading ? "Redirecting…" : "Get Pro — $9/mo"}
                 </button>
               ) : (
                 <button
                   type="button"
                   className="btn-fill"
                   style={{ width: "100%", justifyContent: "center" }}
-                  onClick={() =>
-                    signIn("google", { callbackUrl: window.location.href })
-                  }
+                  onClick={() => signIn("google", { callbackUrl: window.location.href })}
                 >
-                  Sign in with Google to Subscribe
+                  Sign in with Google to continue
                 </button>
               )}
 
-              <span
-                style={{
-                  fontSize: "11px",
-                  color: "var(--text-3)",
-                  textAlign: "center",
-                }}
-              >
+              <span style={{ fontSize: "11px", color: "var(--text-3)", textAlign: "center" }}>
                 {isAuthenticated
                   ? "Secure checkout via Lemon Squeezy. Cancel anytime."
-                  : "Sign in first, then subscribe to unlock Pro features."}
+                  : "Sign in first, then subscribe to unlock all Pro features."}
               </span>
             </div>
           </>

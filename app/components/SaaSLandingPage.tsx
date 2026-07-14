@@ -558,9 +558,11 @@ export default function SaaSLandingPage() {
         }
         .pricing-cards {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: 1fr 1fr;
           gap: 24px;
           align-items: start;
+          max-width: 700px;
+          margin: 0 auto;
         }
         .price-card {
           background: var(--surface);
@@ -694,7 +696,7 @@ export default function SaaSLandingPage() {
         @media (max-width: 900px) {
           .tools-grid { grid-template-columns: 1fr; gap: 20px; }
           .vs-container { grid-template-columns: 1fr; }
-          .pricing-cards { grid-template-columns: 1fr !important; }
+          .pricing-cards { grid-template-columns: 1fr !important; max-width: 400px !important; }
           .hero-mockup-row { gap: 12px; }
           .hero-mockup { width: 160px; height: 240px; border-radius: 16px; padding: 16px 12px; gap: 10px; }
           .hero-mockup-text { font-size: 13px; }
@@ -1032,52 +1034,54 @@ export default function SaaSLandingPage() {
       {/* ── PRICING ── */}
       <section className="pricing">
         <div className="section-title">
-          <h2>Flexible Pricing Plans</h2>
-          <p>Choose the tier that fits your launch requirements.</p>
+          <h2>Simple, honest pricing</h2>
+          <p>One plan. Everything included. No tiers to decode.</p>
         </div>
         <div className="pricing-cards" style={{ marginTop: "20px" }}>
-          {/* Free Tier */}
+          {/* Free */}
           <div className="price-card">
-            <h3 className="price-name">Free Plan</h3>
+            <h3 className="price-name">Free</h3>
             <div>
               <span className="price-val">$0</span>
               <span className="price-period"> / forever</span>
             </div>
             <p style={{ fontSize: "13px", color: "var(--text-3)", margin: 0 }}>
-              Essential design templates for quick product launches.
+              Build and export screenshots with no account required.
             </p>
             <ul className="price-features">
-              <li className="price-feature"><span>✓</span> Standard flat device frames</li>
-              <li className="price-feature"><span>✓</span> Base gradients & solid colors</li>
-              <li className="price-feature"><span>✓</span> 1080p PNG exports</li>
-              <li className="price-feature"><span>✓</span> Interactive caption overlays</li>
+              <li className="price-feature"><span>✓</span> All device frames & templates</li>
+              <li className="price-feature"><span>✓</span> Gradients, solid colors & mesh</li>
+              <li className="price-feature"><span>✓</span> PNG export (with watermark)</li>
+              <li className="price-feature"><span>✓</span> 5 AI headline generations</li>
             </ul>
             <Link
               href="/screenshot-builder"
               className="btn-outline btn-md"
               style={{ textAlign: "center", textDecoration: "none" }}
             >
-              Get Started Free
+              Start for free
             </Link>
           </div>
 
-          {/* Pro Tier */}
+          {/* Pro */}
           <div className="price-card pro">
-            <span className="badge-pro">Launch Price</span>
-            <h3 className="price-name" style={{ color: "var(--fill)" }}>Pro Plan</h3>
+            <span className="badge-pro">Everything included</span>
+            <h3 className="price-name" style={{ color: "var(--fill)" }}>Pro</h3>
             <div>
-              <span className="price-val">$4</span>
-              <span className="price-period"> /month · <span style={{ textDecoration: "line-through", opacity: 0.5 }}>$8</span> 50% launch discount</span>
+              <span className="price-val">$9</span>
+              <span className="price-period"> /month</span>
             </div>
             <p style={{ fontSize: "13px", color: "var(--text-3)", margin: 0 }}>
-              Batch exporters and custom brand presets for marketing builders.
+              Clean exports, batch sizing, and unlimited AI — all in one plan.
             </p>
             <ul className="price-features">
-              <li className="price-feature" style={{ fontWeight: 600 }}><span>✦</span> Watermark-free downloads</li>
-              <li className="price-feature"><span>✓</span> 3D perspective device tilts</li>
-              <li className="price-feature"><span>✓</span> Batch multi-device store exports</li>
+              <li className="price-feature" style={{ fontWeight: 600 }}><span>✦</span> Watermark-free exports</li>
+              <li className="price-feature"><span>✓</span> Batch export — all Apple & Google sizes</li>
+              <li className="price-feature"><span>✓</span> Canonical store filenames (ready to upload)</li>
+              <li className="price-feature"><span>✓</span> 3D device tilts & 4K PNG</li>
+              <li className="price-feature"><span>✓</span> Unlimited AI headline generation</li>
+              <li className="price-feature"><span>✓</span> AI translation — 15+ languages</li>
               <li className="price-feature"><span>✓</span> Custom brand presets & swatches</li>
-              <li className="price-feature"><span>✓</span> 4K high-resolution PNG & WebP</li>
             </ul>
             <button
               type="button"
@@ -1085,38 +1089,7 @@ export default function SaaSLandingPage() {
               className="btn-fill btn-md"
               style={{ width: "100%", justifyContent: "center", fontWeight: 700, cursor: "pointer", border: "none" }}
             >
-              Get Pro — $4/mo
-            </button>
-          </div>
-
-          {/* AI Pro Tier */}
-          <div className="price-card pro" style={{ border: "2px solid var(--fill)", position: "relative" }}>
-            <span className="badge-pro" style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)" }}>Most Popular</span>
-            <h3 className="price-name" style={{ color: "var(--fill)" }}>AI Pro Plan</h3>
-            <div>
-              <span className="price-val">$20</span>
-              <span className="price-period"> /month</span>
-            </div>
-            <p style={{ fontSize: "13px", color: "var(--text-3)", margin: 0 }}>
-              Everything in Pro + unlimited AI-powered copywriting & translation.
-            </p>
-            <ul className="price-features">
-              <li className="price-feature" style={{ fontWeight: 600 }}><span>✦</span> Everything in Pro</li>
-              <li className="price-feature"><span>✦</span> Unlimited AI headline generation</li>
-              <li className="price-feature"><span>✦</span> AI-powered 15+ language translation</li>
-              <li className="price-feature"><span>✦</span> Smart tone & category targeting</li>
-              <li className="price-feature"><span>✦</span> Priority generation speed</li>
-            </ul>
-            <button
-              type="button"
-              onClick={() => setIsPremiumOpen(true)}
-              className="btn-fill btn-md"
-              style={{
-                width: "100%", justifyContent: "center", fontWeight: 700, cursor: "pointer", border: "none",
-                background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-              }}
-            >
-              Get AI Pro — $20/mo
+              Get Pro — $9/mo
             </button>
           </div>
         </div>
