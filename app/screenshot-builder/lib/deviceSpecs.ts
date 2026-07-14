@@ -23,6 +23,16 @@ export interface DeviceSpec {
   frameAspect: number;    // canvasW / canvasH — for preview scaling
   frameType: "iphone-dynamic" | "iphone-notch" | "ipad" | "android" | "android-tab";
   isLandscape?: boolean;
+  /** Prefix used for Apple/Google canonical export filenames */
+  storePrefix: string;
+  /** Human-readable folder name for all-sizes ZIP exports */
+  exportFolder: string;
+}
+
+/** Returns the canonical store filename for a given device and 0-based index */
+export function getStoreFilename(device: DeviceSpec, index: number): string {
+  const n = (index + 1).toString().padStart(2, "0");
+  return `${device.storePrefix}_${n}.png`;
 }
 
 export const DEVICE_SPECS: DeviceSpec[] = [
@@ -36,6 +46,8 @@ export const DEVICE_SPECS: DeviceSpec[] = [
     canvasH: 2796,
     frameAspect: 1290 / 2796,
     frameType: "iphone-dynamic",
+    storePrefix: "iPhone_6.7",
+    exportFolder: "iPhone_6.7_1290x2796",
   },
   {
     id: "iphone-65",
@@ -46,6 +58,8 @@ export const DEVICE_SPECS: DeviceSpec[] = [
     canvasH: 2688,
     frameAspect: 1242 / 2688,
     frameType: "iphone-notch",
+    storePrefix: "iPhone_6.5",
+    exportFolder: "iPhone_6.5_1242x2688",
   },
   {
     id: "iphone-55",
@@ -56,6 +70,8 @@ export const DEVICE_SPECS: DeviceSpec[] = [
     canvasH: 2208,
     frameAspect: 1242 / 2208,
     frameType: "iphone-notch",
+    storePrefix: "iPhone_5.5",
+    exportFolder: "iPhone_5.5_1242x2208",
   },
   {
     id: "ipad-129",
@@ -66,6 +82,8 @@ export const DEVICE_SPECS: DeviceSpec[] = [
     canvasH: 2732,
     frameAspect: 2048 / 2732,
     frameType: "ipad",
+    storePrefix: "iPad_Pro_12.9",
+    exportFolder: "iPad_Pro_12.9_2048x2732",
   },
   {
     id: "ipad-11",
@@ -76,6 +94,8 @@ export const DEVICE_SPECS: DeviceSpec[] = [
     canvasH: 2388,
     frameAspect: 1668 / 2388,
     frameType: "ipad",
+    storePrefix: "iPad_Pro_11",
+    exportFolder: "iPad_Pro_11_1668x2388",
   },
   // ── Google Play Store ─────────────────────────────────────────────────────
   {
@@ -87,6 +107,8 @@ export const DEVICE_SPECS: DeviceSpec[] = [
     canvasH: 1920,
     frameAspect: 1080 / 1920,
     frameType: "android",
+    storePrefix: "phone_screenshot",
+    exportFolder: "Phone_1080x1920",
   },
   {
     id: "android-7tab",
@@ -97,6 +119,8 @@ export const DEVICE_SPECS: DeviceSpec[] = [
     canvasH: 1920,
     frameAspect: 1200 / 1920,
     frameType: "android-tab",
+    storePrefix: "7inch_tablet_screenshot",
+    exportFolder: "7inch_Tablet_1200x1920",
   },
   {
     id: "android-10tab",
@@ -108,6 +132,8 @@ export const DEVICE_SPECS: DeviceSpec[] = [
     frameAspect: 1920 / 1200,
     frameType: "android-tab",
     isLandscape: true,
+    storePrefix: "10inch_tablet_screenshot",
+    exportFolder: "10inch_Tablet_1920x1200",
   },
 ];
 

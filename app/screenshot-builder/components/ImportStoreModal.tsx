@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { BuilderConfig } from "../lib/deviceSpecs";
 import { DEFAULT_CONFIG } from "../lib/deviceSpecs";
 
@@ -8,12 +8,19 @@ interface ImportStoreModalProps {
   isOpen: boolean;
   onClose: () => void;
   onImport: (screens: BuilderConfig[], screenshots: string[]) => void;
+  initialUrl?: string;
 }
 
-export default function ImportStoreModal({ isOpen, onClose, onImport }: ImportStoreModalProps) {
-  const [url, setUrl] = useState("");
+export default function ImportStoreModal({ isOpen, onClose, onImport, initialUrl }: ImportStoreModalProps) {
+  const [url, setUrl] = useState(initialUrl ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (initialUrl) {
+      setUrl(initialUrl);
+    }
+  }, [initialUrl]);
 
   if (!isOpen) return null;
 

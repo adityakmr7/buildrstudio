@@ -27,7 +27,7 @@ import DeviceFrame from "./DeviceFrame";
 // ── Public handle ─────────────────────────────────────────────────────────────
 
 export interface BuilderCanvasHandle {
-  exportPng: () => Promise<void>;
+  exportPng: (filename?: string) => Promise<void>;
   copyToClipboard: () => Promise<void>;
   getCapture: () => Promise<string>;
 }
@@ -443,11 +443,11 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
 
     useImperativeHandle(ref, () => ({
       getCapture,
-      async exportPng() {
+      async exportPng(filename?: string) {
         const dataUrl = await getCapture();
         const a = document.createElement("a");
         a.href = dataUrl;
-        a.download = `buildrstudio-${spec.id}-screenshot.png`;
+        a.download = filename ?? `buildrstudio-${spec.id}-screenshot.png`;
         a.click();
       },
       async copyToClipboard() {

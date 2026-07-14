@@ -221,7 +221,7 @@ export default function TemplateGallery({ isOpen, onClose, onApply }: TemplateGa
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)"; }}
           >
             <div style={{ height: "80px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--surface-2)" }}>
-              <span style={{ fontSize: "24px", opacity: 0.4 }}>➕</span>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{opacity:0.35}}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </div>
             <div style={{ padding: "12px 14px" }}>
               <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-1)" }}>Start Blank</div>

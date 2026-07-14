@@ -6,8 +6,9 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import type { BuilderConfig, DeviceId } from "./lib/deviceSpecs";
-import { DEFAULT_CONFIG, APPSTORE_DEVICES, PLAYSTORE_DEVICES } from "./lib/deviceSpecs";
+import { DEFAULT_CONFIG, APPSTORE_DEVICES, PLAYSTORE_DEVICES, getStoreFilename, getDevice } from "./lib/deviceSpecs";
 import BuilderSidebar from "./components/BuilderSidebar";
 import BuilderCanvas, { BuilderCanvasHandle } from "./components/BuilderCanvas";
 import PremiumModal from "../components/PremiumModal";
@@ -15,12 +16,14 @@ import AppHeader from "../components/AppHeader";
 import UnlockWatermarkModal from "../components/UnlockWatermarkModal";
 import TemplateGallery from "./components/TemplateGallery";
 import ImportStoreModal from "./components/ImportStoreModal";
+import PostExportShareModal from "./components/PostExportShareModal";
 import OnboardingTour from "../components/OnboardingTour";
 import ToolCrossLinks from "../components/ToolCrossLinks";
 import { useToast } from "../components/Toast";
 
 export default function ScreenshotBuilderHub() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const [deck, setDeck] = useState<{
     screens: BuilderConfig[];
     activeScreenIndex: number;
@@ -50,6 +53,8 @@ export default function ScreenshotBuilderHub() {
   const [isExporting, setIsExporting] = useState(false);
   const [isTemplateOpen, setIsTemplateOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [importStoreInitialUrl, setImportStoreInitialUrl] = useState<string | undefined>(undefined);
+  const [shareModal, setShareModal] = useState<{ isOpen: boolean; count: number }>({ isOpen: false, count: 1 });
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [projectName, setProjectName] = useState("Untitled Project");
@@ -177,6 +182,15 @@ export default function ScreenshotBuilderHub() {
     });
   };
 
+  // Auto-open import modal when ?url= is in the URL (e.g. from landing page hero)
+  useEffect(() => {
+    const url = searchParams.get("url");
+    if (url) {
+      setImportStoreInitialUrl(url);
+      setIsImportOpen(true);
+    }
+  }, []);
+
   // Show template gallery on first visit
   useEffect(() => {
     const visited = localStorage.getItem("buildr_sb_visited");
@@ -268,15 +282,11 @@ export default function ScreenshotBuilderHub() {
   const handleExport = () => {
     if (!canvasRef.current || isExporting) return;
     setIsExporting(true);
-    canvasRef.current.exportPng().then(() => {
-      toast("Screenshot exported!", "success", {
-        label: "Share on X",
-        onClick: () => {
-          const text = encodeURIComponent("Just built these App Store screenshots in seconds with @BuildrStudio!\n");
-          const url = encodeURIComponent("https://buildrstudio.in/screenshot-builder");
-          window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
-        },
-      });
+    const activeScreen = deck.screens[deck.activeScreenIndex];
+    const device = getDevice(activeScreen?.deviceId || "iphone-67");
+    const filename = getStoreFilename(device, deck.activeScreenIndex);
+    canvasRef.current.exportPng(filename).then(() => {
+      setShareModal({ isOpen: true, count: 1 });
     }).catch((err) => {
       console.error("Export failed:", err);
       toast("Export failed — please try again", "error");
@@ -300,7 +310,8 @@ export default function ScreenshotBuilderHub() {
         : [deck.screens[0]?.deviceId || "iphone-67"];
 
       for (const deviceId of deviceSizes) {
-        const folder = smartResize ? zip.folder(deviceId)! : zip;
+        const device = getDevice(deviceId);
+        const folder = smartResize ? zip.folder(device.exportFolder)! : zip;
 
         for (let i = 0; i < originalScreens.length; i++) {
           setDeck(prev => {
@@ -311,13 +322,11 @@ export default function ScreenshotBuilderHub() {
           await new Promise(r => setTimeout(r, 400));
           const dataUrl = await canvasRef.current!.getCapture();
           const base64 = dataUrl.split(",")[1];
-          const filename = smartResize
-            ? `screen-${i + 1}.png`
-            : `screen-${i + 1}.png`;
+          const filename = getStoreFilename(device, i);
           folder.file(filename, base64, { base64: true });
         }
         if (smartResize) {
-          toast(`Exported ${deviceId}...`, "info");
+          toast(`Exported ${device.label}...`, "info");
         }
       }
 
@@ -334,7 +343,7 @@ export default function ScreenshotBuilderHub() {
       const totalFiles = smartResize
         ? deviceSizes.length * originalScreens.length
         : originalScreens.length;
-      toast(`${totalFiles} screenshots exported as ZIP!`, "success");
+      setShareModal({ isOpen: true, count: totalFiles });
     } catch (err) {
       console.error("Batch export failed:", err);
       toast("Batch export failed — please try again", "error");
@@ -710,384 +719,248 @@ export default function ScreenshotBuilderHub() {
             background: "var(--surface-2)",
           }}
         >
-          {/* Deck Navigator Strip */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "14px",
-              padding: "10px 20px",
-              borderBottom: "1.5px solid var(--border)",
-              background: "var(--surface)",
-              overflowX: "auto",
-              flexShrink: 0,
-              scrollbarWidth: "none",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+          {/* ── Toolbar row ── */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "0 16px",
+            height: "44px",
+            borderBottom: "1px solid var(--border)",
+            background: "var(--surface)",
+            flexShrink: 0,
+          }}>
+            {/* Sidebar toggle */}
+            <button
+              type="button"
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              title={isSidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
+              style={{
+                background: "none", border: "1px solid var(--border)", borderRadius: "6px",
+                width: "28px", height: "28px", display: "flex", alignItems: "center",
+                justifyContent: "center", cursor: "pointer", color: "var(--text-2)", flexShrink: 0,
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/>
+              </svg>
+            </button>
+
+            <div style={{ width: "1px", height: "20px", background: "var(--border)", flexShrink: 0 }} />
+
+            {/* Project name */}
+            <input
+              type="text"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+              style={{
+                background: "transparent", border: "none", fontSize: "13px", fontWeight: 600,
+                color: "var(--text-1)", width: "140px", padding: "4px 6px",
+                borderRadius: "4px", outline: "none", fontFamily: "var(--font)",
+              }}
+              onFocus={(e) => { e.currentTarget.style.background = "var(--surface-2, var(--surface))"; }}
+              onBlur={(e) => { e.currentTarget.style.background = "transparent"; }}
+            />
+
+            <div style={{ flex: 1 }} />
+
+            {/* Action buttons */}
+            {(["Templates", "Import App", "Share"] as const).map((label) => (
               <button
+                key={label}
                 type="button"
-                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                title={isSidebarCollapsed ? "Show sidebar" : "Full-screen canvas"}
+                onClick={label === "Templates" ? () => setIsTemplateOpen(true) : label === "Import App" ? () => setIsImportOpen(true) : handleShareDeck}
                 style={{
-                  background: isSidebarCollapsed ? "var(--fill)" : "var(--surface-2, var(--surface))",
-                  color: isSidebarCollapsed ? "var(--on-fill, #fff)" : "var(--text-2)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "6px",
-                  width: "28px",
-                  height: "28px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  flexShrink: 0,
-                }}
-              >
-                {isSidebarCollapsed ? "◨" : "⛶"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsTemplateOpen(true)}
-                title="Start from template"
-                style={{
-                  background: "var(--surface-2, var(--surface))",
-                  color: "var(--text-2)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "6px",
-                  padding: "4px 10px",
-                  fontSize: "11px",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                }}
-              >
-                Templates
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsImportOpen(true)}
-                title="Import from App Store / Play Store"
-                style={{
-                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "6px",
-                  padding: "4px 10px",
-                  fontSize: "11px",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                }}
-              >
-                Import App
-              </button>
-              <button
-                type="button"
-                onClick={handleShareDeck}
-                title="Copy share link"
-                style={{
-                  background: "var(--surface-2, var(--surface))",
-                  color: "var(--text-2)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "6px",
-                  padding: "4px 10px",
-                  fontSize: "11px",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                }}
-              >
-                Share
-              </button>
-              <div style={{ height: "20px", width: "1px", background: "var(--border)", flexShrink: 0 }} />
-              <input
-                type="text"
-                value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
-                style={{
-                  background: "transparent", border: "none", fontSize: "11px", fontWeight: 600,
-                  color: "var(--text-1)", width: "120px", padding: "4px 6px",
-                  borderRadius: "4px", outline: "none",
-                }}
-                onFocus={(e) => { e.currentTarget.style.background = "var(--surface-2, var(--surface))"; }}
-                onBlur={(e) => { e.currentTarget.style.background = "transparent"; }}
-              />
-              <button
-                type="button"
-                onClick={handleSaveProject}
-                disabled={isSaving}
-                title="Save project"
-                style={{
-                  background: "var(--surface-2, var(--surface))", color: "var(--text-2)",
+                  background: "none", color: "var(--text-2)",
                   border: "1px solid var(--border)", borderRadius: "6px",
-                  padding: "4px 10px", fontSize: "11px", fontWeight: 600,
-                  cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
+                  padding: "4px 12px", fontSize: "12px", fontWeight: 500,
+                  cursor: "pointer", whiteSpace: "nowrap", height: "28px",
+                  display: "flex", alignItems: "center",
                 }}
               >
-                {isSaving ? "Saving..." : currentProjectId ? "Save" : "Save New"}
+                {label}
               </button>
-              <button
-                type="button"
-                onClick={handleLoadProjects}
-                title="Open saved project"
-                style={{
-                  background: "var(--surface-2, var(--surface))", color: "var(--text-2)",
-                  border: "1px solid var(--border)", borderRadius: "6px",
-                  padding: "4px 10px", fontSize: "11px", fontWeight: 600,
-                  cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
-                }}
-              >
-                Open
-              </button>
-              <div
-                style={{
-                  fontSize: "10px",
-                  fontWeight: 700,
-                  color: "var(--text-3)",
-                  letterSpacing: "1px",
-                  textTransform: "uppercase",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                Screens ({screens.length})
-              </div>
-            </div>
+            ))}
 
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              {screens.map((scr, idx) => {
-                const isActive = idx === activeScreenIndex;
+            <div style={{ width: "1px", height: "20px", background: "var(--border)", flexShrink: 0 }} />
 
-                // Compute swatch
-                let bgVal = "#0f172a";
-                if (scr.bgType === "gradient") {
-                  const p =
-                    scr.gradientPreset === "Indigo Dusk"
-                      ? { from: "#6366f1", via: "#a855f7", to: "#ec4899" }
-                      : scr.gradientPreset === "Ocean Breeze"
-                      ? { from: "#0ea5e9", via: "#38bdf8", to: "#7dd3fc" }
-                      : scr.gradientPreset === "Sunset Blaze"
-                      ? { from: "#f97316", via: "#fb923c", to: "#fbbf24" }
-                      : scr.gradientPreset === "Arctic White"
-                      ? { from: "#f8fafc", via: "#f1f5f9", to: "#e2e8f0" }
-                      : { from: "#111827", via: "#1f2937", to: "#374151" };
+            <button
+              type="button"
+              onClick={handleSaveProject}
+              disabled={isSaving}
+              style={{
+                background: "var(--fill)", color: "var(--fill-text)",
+                border: "none", borderRadius: "6px",
+                padding: "4px 14px", fontSize: "12px", fontWeight: 600,
+                cursor: "pointer", whiteSpace: "nowrap", height: "28px",
+                display: "flex", alignItems: "center", opacity: isSaving ? 0.6 : 1,
+              }}
+            >
+              {isSaving ? "Saving..." : currentProjectId ? "Save" : "Save New"}
+            </button>
+            <button
+              type="button"
+              onClick={handleLoadProjects}
+              style={{
+                background: "none", color: "var(--text-2)",
+                border: "1px solid var(--border)", borderRadius: "6px",
+                padding: "4px 12px", fontSize: "12px", fontWeight: 500,
+                cursor: "pointer", whiteSpace: "nowrap", height: "28px",
+                display: "flex", alignItems: "center",
+              }}
+            >
+              Open
+            </button>
+          </div>
 
-                  bgVal = p.via
-                    ? `linear-gradient(${scr.gradientDir}, ${p.from}, ${p.via}, ${p.to})`
-                    : `linear-gradient(${scr.gradientDir}, ${p.from}, ${p.to})`;
-                } else if (scr.bgType === "solid") {
-                  bgVal = scr.solidColor;
-                } else if (scr.bgType === "mesh") {
-                  bgVal = `linear-gradient(135deg, ${scr.meshColor1 || "#6366f1"}, ${scr.meshColor3 || "#ec4899"})`;
-                }
+          {/* ── Deck strip ── */}
+          <div style={{
+            borderBottom: "1px solid var(--border)",
+            background: "var(--surface)",
+            flexShrink: 0,
+            overflow: "visible",
+          }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "14px 16px 8px",
+            overflowX: "auto",
+            overflowY: "visible",
+            scrollbarWidth: "none",
+          }}>
+            <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.06em", flexShrink: 0 }}>
+              Screens
+            </span>
 
-                return (
-                  <div
-                    key={idx}
-                    className={`deck-card-container${isActive ? " active-card" : ""}`}
-                    onClick={() => setDeck((prev) => ({ ...prev, activeScreenIndex: idx }))}
-                    style={{
-                      width: "120px",
-                      height: "76px",
-                      borderRadius: "var(--r-sm)",
-                      background: bgVal,
-                      border: isActive ? "2px solid var(--fill)" : "1.5px solid var(--border)",
-                      position: "relative",
-                      cursor: "pointer",
-                      padding: "6px 8px",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      boxShadow: isActive ? "0 4px 12px rgba(0,0,0,0.18)" : "none",
-                      transition: "all 0.15s ease",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {/* Screenshot thumbnail */}
+            {screens.map((scr, idx) => {
+              const isActive = idx === activeScreenIndex;
+              let bgVal = "#0f172a";
+              if (scr.bgType === "gradient") {
+                const p = scr.gradientPreset === "Indigo Dusk" ? { from: "#6366f1", to: "#ec4899" }
+                  : scr.gradientPreset === "Ocean Breeze" ? { from: "#0ea5e9", to: "#7dd3fc" }
+                  : scr.gradientPreset === "Sunset Blaze" ? { from: "#f97316", to: "#fbbf24" }
+                  : scr.gradientPreset === "Arctic White" ? { from: "#f8fafc", to: "#e2e8f0" }
+                  : { from: "#111827", to: "#374151" };
+                bgVal = `linear-gradient(135deg, ${p.from}, ${p.to})`;
+              } else if (scr.bgType === "solid") {
+                bgVal = scr.solidColor;
+              } else if (scr.bgType === "mesh") {
+                bgVal = `linear-gradient(135deg, ${scr.meshColor1 || "#6366f1"}, ${scr.meshColor3 || "#ec4899"})`;
+              }
+
+              return (
+                <div
+                  key={idx}
+                  className={`deck-card-container${isActive ? " active-card" : ""}`}
+                  onClick={() => setDeck((prev) => ({ ...prev, activeScreenIndex: idx }))}
+                  style={{
+                    width: "54px",
+                    height: "72px",
+                    borderRadius: "6px",
+                    background: bgVal,
+                    border: isActive ? "2px solid var(--fill)" : "1.5px solid var(--border)",
+                    position: "relative",
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    padding: "4px",
+                    boxShadow: isActive ? "0 0 0 3px rgba(99,102,241,0.15)" : "none",
+                    transition: "all 0.15s ease",
+                    overflow: "visible",
+                    flexShrink: 0,
+                  }}
+                >
+                  {/* Screenshot thumbnail */}
+                  <div style={{ position: "absolute", inset: 0, borderRadius: "5px", overflow: "hidden" }}>
                     {scr.screenshotUrl && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={scr.screenshotUrl}
                         alt=""
                         style={{
-                          position: "absolute",
-                          bottom: "4px",
-                          right: "4px",
-                          width: "28px",
-                          height: "50px",
+                          width: "100%",
+                          height: "100%",
                           objectFit: "cover",
-                          borderRadius: "4px",
-                          border: "1px solid rgba(255,255,255,0.2)",
-                          opacity: 0.85,
+                          opacity: 0.4,
                         }}
                       />
                     )}
-                    {/* Tiny headline */}
-                    <div
-                      style={{
-                        fontSize: "9px",
-                        fontWeight: 800,
-                        color: scr.headlineColor || "#fff",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        maxWidth: "100%",
-                      }}
-                    >
-                      {scr.headline || "Blank Screen"}
-                    </div>
-
-                    {/* Tiny specs badge */}
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: "8px",
-                          fontWeight: 700,
-                          color: "#fff",
-                          background: "rgba(0,0,0,0.4)",
-                          padding: "1px 4px",
-                          borderRadius: "3px",
-                        }}
-                      >
-                        S{idx + 1}
-                      </span>
-                      {scr.panoramic !== "none" && (
-                        <span
-                          style={{
-                            fontSize: "8px",
-                            fontWeight: 800,
-                            color: "#fde047",
-                            background: "rgba(0,0,0,0.5)",
-                            padding: "1px 4.5px",
-                            borderRadius: "3px",
-                          }}
-                        >
-                          ↔ {scr.panoramic.toUpperCase()}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Actions Overlay */}
-                    <div
-                      className="deck-card-actions"
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        background: "rgba(15,23,42,0.9)",
-                        backdropFilter: "blur(2px)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "6px",
-                        opacity: 0,
-                        transition: "opacity 0.15s ease",
-                        zIndex: 10,
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDeck((prev) => ({ ...prev, activeScreenIndex: idx }));
-                      }}
-                    >
-                      <button
-                        title="Move Left"
-                        disabled={idx === 0}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleMoveScreen(idx, "left");
-                        }}
-                        style={{
-                          background: "none",
-                          border: "none",
-                          cursor: idx === 0 ? "not-allowed" : "pointer",
-                          fontSize: "11px",
-                          opacity: idx === 0 ? 0.35 : 1,
-                        }}
-                      >
-                        ◀️
-                      </button>
-                      <button
-                        title="Duplicate"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDuplicateScreen(idx);
-                        }}
-                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: "11px" }}
-                      >
-                        📋
-                      </button>
-                      <button
-                        title="Delete"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteScreen(idx);
-                        }}
-                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: "11px" }}
-                      >
-                        🗑️
-                      </button>
-                      <button
-                        title="Move Right"
-                        disabled={idx === screens.length - 1}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleMoveScreen(idx, "right");
-                        }}
-                        style={{
-                          background: "none",
-                          border: "none",
-                          cursor: idx === screens.length - 1 ? "not-allowed" : "pointer",
-                          fontSize: "11px",
-                          opacity: idx === screens.length - 1 ? 0.35 : 1,
-                        }}
-                      >
-                        ▶️
-                      </button>
-                    </div>
                   </div>
-                );
-              })}
 
-              {/* Add Screen Button */}
-              <button
-                type="button"
-                onClick={handleAddScreen}
-                style={{
-                  width: "120px",
-                  height: "76px",
-                  borderRadius: "var(--r-sm)",
-                  border: "1.5px dashed var(--border-strong)",
-                  background: "transparent",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "4px",
-                  cursor: "pointer",
-                  color: "var(--text-2)",
-                  transition: "all 0.15s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "var(--text-1)";
-                  e.currentTarget.style.color = "var(--text-1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "var(--border-strong)";
-                  e.currentTarget.style.color = "var(--text-2)";
-                }}
-              >
-                <span style={{ fontSize: "18px" }}>➕</span>
-                <span style={{ fontSize: "10px", fontWeight: 700 }}>Add Screen</span>
-              </button>
-            </div>
+                  {/* Screen number badge */}
+                  <span style={{
+                    position: "relative",
+                    fontSize: "10px", fontWeight: 700,
+                    color: "#fff",
+                    background: "rgba(0,0,0,0.45)",
+                    borderRadius: "3px",
+                    padding: "1px 5px",
+                    letterSpacing: "0.03em",
+                  }}>
+                    {idx + 1}
+                  </span>
+
+                  {/* Delete button — top-right, visible on hover */}
+                  <button
+                    className="deck-card-delete"
+                    title="Remove screen"
+                    onClick={(e) => { e.stopPropagation(); handleDeleteScreen(idx); }}
+                    style={{
+                      position: "absolute",
+                      top: "-6px",
+                      right: "-6px",
+                      width: "16px",
+                      height: "16px",
+                      borderRadius: "50%",
+                      background: "#ef4444",
+                      border: "1.5px solid var(--bg, #fff)",
+                      color: "#fff",
+                      fontSize: "9px",
+                      lineHeight: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      opacity: 0,
+                      transition: "opacity 0.15s ease",
+                      zIndex: 20,
+                      padding: 0,
+                    }}
+                  >
+                    <svg width="7" height="7" viewBox="0 0 8 8" fill="none">
+                      <path d="M1 1l6 6M7 1L1 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+              );
+            })}
+
+            {/* Add Screen */}
+            <button
+              type="button"
+              onClick={handleAddScreen}
+              style={{
+                width: "54px", height: "72px",
+                borderRadius: "6px",
+                border: "1.5px dashed var(--border-strong)",
+                background: "transparent",
+                display: "flex", flexDirection: "column",
+                alignItems: "center", justifyContent: "center",
+                gap: "3px", cursor: "pointer", color: "var(--text-3)",
+                transition: "all 0.15s ease", flexShrink: 0,
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--fill)"; e.currentTarget.style.color = "var(--fill)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.color = "var(--text-3)"; }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              <span style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.04em" }}>ADD</span>
+            </button>
+          </div>
           </div>
 
           {/* Right canvas live preview */}
@@ -1136,10 +1009,10 @@ export default function ScreenshotBuilderHub() {
                   </button>
                   <button
                     onClick={() => handleDeleteProject(p.id)}
-                    style={{ background: "none", border: "none", cursor: "pointer", fontSize: "14px", color: "var(--text-3)", padding: "4px" }}
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", padding: "4px", display: "flex", alignItems: "center" }}
                     title="Delete"
                   >
-                    🗑️
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
                   </button>
                 </div>
               ))
@@ -1151,8 +1024,16 @@ export default function ScreenshotBuilderHub() {
       {/* Import from store */}
       <ImportStoreModal
         isOpen={isImportOpen}
-        onClose={() => setIsImportOpen(false)}
+        onClose={() => { setIsImportOpen(false); setImportStoreInitialUrl(undefined); }}
         onImport={handleStoreImport}
+        initialUrl={importStoreInitialUrl}
+      />
+
+      <PostExportShareModal
+        isOpen={shareModal.isOpen}
+        onClose={() => setShareModal({ isOpen: false, count: 1 })}
+        exportCount={shareModal.count}
+        projectName={projectName}
       />
 
       {/* Template gallery */}
@@ -1191,7 +1072,7 @@ export default function ScreenshotBuilderHub() {
           transform: scale(1.05) translateY(-2px);
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 0 2px var(--fill) !important;
         }
-        .deck-card-container:hover .deck-card-actions {
+        .deck-card-container:hover .deck-card-delete {
           opacity: 1 !important;
         }
       `}</style>

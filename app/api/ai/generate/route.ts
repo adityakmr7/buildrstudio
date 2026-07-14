@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { auth } from "@/auth";
 import { getAiUsageTotal, recordAiUsage } from "@/app/lib/db";
 
-const FREE_LIFETIME_LIMIT = 1;
+const FREE_LIFETIME_LIMIT = 5;
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? "");
 
