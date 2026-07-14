@@ -891,7 +891,7 @@ function TabStyle({
                     padding: "6px",
                     fontSize: "14px",
                     background: config.gradientDir === d.value ? "var(--fill)" : "var(--surface-2, var(--surface))",
-                    color: config.gradientDir === d.value ? "var(--on-fill, #fff)" : "var(--text-2)",
+                    color: config.gradientDir === d.value ? "var(--fill-text)" : "var(--text-2)",
                     border: "1px solid var(--border)",
                     borderRadius: "6px",
                     cursor: "pointer",

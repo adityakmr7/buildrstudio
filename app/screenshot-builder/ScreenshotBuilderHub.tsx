@@ -780,7 +780,7 @@ export default function ScreenshotBuilderHub() {
               onClick={handleSaveProject}
               disabled={isSaving}
               style={{
-                background: "var(--fill)", color: "var(--on-fill, #fff)",
+                background: "var(--fill)", color: "var(--fill-text)",
                 border: "none", borderRadius: "6px",
                 padding: "4px 14px", fontSize: "12px", fontWeight: 600,
                 cursor: "pointer", whiteSpace: "nowrap", height: "28px",

@@ -125,7 +125,7 @@ export default function AICopywriter({ onApply, onUpgrade }: AICopywriterProps) 
             style={{
               padding: "8px",
               background: loading ? "var(--surface-2, var(--surface))" : "var(--fill)",
-              color: loading ? "var(--text-2)" : "var(--on-fill, #fff)",
+              color: loading ? "var(--text-2)" : "var(--fill-text)",
               border: "none",
               borderRadius: "8px",
               fontSize: "12px",

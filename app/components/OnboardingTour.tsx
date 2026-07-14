@@ -102,7 +102,7 @@ export default function OnboardingTour({ storageKey }: OnboardingTourProps) {
             onClick={() => isLast ? dismiss() : setStep(step + 1)}
             style={{
               background: "var(--fill)",
-              color: "var(--on-fill, #fff)",
+              color: "var(--fill-text)",
               border: "none",
               borderRadius: "8px",
               padding: "6px 16px",
