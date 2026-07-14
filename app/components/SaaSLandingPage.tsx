@@ -3,8 +3,9 @@
 // ─── SaaSLandingPage.tsx ─────────────────────────────────────────────────────
 // The client-side marketing components, toggles, and FAQs.
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import PremiumModal from "./PremiumModal";
 import AppHeader from "./AppHeader";
 
@@ -30,6 +31,17 @@ const FAQS = [
 export default function SaaSLandingPage() {
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
+  const [heroUrl, setHeroUrl] = useState("");
+  const [heroLoading, setHeroLoading] = useState(false);
+  const heroInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+
+  const handleHeroImport = () => {
+    const trimmed = heroUrl.trim();
+    if (!trimmed) { heroInputRef.current?.focus(); return; }
+    setHeroLoading(true);
+    router.push(`/screenshot-builder?url=${encodeURIComponent(trimmed)}`);
+  };
 
   const toggleFaq = (index: number) => {
     setFaqOpen(faqOpen === index ? null : index);
@@ -142,14 +154,63 @@ export default function SaaSLandingPage() {
         .hero-desc {
           font-size: clamp(16px, 2.5vw, 20px);
           color: var(--text-2);
-          max-width: 650px;
+          max-width: 580px;
           line-height: 1.5;
-          margin: 0 auto 36px;
+          margin: 0 auto 32px;
         }
-        .hero-ctas {
+        .hero-import-row {
+          width: 100%;
+          max-width: 600px;
+          margin: 0 auto 40px;
           display: flex;
-          gap: 16px;
-          margin-bottom: 40px;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+        }
+        .hero-import-wrap {
+          display: flex;
+          width: 100%;
+          border-radius: 12px;
+          overflow: hidden;
+          border: 1.5px solid var(--border-strong);
+          background: var(--surface);
+          box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+          transition: border-color 0.15s;
+        }
+        .hero-import-wrap:focus-within {
+          border-color: var(--fill);
+        }
+        .hero-import-input {
+          flex: 1;
+          border: none;
+          outline: none;
+          background: transparent;
+          font-family: var(--font);
+          font-size: 14px;
+          color: var(--text-1);
+          padding: 14px 16px;
+          min-width: 0;
+        }
+        .hero-import-input::placeholder { color: var(--text-3); }
+        .hero-import-btn {
+          flex-shrink: 0;
+          background: var(--fill);
+          color: var(--fill-text);
+          border: none;
+          padding: 12px 20px;
+          font-family: var(--font);
+          font-size: 14px;
+          font-weight: 700;
+          cursor: pointer;
+          white-space: nowrap;
+          transition: opacity 0.15s;
+        }
+        .hero-import-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .hero-import-btn:hover:not(:disabled) { opacity: 0.88; }
+        .hero-import-hint {
+          font-size: 12px;
+          color: var(--text-3);
+          margin: 0;
         }
         .hero-visual {
           width: 100%;
@@ -656,15 +717,36 @@ export default function SaaSLandingPage() {
         </div>
         <h1 className="hero-title">App Store Screenshots That Actually Convert</h1>
         <p className="hero-desc">
-          Paste your App Store URL or upload a screenshot — get polished, submission-ready mockups for iOS and Google Play in seconds. No design skills needed.
+          Paste your App Store URL — get device-framed mockups with AI headlines ready to submit in seconds.
         </p>
-        <div className="hero-ctas">
-          <Link href="/screenshot-builder" className="btn-fill btn-lg" style={{ textDecoration: "none" }}>
-            Create Screenshots Free
-          </Link>
-          <Link href="/screenshot-builder#templates" className="btn-outline btn-lg" style={{ textDecoration: "none" }}>
-            See Templates
-          </Link>
+
+        {/* Hero URL import */}
+        <div className="hero-import-row">
+          <div className="hero-import-wrap">
+            <input
+              ref={heroInputRef}
+              type="url"
+              className="hero-import-input"
+              placeholder="https://apps.apple.com/app/your-app/id…"
+              value={heroUrl}
+              onChange={(e) => setHeroUrl(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleHeroImport()}
+            />
+            <button
+              type="button"
+              className="hero-import-btn"
+              onClick={handleHeroImport}
+              disabled={heroLoading}
+            >
+              {heroLoading ? "Loading…" : "Generate Screenshots"}
+            </button>
+          </div>
+          <p className="hero-import-hint">
+            Supports apps.apple.com and play.google.com ·{" "}
+            <Link href="/screenshot-builder" style={{ color: "var(--text-3)", textDecoration: "underline" }}>
+              or start from scratch
+            </Link>
+          </p>
         </div>
 
         {/* Hero visual — animated product showcase */}

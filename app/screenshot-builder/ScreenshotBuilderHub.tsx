@@ -6,6 +6,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import type { BuilderConfig, DeviceId } from "./lib/deviceSpecs";
 import { DEFAULT_CONFIG, APPSTORE_DEVICES, PLAYSTORE_DEVICES } from "./lib/deviceSpecs";
 import BuilderSidebar from "./components/BuilderSidebar";
@@ -21,6 +22,7 @@ import { useToast } from "../components/Toast";
 
 export default function ScreenshotBuilderHub() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const [deck, setDeck] = useState<{
     screens: BuilderConfig[];
     activeScreenIndex: number;
@@ -50,6 +52,7 @@ export default function ScreenshotBuilderHub() {
   const [isExporting, setIsExporting] = useState(false);
   const [isTemplateOpen, setIsTemplateOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [importStoreInitialUrl, setImportStoreInitialUrl] = useState<string | undefined>(undefined);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [projectName, setProjectName] = useState("Untitled Project");
@@ -176,6 +179,15 @@ export default function ScreenshotBuilderHub() {
       toast("Failed to copy link", "error");
     });
   };
+
+  // Auto-open import modal when ?url= is in the URL (e.g. from landing page hero)
+  useEffect(() => {
+    const url = searchParams.get("url");
+    if (url) {
+      setImportStoreInitialUrl(url);
+      setIsImportOpen(true);
+    }
+  }, []);
 
   // Show template gallery on first visit
   useEffect(() => {
@@ -1006,8 +1018,9 @@ export default function ScreenshotBuilderHub() {
       {/* Import from store */}
       <ImportStoreModal
         isOpen={isImportOpen}
-        onClose={() => setIsImportOpen(false)}
+        onClose={() => { setIsImportOpen(false); setImportStoreInitialUrl(undefined); }}
         onImport={handleStoreImport}
+        initialUrl={importStoreInitialUrl}
       />
 
       {/* Template gallery */}
