@@ -820,14 +820,18 @@ export default function ScreenshotBuilderHub() {
 
           {/* ── Deck strip ── */}
           <div style={{
+            borderBottom: "1px solid var(--border)",
+            background: "var(--surface)",
+            flexShrink: 0,
+            overflow: "visible",
+          }}>
+          <div style={{
             display: "flex",
             alignItems: "center",
             gap: "8px",
-            padding: "8px 16px",
-            borderBottom: "1px solid var(--border)",
-            background: "var(--surface)",
+            padding: "14px 16px 8px",
             overflowX: "auto",
-            flexShrink: 0,
+            overflowY: "visible",
             scrollbarWidth: "none",
           }}>
             <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.06em", flexShrink: 0 }}>
@@ -870,26 +874,28 @@ export default function ScreenshotBuilderHub() {
                     padding: "4px",
                     boxShadow: isActive ? "0 0 0 3px rgba(99,102,241,0.15)" : "none",
                     transition: "all 0.15s ease",
-                    overflow: "hidden",
+                    overflow: "visible",
                     flexShrink: 0,
                   }}
                 >
                   {/* Screenshot thumbnail */}
-                  {scr.screenshotUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={scr.screenshotUrl}
-                      alt=""
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        opacity: 0.4,
-                      }}
-                    />
-                  )}
+                  <div style={{ position: "absolute", inset: 0, borderRadius: "5px", overflow: "hidden" }}>
+                    {scr.screenshotUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={scr.screenshotUrl}
+                        alt=""
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          opacity: 0.4,
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  {/* Screen number badge */}
                   <span style={{
                     position: "relative",
                     fontSize: "10px", fontWeight: 700,
@@ -902,35 +908,37 @@ export default function ScreenshotBuilderHub() {
                     {idx + 1}
                   </span>
 
-                  {/* Hover actions overlay */}
-                  <div
-                    className="deck-card-actions"
+                  {/* Delete button — top-right, visible on hover */}
+                  <button
+                    className="deck-card-delete"
+                    title="Remove screen"
+                    onClick={(e) => { e.stopPropagation(); handleDeleteScreen(idx); }}
                     style={{
                       position: "absolute",
-                      inset: 0,
-                      background: "rgba(15,23,42,0.85)",
+                      top: "-6px",
+                      right: "-6px",
+                      width: "16px",
+                      height: "16px",
+                      borderRadius: "50%",
+                      background: "#ef4444",
+                      border: "1.5px solid var(--bg, #fff)",
+                      color: "#fff",
+                      fontSize: "9px",
+                      lineHeight: 1,
                       display: "flex",
-                      flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
-                      gap: "4px",
+                      cursor: "pointer",
                       opacity: 0,
                       transition: "opacity 0.15s ease",
-                      zIndex: 10,
+                      zIndex: 20,
+                      padding: 0,
                     }}
-                    onClick={(e) => e.stopPropagation()}
                   >
-                    <button title="Duplicate" onClick={(e) => { e.stopPropagation(); handleDuplicateScreen(idx); }}
-                      style={{ background: "none", border: "none", cursor: "pointer", color: "#fff", fontSize: "13px", lineHeight: 1 }}>⧉</button>
-                    <button title="Delete" onClick={(e) => { e.stopPropagation(); handleDeleteScreen(idx); }}
-                      style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: "13px", lineHeight: 1 }}>✕</button>
-                    <div style={{ display: "flex", gap: "2px" }}>
-                      <button title="Move Left" disabled={idx === 0} onClick={(e) => { e.stopPropagation(); handleMoveScreen(idx, "left"); }}
-                        style={{ background: "none", border: "none", cursor: idx === 0 ? "not-allowed" : "pointer", color: "#fff", fontSize: "10px", opacity: idx === 0 ? 0.3 : 1 }}>◀</button>
-                      <button title="Move Right" disabled={idx === screens.length - 1} onClick={(e) => { e.stopPropagation(); handleMoveScreen(idx, "right"); }}
-                        style={{ background: "none", border: "none", cursor: idx === screens.length - 1 ? "not-allowed" : "pointer", color: "#fff", fontSize: "10px", opacity: idx === screens.length - 1 ? 0.3 : 1 }}>▶</button>
-                    </div>
-                  </div>
+                    <svg width="7" height="7" viewBox="0 0 8 8" fill="none">
+                      <path d="M1 1l6 6M7 1L1 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                  </button>
                 </div>
               );
             })}
@@ -957,6 +965,7 @@ export default function ScreenshotBuilderHub() {
               </svg>
               <span style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.04em" }}>ADD</span>
             </button>
+          </div>
           </div>
 
           {/* Right canvas live preview */}
@@ -1061,7 +1070,7 @@ export default function ScreenshotBuilderHub() {
           transform: scale(1.05) translateY(-2px);
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 0 2px var(--fill) !important;
         }
-        .deck-card-container:hover .deck-card-actions {
+        .deck-card-container:hover .deck-card-delete {
           opacity: 1 !important;
         }
       `}</style>
