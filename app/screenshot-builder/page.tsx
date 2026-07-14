@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Suspense } from "react";
 import ScreenshotBuilderHub from "./ScreenshotBuilderHub";
 
 export const metadata: Metadata = {
@@ -73,7 +74,9 @@ export default function ScreenshotBuilderPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <h1 className="sr-only">Free App Store Screenshot Builder — Create iOS &amp; Play Store Mockups</h1>
-      <ScreenshotBuilderHub />
+      <Suspense>
+        <ScreenshotBuilderHub />
+      </Suspense>
     </>
   );
 }
