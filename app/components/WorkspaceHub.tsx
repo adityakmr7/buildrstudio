@@ -255,7 +255,7 @@ function CanvasToolbar({
           onClick={() => setImageSource(null)}
           onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.color = "var(--text-1)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-2)"; }}>
-          <span style={{ fontSize: "13px" }}>🔄</span> Change
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Change
         </button>
       )}
 
@@ -270,7 +270,7 @@ function CanvasToolbar({
       }} disabled={disabled} onClick={() => setIsFeedPreview(!isFeedPreview)}
         onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.borderColor = "var(--text-1)"; }}
         onMouseLeave={(e) => { if (!isFeedPreview) e.currentTarget.style.borderColor = "var(--border)"; }}>
-        <span>👁️</span> {isFeedPreview ? "Show Image Only" : "Simulate Feed"}
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> {isFeedPreview ? "Show Image Only" : "Simulate Feed"}
       </button>
 
       <div className="canvas-toolbar-divider" />
@@ -279,12 +279,12 @@ function CanvasToolbar({
       <button type="button" style={btnBase} disabled={disabled} onClick={shareToTwitter}
         onMouseEnter={(e) => { if (!disabled) { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.background = "var(--fill-subtle)"; }}}
         onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "transparent"; }}>
-        <span>🐦</span> X
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.261 5.635 5.902-5.635zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> X
       </button>
       <button type="button" style={btnBase} disabled={disabled} onClick={shareToLinkedIn}
         onMouseEnter={(e) => { if (!disabled) { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.background = "var(--fill-subtle)"; }}}
         onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "transparent"; }}>
-        <span>💼</span> LinkedIn
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg> LinkedIn
       </button>
 
       <div className="canvas-toolbar-divider" />
@@ -300,8 +300,8 @@ function CanvasToolbar({
         onMouseLeave={(e) => { if (copyStatus !== "ok") { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "transparent"; }}}>
         {isCopying    ? <><Spinner /> Copying…</>
          : copyStatus === "ok"  ? <>✓ Copied!</>
-         : copyStatus === "err" ? <>❌ Error</>
-         : <><span>📋</span> Copy</>}
+         : copyStatus === "err" ? <>✕ Error</>
+         : <><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</>}
       </button>
 
       {/* Export */}
@@ -312,7 +312,7 @@ function CanvasToolbar({
         }}
         onMouseEnter={(e) => { if (!disabled && !isExporting) e.currentTarget.style.opacity = "0.85"; }}
         onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}>
-        {isExporting ? <><Spinner light /> Exporting…</> : <><span>📥</span> Export PNG</>}
+        {isExporting ? <><Spinner light /> Exporting…</> : <><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export PNG</>}
       </button>
     </div>
   );

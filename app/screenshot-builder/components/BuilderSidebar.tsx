@@ -614,7 +614,7 @@ function TabDevice({
               style={{ width: "100%", justifyContent: "center", height: "60px", fontSize: "12px" }}
               onClick={() => fileInputRef.current?.click()}
             >
-              📁 Select Screenshot File
+              Select Screenshot File
             </button>
             <button
               type="button"
@@ -622,7 +622,7 @@ function TabDevice({
               style={{ width: "100%", justifyContent: "center" }}
               onClick={handlePaste}
             >
-              📋 Paste from Clipboard
+              Paste from Clipboard
             </button>
           </div>
         )}
@@ -1008,8 +1008,8 @@ function TabStyle({
             style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", borderRadius: "var(--r-md)", background: "var(--success-subtle, #dcfce7)", border: "1.5px solid var(--success, #22c55e)", cursor: "pointer", fontFamily: "var(--font)", transition: "all .12s" }}
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--text-1)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--success, #22c55e)"; }}>
-            <span style={{ fontSize: "12px", fontWeight: 600, color: "#15803d" }}>Watermark Unlocked! (24h) ✨</span>
-            <span className="badge-pill" style={{ background: "var(--success, #22c55e)", color: "white", fontSize: "10px" }}>🔓 Active</span>
+            <span style={{ fontSize: "12px", fontWeight: 600, color: "#15803d" }}>Watermark Unlocked! (24h)</span>
+            <span className="badge-pill" style={{ background: "var(--success, #22c55e)", color: "white", fontSize: "10px" }}>Active</span>
           </button>
         ) : (
           <button type="button" onClick={onOpenUnlockWatermark}
@@ -1017,7 +1017,7 @@ function TabStyle({
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--text-1)"; e.currentTarget.style.background = "var(--fill)"; e.currentTarget.querySelector("span")!.style.color = "var(--fill-text)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "var(--fill-subtle)"; e.currentTarget.querySelector("span")!.style.color = "var(--text-2)"; }}>
             <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-2)", transition: "color .12s" }}>Remove watermark · 4K export</span>
-            <span className="badge-pill" style={{ background: "var(--fill)", color: "var(--fill-text)", fontSize: "10px" }}>👑 Pro</span>
+            <span className="badge-pill" style={{ background: "var(--fill)", color: "var(--fill-text)", fontSize: "10px" }}>Pro</span>
           </button>
         )}
       </div>

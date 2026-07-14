@@ -22,14 +22,24 @@ interface TabbedSidebarProps {
 
 type TabId = "bg" | "frame" | "layout" | "caption" | "image" | "annotations" | "presets";
 
-const TABS: { id: TabId; icon: string; label: string }[] = [
-  { id: "bg",          icon: "🎨", label: "BG"      },
-  { id: "frame",       icon: "🖥",  label: "Frame"   },
-  { id: "layout",      icon: "📐", label: "Layout"  },
-  { id: "caption",     icon: "✍️",  label: "Caption" },
-  { id: "image",       icon: "🔧", label: "Image"   },
-  { id: "annotations", icon: "📍", label: "Annot"   },
-  { id: "presets",     icon: "⚡", label: "Presets" },
+const TAB_ICONS: Record<TabId, React.ReactNode> = {
+  bg: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 22C6.5 22 2 17.5 2 12c0-.7.1-1.4.2-2.1L9 7l4 4 4-4 3.8 3.8c.1.7.2 1.4.2 2.2 0 5.5-4.5 10-10 10z"/></svg>,
+  frame: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>,
+  layout: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>,
+  caption: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 6H3"/><path d="M21 12H3"/><path d="M15 18H3"/></svg>,
+  image: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>,
+  annotations: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>,
+  presets: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
+};
+
+const TABS: { id: TabId; label: string }[] = [
+  { id: "bg",          label: "BG"      },
+  { id: "frame",       label: "Frame"   },
+  { id: "layout",      label: "Layout"  },
+  { id: "caption",     label: "Caption" },
+  { id: "image",       label: "Image"   },
+  { id: "annotations", label: "Annot"   },
+  { id: "presets",     label: "Presets" },
 ];
 
 // ─── Preset data ──────────────────────────────────────────────────────────────
@@ -357,7 +367,7 @@ function TabBackground({ config, update }: { config: OptimizationConfig; update:
           ) : (
             <button type="button" className="btn-outline btn-sm" onClick={() => bgFileRef.current?.click()}
               style={{ width: "100%", justifyContent: "center" }}>
-              📁 Upload Background Image
+              Upload Background Image
             </button>
           )}
         </>
@@ -372,12 +382,12 @@ function TabBackground({ config, update }: { config: OptimizationConfig; update:
 // ─── TAB CONTENT: Frame ───────────────────────────────────────────────────────
 
 const FRAME_OPTS = [
-  { label: "macOS",    value: "macos",    icon: "🖥" },
-  { label: "Browser",  value: "browser",  icon: "🌐" },
-  { label: "Terminal", value: "terminal", icon: "⌨️" },
-  { label: "iPhone",   value: "iphone",   icon: "📱" },
-  { label: "Android",  value: "android",  icon: "🤖" },
-  { label: "None",     value: "none",     icon: "⬜" },
+  { label: "macOS",    value: "macos",    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> },
+  { label: "Browser",  value: "browser",  icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> },
+  { label: "Terminal", value: "terminal", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> },
+  { label: "iPhone",   value: "iphone",   icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg> },
+  { label: "Android",  value: "android",  icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 16a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2"/><path d="M8 16v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2"/><line x1="8" y1="8" x2="8" y2="8.01"/><line x1="16" y1="8" x2="16" y2="8.01"/><path d="M6.5 8 5 5.5"/><path d="M17.5 8 19 5.5"/></svg> },
+  { label: "None",     value: "none",     icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> },
 ] as const;
 
 function TabFrame({ config, update }: { config: OptimizationConfig; update: <K extends keyof OptimizationConfig>(k: K, v: OptimizationConfig[K]) => void }) {
@@ -783,7 +793,7 @@ export default function TabbedSidebar({
           <button key={tab.id} role="tab" aria-selected={activeTab === tab.id} type="button"
             className={`sidebar-tab-btn${activeTab === tab.id ? " active" : ""}`}
             onClick={() => setActiveTab(tab.id)} title={tab.label}>
-            <span className="sidebar-tab-icon">{tab.icon}</span>
+            <span className="sidebar-tab-icon">{TAB_ICONS[tab.id]}</span>
             <span className="sidebar-tab-label">{tab.label}</span>
           </button>
         ))}
@@ -807,8 +817,8 @@ export default function TabbedSidebar({
             style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", borderRadius: "var(--r-md)", background: "var(--success-subtle, #dcfce7)", border: "1.5px solid var(--success, #22c55e)", cursor: "pointer", fontFamily: "var(--font)", transition: "all .12s" }}
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--text-1)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--success, #22c55e)"; }}>
-            <span style={{ fontSize: "12px", fontWeight: 600, color: "#15803d" }}>Watermark Unlocked! (24h) ✨</span>
-            <span className="badge-pill" style={{ background: "var(--success, #22c55e)", color: "white", fontSize: "10px" }}>🔓 Active</span>
+            <span style={{ fontSize: "12px", fontWeight: 600, color: "#15803d" }}>Watermark Unlocked! (24h)</span>
+            <span className="badge-pill" style={{ background: "var(--success, #22c55e)", color: "white", fontSize: "10px" }}>Active</span>
           </button>
         ) : (
           <button type="button" onClick={onOpenUnlockWatermark}
@@ -816,7 +826,7 @@ export default function TabbedSidebar({
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--text-1)"; e.currentTarget.style.background = "var(--fill)"; e.currentTarget.querySelector("span")!.style.color = "var(--fill-text)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "var(--fill-subtle)"; e.currentTarget.querySelector("span")!.style.color = "var(--text-2)"; }}>
             <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-2)", transition: "color .12s" }}>Remove watermark · 4K export</span>
-            <span className="badge-pill" style={{ background: "var(--fill)", color: "var(--fill-text)", fontSize: "10px" }}>👑 Pro</span>
+            <span className="badge-pill" style={{ background: "var(--fill)", color: "var(--fill-text)", fontSize: "10px" }}>Pro</span>
           </button>
         )}
       </div>

@@ -233,7 +233,7 @@ export default function DeviceFrame({ spec, children, shadow, tilt3d, tiltX, til
           background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
           gap: 8,
         }}>
-          <span style={{ fontSize: 32 }}>📱</span>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
           <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontFamily: "var(--font)", textAlign: "center", padding: "0 12px" }}>
             Upload a screenshot
           </span>
