@@ -710,384 +710,239 @@ export default function ScreenshotBuilderHub() {
             background: "var(--surface-2)",
           }}
         >
-          {/* Deck Navigator Strip */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "14px",
-              padding: "10px 20px",
-              borderBottom: "1.5px solid var(--border)",
-              background: "var(--surface)",
-              overflowX: "auto",
-              flexShrink: 0,
-              scrollbarWidth: "none",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+          {/* ── Toolbar row ── */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "0 16px",
+            height: "44px",
+            borderBottom: "1px solid var(--border)",
+            background: "var(--surface)",
+            flexShrink: 0,
+          }}>
+            {/* Sidebar toggle */}
+            <button
+              type="button"
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              title={isSidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
+              style={{
+                background: "none", border: "1px solid var(--border)", borderRadius: "6px",
+                width: "28px", height: "28px", display: "flex", alignItems: "center",
+                justifyContent: "center", cursor: "pointer", color: "var(--text-2)", flexShrink: 0,
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/>
+              </svg>
+            </button>
+
+            <div style={{ width: "1px", height: "20px", background: "var(--border)", flexShrink: 0 }} />
+
+            {/* Project name */}
+            <input
+              type="text"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+              style={{
+                background: "transparent", border: "none", fontSize: "13px", fontWeight: 600,
+                color: "var(--text-1)", width: "140px", padding: "4px 6px",
+                borderRadius: "4px", outline: "none", fontFamily: "var(--font)",
+              }}
+              onFocus={(e) => { e.currentTarget.style.background = "var(--surface-2, var(--surface))"; }}
+              onBlur={(e) => { e.currentTarget.style.background = "transparent"; }}
+            />
+
+            <div style={{ flex: 1 }} />
+
+            {/* Action buttons */}
+            {(["Templates", "Import App", "Share"] as const).map((label) => (
               <button
+                key={label}
                 type="button"
-                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                title={isSidebarCollapsed ? "Show sidebar" : "Full-screen canvas"}
+                onClick={label === "Templates" ? () => setIsTemplateOpen(true) : label === "Import App" ? () => setIsImportOpen(true) : handleShareDeck}
                 style={{
-                  background: isSidebarCollapsed ? "var(--fill)" : "var(--surface-2, var(--surface))",
-                  color: isSidebarCollapsed ? "var(--on-fill, #fff)" : "var(--text-2)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "6px",
-                  width: "28px",
-                  height: "28px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  flexShrink: 0,
-                }}
-              >
-                {isSidebarCollapsed ? "◨" : "⛶"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsTemplateOpen(true)}
-                title="Start from template"
-                style={{
-                  background: "var(--surface-2, var(--surface))",
-                  color: "var(--text-2)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "6px",
-                  padding: "4px 10px",
-                  fontSize: "11px",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                }}
-              >
-                Templates
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsImportOpen(true)}
-                title="Import from App Store / Play Store"
-                style={{
-                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "6px",
-                  padding: "4px 10px",
-                  fontSize: "11px",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                }}
-              >
-                Import App
-              </button>
-              <button
-                type="button"
-                onClick={handleShareDeck}
-                title="Copy share link"
-                style={{
-                  background: "var(--surface-2, var(--surface))",
-                  color: "var(--text-2)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "6px",
-                  padding: "4px 10px",
-                  fontSize: "11px",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                }}
-              >
-                Share
-              </button>
-              <div style={{ height: "20px", width: "1px", background: "var(--border)", flexShrink: 0 }} />
-              <input
-                type="text"
-                value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
-                style={{
-                  background: "transparent", border: "none", fontSize: "11px", fontWeight: 600,
-                  color: "var(--text-1)", width: "120px", padding: "4px 6px",
-                  borderRadius: "4px", outline: "none",
-                }}
-                onFocus={(e) => { e.currentTarget.style.background = "var(--surface-2, var(--surface))"; }}
-                onBlur={(e) => { e.currentTarget.style.background = "transparent"; }}
-              />
-              <button
-                type="button"
-                onClick={handleSaveProject}
-                disabled={isSaving}
-                title="Save project"
-                style={{
-                  background: "var(--surface-2, var(--surface))", color: "var(--text-2)",
+                  background: "none", color: "var(--text-2)",
                   border: "1px solid var(--border)", borderRadius: "6px",
-                  padding: "4px 10px", fontSize: "11px", fontWeight: 600,
-                  cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
+                  padding: "4px 12px", fontSize: "12px", fontWeight: 500,
+                  cursor: "pointer", whiteSpace: "nowrap", height: "28px",
+                  display: "flex", alignItems: "center",
                 }}
               >
-                {isSaving ? "Saving..." : currentProjectId ? "Save" : "Save New"}
+                {label}
               </button>
-              <button
-                type="button"
-                onClick={handleLoadProjects}
-                title="Open saved project"
-                style={{
-                  background: "var(--surface-2, var(--surface))", color: "var(--text-2)",
-                  border: "1px solid var(--border)", borderRadius: "6px",
-                  padding: "4px 10px", fontSize: "11px", fontWeight: 600,
-                  cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
-                }}
-              >
-                Open
-              </button>
-              <div
-                style={{
-                  fontSize: "10px",
-                  fontWeight: 700,
-                  color: "var(--text-3)",
-                  letterSpacing: "1px",
-                  textTransform: "uppercase",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                Screens ({screens.length})
-              </div>
-            </div>
+            ))}
 
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              {screens.map((scr, idx) => {
-                const isActive = idx === activeScreenIndex;
+            <div style={{ width: "1px", height: "20px", background: "var(--border)", flexShrink: 0 }} />
 
-                // Compute swatch
-                let bgVal = "#0f172a";
-                if (scr.bgType === "gradient") {
-                  const p =
-                    scr.gradientPreset === "Indigo Dusk"
-                      ? { from: "#6366f1", via: "#a855f7", to: "#ec4899" }
-                      : scr.gradientPreset === "Ocean Breeze"
-                      ? { from: "#0ea5e9", via: "#38bdf8", to: "#7dd3fc" }
-                      : scr.gradientPreset === "Sunset Blaze"
-                      ? { from: "#f97316", via: "#fb923c", to: "#fbbf24" }
-                      : scr.gradientPreset === "Arctic White"
-                      ? { from: "#f8fafc", via: "#f1f5f9", to: "#e2e8f0" }
-                      : { from: "#111827", via: "#1f2937", to: "#374151" };
+            <button
+              type="button"
+              onClick={handleSaveProject}
+              disabled={isSaving}
+              style={{
+                background: "var(--fill)", color: "var(--on-fill, #fff)",
+                border: "none", borderRadius: "6px",
+                padding: "4px 14px", fontSize: "12px", fontWeight: 600,
+                cursor: "pointer", whiteSpace: "nowrap", height: "28px",
+                display: "flex", alignItems: "center", opacity: isSaving ? 0.6 : 1,
+              }}
+            >
+              {isSaving ? "Saving..." : currentProjectId ? "Save" : "Save New"}
+            </button>
+            <button
+              type="button"
+              onClick={handleLoadProjects}
+              style={{
+                background: "none", color: "var(--text-2)",
+                border: "1px solid var(--border)", borderRadius: "6px",
+                padding: "4px 12px", fontSize: "12px", fontWeight: 500,
+                cursor: "pointer", whiteSpace: "nowrap", height: "28px",
+                display: "flex", alignItems: "center",
+              }}
+            >
+              Open
+            </button>
+          </div>
 
-                  bgVal = p.via
-                    ? `linear-gradient(${scr.gradientDir}, ${p.from}, ${p.via}, ${p.to})`
-                    : `linear-gradient(${scr.gradientDir}, ${p.from}, ${p.to})`;
-                } else if (scr.bgType === "solid") {
-                  bgVal = scr.solidColor;
-                } else if (scr.bgType === "mesh") {
-                  bgVal = `linear-gradient(135deg, ${scr.meshColor1 || "#6366f1"}, ${scr.meshColor3 || "#ec4899"})`;
-                }
+          {/* ── Deck strip ── */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "8px 16px",
+            borderBottom: "1px solid var(--border)",
+            background: "var(--surface)",
+            overflowX: "auto",
+            flexShrink: 0,
+            scrollbarWidth: "none",
+          }}>
+            <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.06em", flexShrink: 0 }}>
+              Screens
+            </span>
 
-                return (
-                  <div
-                    key={idx}
-                    className={`deck-card-container${isActive ? " active-card" : ""}`}
-                    onClick={() => setDeck((prev) => ({ ...prev, activeScreenIndex: idx }))}
-                    style={{
-                      width: "120px",
-                      height: "76px",
-                      borderRadius: "var(--r-sm)",
-                      background: bgVal,
-                      border: isActive ? "2px solid var(--fill)" : "1.5px solid var(--border)",
-                      position: "relative",
-                      cursor: "pointer",
-                      padding: "6px 8px",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      boxShadow: isActive ? "0 4px 12px rgba(0,0,0,0.18)" : "none",
-                      transition: "all 0.15s ease",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {/* Screenshot thumbnail */}
-                    {scr.screenshotUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={scr.screenshotUrl}
-                        alt=""
-                        style={{
-                          position: "absolute",
-                          bottom: "4px",
-                          right: "4px",
-                          width: "28px",
-                          height: "50px",
-                          objectFit: "cover",
-                          borderRadius: "4px",
-                          border: "1px solid rgba(255,255,255,0.2)",
-                          opacity: 0.85,
-                        }}
-                      />
-                    )}
-                    {/* Tiny headline */}
-                    <div
-                      style={{
-                        fontSize: "9px",
-                        fontWeight: 800,
-                        color: scr.headlineColor || "#fff",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        maxWidth: "100%",
-                      }}
-                    >
-                      {scr.headline || "Blank Screen"}
-                    </div>
+            {screens.map((scr, idx) => {
+              const isActive = idx === activeScreenIndex;
+              let bgVal = "#0f172a";
+              if (scr.bgType === "gradient") {
+                const p = scr.gradientPreset === "Indigo Dusk" ? { from: "#6366f1", to: "#ec4899" }
+                  : scr.gradientPreset === "Ocean Breeze" ? { from: "#0ea5e9", to: "#7dd3fc" }
+                  : scr.gradientPreset === "Sunset Blaze" ? { from: "#f97316", to: "#fbbf24" }
+                  : scr.gradientPreset === "Arctic White" ? { from: "#f8fafc", to: "#e2e8f0" }
+                  : { from: "#111827", to: "#374151" };
+                bgVal = `linear-gradient(135deg, ${p.from}, ${p.to})`;
+              } else if (scr.bgType === "solid") {
+                bgVal = scr.solidColor;
+              } else if (scr.bgType === "mesh") {
+                bgVal = `linear-gradient(135deg, ${scr.meshColor1 || "#6366f1"}, ${scr.meshColor3 || "#ec4899"})`;
+              }
 
-                    {/* Tiny specs badge */}
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: "8px",
-                          fontWeight: 700,
-                          color: "#fff",
-                          background: "rgba(0,0,0,0.4)",
-                          padding: "1px 4px",
-                          borderRadius: "3px",
-                        }}
-                      >
-                        S{idx + 1}
-                      </span>
-                      {scr.panoramic !== "none" && (
-                        <span
-                          style={{
-                            fontSize: "8px",
-                            fontWeight: 800,
-                            color: "#fde047",
-                            background: "rgba(0,0,0,0.5)",
-                            padding: "1px 4.5px",
-                            borderRadius: "3px",
-                          }}
-                        >
-                          ↔ {scr.panoramic.toUpperCase()}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Actions Overlay */}
-                    <div
-                      className="deck-card-actions"
+              return (
+                <div
+                  key={idx}
+                  className={`deck-card-container${isActive ? " active-card" : ""}`}
+                  onClick={() => setDeck((prev) => ({ ...prev, activeScreenIndex: idx }))}
+                  style={{
+                    width: "54px",
+                    height: "72px",
+                    borderRadius: "6px",
+                    background: bgVal,
+                    border: isActive ? "2px solid var(--fill)" : "1.5px solid var(--border)",
+                    position: "relative",
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    padding: "4px",
+                    boxShadow: isActive ? "0 0 0 3px rgba(99,102,241,0.15)" : "none",
+                    transition: "all 0.15s ease",
+                    overflow: "hidden",
+                    flexShrink: 0,
+                  }}
+                >
+                  {/* Screenshot thumbnail */}
+                  {scr.screenshotUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={scr.screenshotUrl}
+                      alt=""
                       style={{
                         position: "absolute",
                         inset: 0,
-                        background: "rgba(15,23,42,0.9)",
-                        backdropFilter: "blur(2px)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "6px",
-                        opacity: 0,
-                        transition: "opacity 0.15s ease",
-                        zIndex: 10,
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        opacity: 0.4,
                       }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDeck((prev) => ({ ...prev, activeScreenIndex: idx }));
-                      }}
-                    >
-                      <button
-                        title="Move Left"
-                        disabled={idx === 0}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleMoveScreen(idx, "left");
-                        }}
-                        style={{
-                          background: "none",
-                          border: "none",
-                          cursor: idx === 0 ? "not-allowed" : "pointer",
-                          fontSize: "11px",
-                          opacity: idx === 0 ? 0.35 : 1,
-                        }}
-                      >
-                        ◀️
-                      </button>
-                      <button
-                        title="Duplicate"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDuplicateScreen(idx);
-                        }}
-                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: "11px" }}
-                      >
-                        📋
-                      </button>
-                      <button
-                        title="Delete"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteScreen(idx);
-                        }}
-                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: "11px" }}
-                      >
-                        🗑️
-                      </button>
-                      <button
-                        title="Move Right"
-                        disabled={idx === screens.length - 1}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleMoveScreen(idx, "right");
-                        }}
-                        style={{
-                          background: "none",
-                          border: "none",
-                          cursor: idx === screens.length - 1 ? "not-allowed" : "pointer",
-                          fontSize: "11px",
-                          opacity: idx === screens.length - 1 ? 0.35 : 1,
-                        }}
-                      >
-                        ▶️
-                      </button>
+                    />
+                  )}
+                  <span style={{
+                    position: "relative",
+                    fontSize: "10px", fontWeight: 700,
+                    color: "#fff",
+                    background: "rgba(0,0,0,0.45)",
+                    borderRadius: "3px",
+                    padding: "1px 5px",
+                    letterSpacing: "0.03em",
+                  }}>
+                    {idx + 1}
+                  </span>
+
+                  {/* Hover actions overlay */}
+                  <div
+                    className="deck-card-actions"
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "rgba(15,23,42,0.85)",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "4px",
+                      opacity: 0,
+                      transition: "opacity 0.15s ease",
+                      zIndex: 10,
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button title="Duplicate" onClick={(e) => { e.stopPropagation(); handleDuplicateScreen(idx); }}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "#fff", fontSize: "13px", lineHeight: 1 }}>⧉</button>
+                    <button title="Delete" onClick={(e) => { e.stopPropagation(); handleDeleteScreen(idx); }}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: "13px", lineHeight: 1 }}>✕</button>
+                    <div style={{ display: "flex", gap: "2px" }}>
+                      <button title="Move Left" disabled={idx === 0} onClick={(e) => { e.stopPropagation(); handleMoveScreen(idx, "left"); }}
+                        style={{ background: "none", border: "none", cursor: idx === 0 ? "not-allowed" : "pointer", color: "#fff", fontSize: "10px", opacity: idx === 0 ? 0.3 : 1 }}>◀</button>
+                      <button title="Move Right" disabled={idx === screens.length - 1} onClick={(e) => { e.stopPropagation(); handleMoveScreen(idx, "right"); }}
+                        style={{ background: "none", border: "none", cursor: idx === screens.length - 1 ? "not-allowed" : "pointer", color: "#fff", fontSize: "10px", opacity: idx === screens.length - 1 ? 0.3 : 1 }}>▶</button>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              );
+            })}
 
-              {/* Add Screen Button */}
-              <button
-                type="button"
-                onClick={handleAddScreen}
-                style={{
-                  width: "120px",
-                  height: "76px",
-                  borderRadius: "var(--r-sm)",
-                  border: "1.5px dashed var(--border-strong)",
-                  background: "transparent",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "4px",
-                  cursor: "pointer",
-                  color: "var(--text-2)",
-                  transition: "all 0.15s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "var(--text-1)";
-                  e.currentTarget.style.color = "var(--text-1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "var(--border-strong)";
-                  e.currentTarget.style.color = "var(--text-2)";
-                }}
-              >
-                <span style={{ fontSize: "18px" }}>➕</span>
-                <span style={{ fontSize: "10px", fontWeight: 700 }}>Add Screen</span>
-              </button>
-            </div>
+            {/* Add Screen */}
+            <button
+              type="button"
+              onClick={handleAddScreen}
+              style={{
+                width: "54px", height: "72px",
+                borderRadius: "6px",
+                border: "1.5px dashed var(--border-strong)",
+                background: "transparent",
+                display: "flex", flexDirection: "column",
+                alignItems: "center", justifyContent: "center",
+                gap: "3px", cursor: "pointer", color: "var(--text-3)",
+                transition: "all 0.15s ease", flexShrink: 0,
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--fill)"; e.currentTarget.style.color = "var(--fill)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.color = "var(--text-3)"; }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              <span style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.04em" }}>ADD</span>
+            </button>
           </div>
 
           {/* Right canvas live preview */}

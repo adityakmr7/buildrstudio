@@ -39,12 +39,40 @@ interface BuilderSidebarProps {
 
 type TabId = "device" | "text" | "style" | "presets" | "export";
 
-const TABS: { id: TabId; icon: string; label: string }[] = [
-  { id: "device",  icon: "📱", label: "Device" },
-  { id: "text",    icon: "✏️", label: "Text" },
-  { id: "style",   icon: "🎨", label: "Style" },
-  { id: "presets", icon: "⚡", label: "Presets" },
-  { id: "export",  icon: "⬇️", label: "Export" },
+const TAB_ICONS: Record<TabId, React.ReactNode> = {
+  device: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+    </svg>
+  ),
+  text: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/>
+    </svg>
+  ),
+  style: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="13.5" cy="6.5" r="0.5"/><circle cx="17.5" cy="10.5" r="0.5"/><circle cx="8.5" cy="7.5" r="0.5"/><circle cx="6.5" cy="12.5" r="0.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+    </svg>
+  ),
+  presets: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+    </svg>
+  ),
+  export: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+  ),
+};
+
+const TABS: { id: TabId; label: string }[] = [
+  { id: "device",  label: "Device" },
+  { id: "text",    label: "Text" },
+  { id: "style",   label: "Style" },
+  { id: "presets", label: "Presets" },
+  { id: "export",  label: "Export" },
 ];
 
 // ── Preset Options ────────────────────────────────────────────────────────────
@@ -1288,7 +1316,7 @@ function TabExport({ onExport, onExportAll, onExportAllSizes, onCopy, isExportin
           className="btn-fill btn-lg"
           style={{ width: "100%", justifyContent: "center", display: "flex", gap: "8px", opacity: isExporting ? 0.6 : 1 }}
         >
-          {isExporting ? "⏳ Exporting..." : "⬇️ Download PNG"}
+          {isExporting ? "Exporting..." : "Download PNG"}
         </button>
 
         <button
@@ -1298,7 +1326,7 @@ function TabExport({ onExport, onExportAll, onExportAllSizes, onCopy, isExportin
           className="btn-outline btn-lg"
           style={{ width: "100%", justifyContent: "center", display: "flex", gap: "8px", opacity: isExporting ? 0.6 : 1 }}
         >
-          📋 Copy to Clipboard
+          Copy to Clipboard
         </button>
       </div>
 
@@ -1319,7 +1347,7 @@ function TabExport({ onExport, onExportAll, onExportAllSizes, onCopy, isExportin
           opacity: isExporting ? 0.6 : 1,
         }}
       >
-        {isExporting ? "⏳ Exporting..." : `📦 Export All as ZIP (${screenCount})`}
+        {isExporting ? "Exporting..." : `Export All as ZIP (${screenCount})`}
       </button>
 
       <div className="ctrl-divider" style={{ margin: "16px 0" }} />
@@ -1339,7 +1367,7 @@ function TabExport({ onExport, onExportAll, onExportAllSizes, onCopy, isExportin
           opacity: isExporting ? 0.6 : 1,
         }}
       >
-        {isExporting ? "⏳ Exporting..." : "📐 Export All Sizes"}
+        {isExporting ? "Exporting..." : "Export All Sizes"}
       </button>
 
       <div className="ctrl-divider" style={{ margin: "16px 0" }} />
@@ -1393,7 +1421,7 @@ export default function BuilderSidebar({
             onClick={() => setActiveTab(tab.id)}
             title={tab.label}
           >
-            <span className="sidebar-tab-icon">{tab.icon}</span>
+            <span className="sidebar-tab-icon">{TAB_ICONS[tab.id]}</span>
             <span className="sidebar-tab-label">{tab.label}</span>
           </button>
         ))}
