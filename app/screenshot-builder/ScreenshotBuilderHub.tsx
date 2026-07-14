@@ -16,6 +16,7 @@ import AppHeader from "../components/AppHeader";
 import UnlockWatermarkModal from "../components/UnlockWatermarkModal";
 import TemplateGallery from "./components/TemplateGallery";
 import ImportStoreModal from "./components/ImportStoreModal";
+import PostExportShareModal from "./components/PostExportShareModal";
 import OnboardingTour from "../components/OnboardingTour";
 import ToolCrossLinks from "../components/ToolCrossLinks";
 import { useToast } from "../components/Toast";
@@ -53,6 +54,7 @@ export default function ScreenshotBuilderHub() {
   const [isTemplateOpen, setIsTemplateOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [importStoreInitialUrl, setImportStoreInitialUrl] = useState<string | undefined>(undefined);
+  const [shareModal, setShareModal] = useState<{ isOpen: boolean; count: number }>({ isOpen: false, count: 1 });
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [projectName, setProjectName] = useState("Untitled Project");
@@ -284,14 +286,7 @@ export default function ScreenshotBuilderHub() {
     const device = getDevice(activeScreen?.deviceId || "iphone-67");
     const filename = getStoreFilename(device, deck.activeScreenIndex);
     canvasRef.current.exportPng(filename).then(() => {
-      toast("Screenshot exported!", "success", {
-        label: "Share on X",
-        onClick: () => {
-          const text = encodeURIComponent("Just built these App Store screenshots in seconds with @BuildrStudio!\n");
-          const url = encodeURIComponent("https://buildrstudio.in/screenshot-builder");
-          window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
-        },
-      });
+      setShareModal({ isOpen: true, count: 1 });
     }).catch((err) => {
       console.error("Export failed:", err);
       toast("Export failed — please try again", "error");
@@ -348,7 +343,7 @@ export default function ScreenshotBuilderHub() {
       const totalFiles = smartResize
         ? deviceSizes.length * originalScreens.length
         : originalScreens.length;
-      toast(`${totalFiles} screenshots exported as ZIP!`, "success");
+      setShareModal({ isOpen: true, count: totalFiles });
     } catch (err) {
       console.error("Batch export failed:", err);
       toast("Batch export failed — please try again", "error");
@@ -1032,6 +1027,13 @@ export default function ScreenshotBuilderHub() {
         onClose={() => { setIsImportOpen(false); setImportStoreInitialUrl(undefined); }}
         onImport={handleStoreImport}
         initialUrl={importStoreInitialUrl}
+      />
+
+      <PostExportShareModal
+        isOpen={shareModal.isOpen}
+        onClose={() => setShareModal({ isOpen: false, count: 1 })}
+        exportCount={shareModal.count}
+        projectName={projectName}
       />
 
       {/* Template gallery */}
