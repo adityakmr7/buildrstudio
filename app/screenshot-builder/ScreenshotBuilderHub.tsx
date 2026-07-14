@@ -8,7 +8,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import type { BuilderConfig, DeviceId } from "./lib/deviceSpecs";
-import { DEFAULT_CONFIG, APPSTORE_DEVICES, PLAYSTORE_DEVICES } from "./lib/deviceSpecs";
+import { DEFAULT_CONFIG, APPSTORE_DEVICES, PLAYSTORE_DEVICES, getStoreFilename, getDevice } from "./lib/deviceSpecs";
 import BuilderSidebar from "./components/BuilderSidebar";
 import BuilderCanvas, { BuilderCanvasHandle } from "./components/BuilderCanvas";
 import PremiumModal from "../components/PremiumModal";
@@ -280,7 +280,10 @@ export default function ScreenshotBuilderHub() {
   const handleExport = () => {
     if (!canvasRef.current || isExporting) return;
     setIsExporting(true);
-    canvasRef.current.exportPng().then(() => {
+    const activeScreen = deck.screens[deck.activeScreenIndex];
+    const device = getDevice(activeScreen?.deviceId || "iphone-67");
+    const filename = getStoreFilename(device, deck.activeScreenIndex);
+    canvasRef.current.exportPng(filename).then(() => {
       toast("Screenshot exported!", "success", {
         label: "Share on X",
         onClick: () => {
@@ -312,7 +315,8 @@ export default function ScreenshotBuilderHub() {
         : [deck.screens[0]?.deviceId || "iphone-67"];
 
       for (const deviceId of deviceSizes) {
-        const folder = smartResize ? zip.folder(deviceId)! : zip;
+        const device = getDevice(deviceId);
+        const folder = smartResize ? zip.folder(device.exportFolder)! : zip;
 
         for (let i = 0; i < originalScreens.length; i++) {
           setDeck(prev => {
@@ -323,13 +327,11 @@ export default function ScreenshotBuilderHub() {
           await new Promise(r => setTimeout(r, 400));
           const dataUrl = await canvasRef.current!.getCapture();
           const base64 = dataUrl.split(",")[1];
-          const filename = smartResize
-            ? `screen-${i + 1}.png`
-            : `screen-${i + 1}.png`;
+          const filename = getStoreFilename(device, i);
           folder.file(filename, base64, { base64: true });
         }
         if (smartResize) {
-          toast(`Exported ${deviceId}...`, "info");
+          toast(`Exported ${device.label}...`, "info");
         }
       }
 
