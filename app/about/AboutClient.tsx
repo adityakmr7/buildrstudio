@@ -415,7 +415,8 @@ export default function AboutClient() {
           </div>
 
           <div className="ab-ctas">
-            <button className="ab-btn ab-btn-fill" onClick={handleCopyEmail}>
+            <a href="https://topmate.io/adityakmr/" target="_blank" rel="noopener noreferrer" className="ab-btn ab-btn-fill">Book a Call →</a>
+            <button className="ab-btn ab-btn-outline" onClick={handleCopyEmail}>
               {copied ? "Copied!" : "Copy Email"}
             </button>
             <a href="https://github.com/adityakmr7" target="_blank" rel="noopener noreferrer" className="ab-btn ab-btn-outline">GitHub</a>
@@ -543,8 +544,9 @@ export default function AboutClient() {
               5+ years in Fintech & SaaS. Available for senior full-stack, React Native, or AI engineering roles — remote or Bengaluru.
             </p>
             <div style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap" }}>
-              <button className="ab-btn ab-btn-fill" onClick={handleCopyEmail}>
-                {copied ? "Copied!" : "adityakmr9672@gmail.com"}
+              <a href="https://topmate.io/adityakmr/" target="_blank" rel="noopener noreferrer" className="ab-btn ab-btn-fill">Book a Call →</a>
+              <button className="ab-btn ab-btn-outline" onClick={handleCopyEmail}>
+                {copied ? "Copied!" : "Copy Email"}
               </button>
               <a href="https://linkedin.com/in/adityakmr7" target="_blank" rel="noopener noreferrer" className="ab-btn ab-btn-outline">LinkedIn</a>
               <a href="https://substack.com/@adityakmr7" target="_blank" rel="noopener noreferrer" className="ab-btn ab-btn-outline">Substack</a>
