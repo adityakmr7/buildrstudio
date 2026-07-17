@@ -56,6 +56,7 @@ export default function ScreenshotBuilderHub() {
   const [importStoreInitialUrl, setImportStoreInitialUrl] = useState<string | undefined>(undefined);
   const [shareModal, setShareModal] = useState<{ isOpen: boolean; count: number }>({ isOpen: false, count: 1 });
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isDeckCollapsed, setIsDeckCollapsed] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [projectName, setProjectName] = useState("Untitled Project");
   const [isSaving, setIsSaving] = useState(false);
@@ -824,14 +825,35 @@ export default function ScreenshotBuilderHub() {
             display: "flex",
             alignItems: "center",
             gap: "8px",
-            padding: "14px 16px 8px",
+            padding: isDeckCollapsed ? "6px 16px" : "10px 16px 8px",
             overflowX: "auto",
             overflowY: "visible",
             scrollbarWidth: "none",
           }}>
-            <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.06em", flexShrink: 0 }}>
-              Screens
-            </span>
+            {/* Deck collapse toggle */}
+            <button
+              type="button"
+              onClick={() => setIsDeckCollapsed(!isDeckCollapsed)}
+              title={isDeckCollapsed ? "Show screens" : "Hide screens"}
+              style={{
+                background: "none", border: "none", cursor: "pointer",
+                display: "flex", alignItems: "center", gap: "4px",
+                color: "var(--text-3)", padding: "2px 4px", borderRadius: "4px",
+                flexShrink: 0,
+              }}
+            >
+              <svg
+                width="10" height="10" viewBox="0 0 10 10" fill="none"
+                style={{ transform: isDeckCollapsed ? "rotate(-90deg)" : "rotate(0deg)", transition: "transform 0.15s ease" }}
+              >
+                <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                Screens {isDeckCollapsed ? `(${screens.length})` : ""}
+              </span>
+            </button>
+
+            {isDeckCollapsed ? null : (<>
 
             {screens.map((scr, idx) => {
               const isActive = idx === activeScreenIndex;
@@ -960,6 +982,7 @@ export default function ScreenshotBuilderHub() {
               </svg>
               <span style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.04em" }}>ADD</span>
             </button>
+          </>)}
           </div>
           </div>
 
