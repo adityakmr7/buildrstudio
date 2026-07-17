@@ -99,14 +99,20 @@ function IPhoneDynamic({ children, shadow }: { children: React.ReactNode; shadow
         {/* Glass gloss over screen */}
         <rect x={si} y={si} width={W - si * 2} height={(H - si * 2) * 0.5}
           rx={scR} ry={scR} fill="url(#df-gloss)" clipPath="url(#df-screen-clip)" />
-        {/* Dynamic Island */}
-        <rect x={pill.x} y={pill.y} width={pill.w} height={pill.h} rx={pill.h / 2} fill="#020202" />
-        {/* Camera module inside Dynamic Island */}
-        <circle cx={pill.x + pill.w - 18} cy={pill.y + pill.h / 2} r="7.5" fill="#0a0a0a" />
-        <circle cx={pill.x + pill.w - 18} cy={pill.y + pill.h / 2} r="5" fill="#040404" />
-        <circle cx={pill.x + pill.w - 19.5} cy={pill.y + pill.h / 2 - 1.5} r="1.8" fill="rgba(255,255,255,0.07)" />
-        {/* Microphone dot */}
-        <circle cx={pill.x + 16} cy={pill.y + pill.h / 2} r="3" fill="#0a0a0a" />
+        {/* Dynamic Island — outer glow ring (OLED bloom simulation, makes pill visible on dark content) */}
+        <rect x={pill.x - 1.5} y={pill.y - 1.5} width={pill.w + 3} height={pill.h + 3}
+          rx={(pill.h + 3) / 2} ry={(pill.h + 3) / 2}
+          fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth="1" />
+        {/* Dynamic Island pill body */}
+        <rect x={pill.x} y={pill.y} width={pill.w} height={pill.h} rx={pill.h / 2} fill="#000000" />
+        {/* Camera ring — visible detail */}
+        <circle cx={pill.x + pill.w - 17} cy={pill.y + pill.h / 2} r="8" fill="#111" />
+        <circle cx={pill.x + pill.w - 17} cy={pill.y + pill.h / 2} r="5.5" fill="#0a0a0a" />
+        <circle cx={pill.x + pill.w - 17} cy={pill.y + pill.h / 2} r="3" fill="#050505" />
+        {/* Camera lens highlight */}
+        <circle cx={pill.x + pill.w - 18.5} cy={pill.y + pill.h / 2 - 1.5} r="1.4" fill="rgba(255,255,255,0.12)" />
+        {/* Microphone pill (left side of DI) */}
+        <rect x={pill.x + 10} y={pill.y + pill.h / 2 - 4} width="8" height="8" rx="4" fill="#0a0a0a" />
       </svg>
     </div>
   );
@@ -176,13 +182,19 @@ function IPhoneNotch({ children, shadow }: { children: React.ReactNode; shadow?:
         </defs>
         <rect x={si} y={si} width={W - si * 2} height={(H - si * 2) * 0.5}
           rx={scR} ry={scR} fill="url(#df2-gloss)" clipPath="url(#df2-screen-clip)" />
-        {/* Notch */}
-        <rect x={(W - notch.w) / 2} y="0" width={notch.w} height={notch.h} rx="0" fill="#020202" />
+        {/* Notch — rounded bottom corners to match real iPhone */}
+        <rect x={(W - notch.w) / 2} y="0" width={notch.w} height={notch.h} rx="10" ry="10"
+          style={{ clipPath: "inset(0 0 0 0 round 0 0 10px 10px)" }} fill="#000000" />
+        {/* Notch outer glow ring (bottom edge only) */}
+        <path
+          d={`M ${(W - notch.w) / 2} 0 L ${(W - notch.w) / 2} ${notch.h - 10} Q ${(W - notch.w) / 2} ${notch.h} ${(W - notch.w) / 2 + 10} ${notch.h} L ${(W + notch.w) / 2 - 10} ${notch.h} Q ${(W + notch.w) / 2} ${notch.h} ${(W + notch.w) / 2} ${notch.h - 10} L ${(W + notch.w) / 2} 0`}
+          fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="0.75" />
         {/* Camera + speaker in notch */}
-        <circle cx={W / 2 + 28} cy="15" r="6.5" fill="#080808" />
-        <circle cx={W / 2 + 28} cy="15" r="4" fill="#040404" />
-        <circle cx={W / 2 + 26.5} cy="13.5" r="1.5" fill="rgba(255,255,255,0.06)" />
-        <rect x={W / 2 - 40} y="11" width="38" height="8" rx="4" fill="#080808" />
+        <circle cx={W / 2 + 26} cy="14" r="7" fill="#111" />
+        <circle cx={W / 2 + 26} cy="14" r="4.5" fill="#050505" />
+        <circle cx={W / 2 + 26} cy="14" r="2.5" fill="#030303" />
+        <circle cx={W / 2 + 24.5} cy="12.5" r="1.2" fill="rgba(255,255,255,0.1)" />
+        <rect x={W / 2 - 38} y="10" width="36" height="8" rx="4" fill="#080808" />
       </svg>
     </div>
   );
