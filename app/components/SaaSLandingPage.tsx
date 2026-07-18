@@ -1123,11 +1123,13 @@ export default function SaaSLandingPage() {
         <div className="footer-links">
           <Link href="/screenshot-builder" className="footer-link">Screenshot Builder</Link>
           <Link href="/social-optimizer" className="footer-link">Optimizer</Link>
-          <Link href="/change-log" className="footer-link">Changelog</Link>
+          <Link href="/change-log" className="footer-link">Changelog Card</Link>
           <Link href="/roadmap" className="footer-link">Roadmap</Link>
           <Link href="/pricing" className="footer-link">Pricing</Link>
         </div>
         <div className="footer-links" style={{ marginTop: 0 }}>
+          <Link href="/updates" className="footer-link">What&apos;s New</Link>
+          <Link href="/support" className="footer-link">Support</Link>
           <Link href="/terms" className="footer-link">Terms</Link>
           <Link href="/privacy" className="footer-link">Privacy</Link>
           <Link href="/refund" className="footer-link">Refund Policy</Link>

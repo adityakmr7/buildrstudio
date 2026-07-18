@@ -41,8 +41,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@adityakmr7",
-    creator: "@adityakmr7",
+    site: "@buildrstudio",
+    creator: "@buildrstudio",
   },
   icons: {
     icon: "/icon.svg",

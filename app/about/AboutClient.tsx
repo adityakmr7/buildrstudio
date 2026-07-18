@@ -5,29 +5,51 @@ import Image from "next/image";
 import Link from "next/link";
 
 const SPEC_ROWS = [
-  { label: "BASED",   value: "Bengaluru, India" },
-  { label: "ROLE",    value: "Full-Stack Engineer" },
+  { label: "BASED", value: "Bengaluru, India" },
+  { label: "ROLE", value: "Full-Stack Engineer" },
   { label: "CURRENT", value: "SDE-2 @ Groww" },
-  { label: "STATUS",  value: "Open to Work" },
-  { label: "STACK",   value: "React · React Native · Next.js · TypeScript · AI/LLM" },
-  { label: "XP",      value: "5+ years · Fintech & SaaS" },
+  { label: "STATUS", value: "Open to Work" },
+  { label: "STACK", value: "React · React Native · Next.js · TypeScript · AI/LLM" },
+  { label: "XP", value: "5+ years · Fintech & SaaS" },
 ];
 
 const SKILLS = [
-  { category: "Frontend",       items: ["React / Next.js — 95", "React Native — 92", "TypeScript — 90", "Redux / Zustand — 85"] },
-  { category: "Backend",        items: ["Node.js — 88", "REST APIs — 90", "GraphQL — 82", "WebSockets — 78"] },
-  { category: "AI / ML",        items: ["LLM APIs (OpenAI/Gemini) — 85", "Prompt Engineering — 88", "RAG Pipelines — 80", "AI Agents — 75"] },
-  { category: "Infrastructure", items: ["PostgreSQL / MongoDB — 86", "CI/CD Pipelines — 85", "AWS / Docker — 80", "Redis / Caching — 78"] },
+  {
+    category: "Frontend",
+    items: ["React / Next.js — 95", "React Native — 92", "TypeScript — 90", "Redux / Zustand — 85"],
+  },
+  {
+    category: "Backend",
+    items: ["Node.js — 88", "REST APIs — 90", "GraphQL — 82", "WebSockets — 78"],
+  },
+  {
+    category: "AI / ML",
+    items: [
+      "LLM APIs (OpenAI/Gemini) — 85",
+      "Prompt Engineering — 88",
+      "RAG Pipelines — 80",
+      "AI Agents — 75",
+    ],
+  },
+  {
+    category: "Infrastructure",
+    items: [
+      "PostgreSQL / MongoDB — 86",
+      "CI/CD Pipelines — 85",
+      "AWS / Docker — 80",
+      "Redis / Caching — 78",
+    ],
+  },
 ];
 
 const ACHIEVEMENTS = [
-  { title: "10+ products shipped to production",           meta: "Ship Master" },
-  { title: "3 apps published on iOS App Store",           meta: "App Store Pioneer" },
+  { title: "10+ products shipped to production", meta: "Ship Master" },
+  { title: "3 apps published on iOS App Store", meta: "App Store Pioneer" },
   { title: "3+ years building wealth management at scale", meta: "Fintech Veteran" },
-  { title: "LLM APIs integrated into production apps",     meta: "AI Integration" },
-  { title: "npm package with community adoption",          meta: "Open Source" },
-  { title: "Reduced UI latency by 40% in production",     meta: "Performance" },
-  { title: "Autonomous AI chatbot with human escalation",  meta: "AI Agent Builder" },
+  { title: "LLM APIs integrated into production apps", meta: "AI Integration" },
+  { title: "npm package with community adoption", meta: "Open Source" },
+  { title: "Reduced UI latency by 40% in production", meta: "Performance" },
+  { title: "Autonomous AI chatbot with human escalation", meta: "AI Agent Builder" },
 ];
 
 const PROJECTS = [
@@ -74,11 +96,36 @@ const PROJECTS = [
 ];
 
 const EXPERIENCE = [
-  { role: "SDE-2",         company: "Groww",            period: "Aug 2025 — Present",      desc: "Wealth management products at scale. React Native + TypeScript." },
-  { role: "SDE-2",         company: "Fisdom → Groww",   period: "Oct 2024 — Aug 2025",     desc: "Reduced UI latency 40%. Platform performance +35%." },
-  { role: "SDE-1",         company: "Fisdom",            period: "Jul 2022 — Oct 2024",     desc: "Full-stack fintech: mutual funds, portfolio, REST + GraphQL APIs." },
-  { role: "Associate Dev", company: "Bluespacelabs",    period: "Mar 2021 — May 2022",     desc: "SaaS communication platform. WebSockets + real-time systems." },
-  { role: "Web Developer", company: "IIH Global",       period: "Jul 2020 — Feb 2021",     desc: "Modernized legacy apps with React + Redux." },
+  {
+    role: "SDE-2",
+    company: "Groww",
+    period: "Aug 2025 — Present",
+    desc: "Wealth management products at scale. React Native + TypeScript.",
+  },
+  {
+    role: "SDE-2",
+    company: "Fisdom → Groww",
+    period: "Oct 2024 — Aug 2025",
+    desc: "Reduced UI latency 40%. Platform performance +35%.",
+  },
+  {
+    role: "SDE-1",
+    company: "Fisdom",
+    period: "Jul 2022 — Oct 2024",
+    desc: "Full-stack fintech: mutual funds, portfolio, REST + GraphQL APIs.",
+  },
+  {
+    role: "Associate Dev",
+    company: "Bluespacelabs",
+    period: "Mar 2021 — May 2022",
+    desc: "SaaS communication platform. WebSockets + real-time systems.",
+  },
+  {
+    role: "Web Developer",
+    company: "IIH Global",
+    period: "Jul 2020 — Feb 2021",
+    desc: "Modernized legacy apps with React + Redux.",
+  },
 ];
 
 export default function AboutClient() {
@@ -382,7 +429,6 @@ export default function AboutClient() {
       `}</style>
 
       <div className="ab-inner">
-
         {/* ── HERO ── */}
         <section className="ab-hero">
           <div className="ab-eyebrow">
@@ -391,22 +437,37 @@ export default function AboutClient() {
           </div>
 
           <h1 className="ab-headline">
-            YOU BUILD IT.<br />
+            YOU BUILD IT.
+            <br />
             <span className="ab-headline-hl">I SHIP IT.</span>
           </h1>
 
           <div className="ab-identity">
             <div className="ab-avatar">
-              <Image src="/aditya-avatar.png" alt="Aditya Kumar" width={64} height={64} style={{ width: "100%", height: "100%", objectFit: "cover" }} priority />
+              <Image
+                src="/aditya-avatar.png"
+                alt="Aditya Kumar"
+                width={64}
+                height={64}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center 15%",
+                }}
+                priority
+              />
             </div>
             <p className="ab-bio">
-              Senior Software Engineer with 5+ years designing and scaling full-stack web and mobile apps across Fintech and SaaS. Specialized in AI/LLM integrations, React Native, and high-performance systems.
+              Senior Software Engineer with 5+ years designing and scaling full-stack web and mobile
+              apps across Fintech and SaaS. Specialized in AI/LLM integrations, React Native, and
+              high-performance systems.
             </p>
           </div>
 
           <div className="ab-spec">
             <div className="ab-spec-header">Builder Spec</div>
-            {SPEC_ROWS.map(row => (
+            {SPEC_ROWS.map((row) => (
               <div className="ab-spec-row" key={row.label}>
                 <div className="ab-spec-key">{row.label}</div>
                 <div className="ab-spec-val">{row.value}</div>
@@ -415,22 +476,72 @@ export default function AboutClient() {
           </div>
 
           <div className="ab-ctas">
-            <a href="https://topmate.io/adityakmr/" target="_blank" rel="noopener noreferrer" className="ab-btn ab-btn-fill">Book a Call →</a>
+            <a
+              href="https://cal.com/adityakmr7"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ab-btn ab-btn-fill"
+            >
+              Book a Call →
+            </a>
             <button className="ab-btn ab-btn-outline" onClick={handleCopyEmail}>
               {copied ? "Copied!" : "Copy Email"}
             </button>
-            <a href="https://github.com/adityakmr7" target="_blank" rel="noopener noreferrer" className="ab-btn ab-btn-outline">GitHub</a>
-            <a href="https://x.com/adityakmr7" target="_blank" rel="noopener noreferrer" className="ab-btn ab-btn-outline">X / Twitter</a>
-            <a href="https://linkedin.com/in/adityakmr7" target="_blank" rel="noopener noreferrer" className="ab-btn ab-btn-outline">LinkedIn</a>
+            <a
+              href="https://github.com/adityakmr7"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ab-btn ab-btn-outline"
+            >
+              GitHub
+            </a>
+            <a
+              href="https://x.com/adityakmr7"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ab-btn ab-btn-outline"
+            >
+              X / Twitter
+            </a>
+            <a
+              href="https://linkedin.com/in/adityakmr7"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ab-btn ab-btn-outline"
+            >
+              LinkedIn
+            </a>
           </div>
         </section>
 
         {/* ── TICKER ── */}
         <div className="ab-ticker">
           <div className="ab-ticker-inner">
-            {["React Native", "Next.js", "TypeScript", "Node.js", "GraphQL", "PostgreSQL", "AI/LLM APIs", "AWS", "RAG Pipelines", "Prompt Engineering",
-              "React Native", "Next.js", "TypeScript", "Node.js", "GraphQL", "PostgreSQL", "AI/LLM APIs", "AWS", "RAG Pipelines", "Prompt Engineering"].map((t, i) => (
-              <span key={i}>{t} <span style={{ opacity: 0.4 }}>·</span></span>
+            {[
+              "React Native",
+              "Next.js",
+              "TypeScript",
+              "Node.js",
+              "GraphQL",
+              "PostgreSQL",
+              "AI/LLM APIs",
+              "AWS",
+              "RAG Pipelines",
+              "Prompt Engineering",
+              "React Native",
+              "Next.js",
+              "TypeScript",
+              "Node.js",
+              "GraphQL",
+              "PostgreSQL",
+              "AI/LLM APIs",
+              "AWS",
+              "RAG Pipelines",
+              "Prompt Engineering",
+            ].map((t, i) => (
+              <span key={i}>
+                {t} <span style={{ opacity: 0.4 }}>·</span>
+              </span>
             ))}
           </div>
         </div>
@@ -442,10 +553,10 @@ export default function AboutClient() {
             Stack Depth
           </div>
           <div className="ab-skills-grid">
-            {SKILLS.map(group => (
+            {SKILLS.map((group) => (
               <div className="ab-skill-group" key={group.category}>
                 <div className="ab-skill-cat">{group.category}</div>
-                {group.items.map(item => {
+                {group.items.map((item) => {
                   const [name, num] = item.split(" — ");
                   return (
                     <div className="ab-skill-item" key={item}>
@@ -466,7 +577,7 @@ export default function AboutClient() {
             Proof, Not Adjectives
           </div>
           <div className="ab-ach-list">
-            {ACHIEVEMENTS.map(a => (
+            {ACHIEVEMENTS.map((a) => (
               <div className="ab-ach-row" key={a.title}>
                 <span className="ab-ach-title">{a.title}</span>
                 <span className="ab-ach-meta">{a.meta}</span>
@@ -482,16 +593,24 @@ export default function AboutClient() {
             What I&apos;ve Shipped
           </div>
           <div>
-            {PROJECTS.map(p => (
+            {PROJECTS.map((p) => (
               <Link href={p.href} className="ab-project" key={p.name}>
                 <div className="ab-project-top">
                   <span className="ab-project-name">{p.name}</span>
-                  <span className={`ab-project-status${p.status === "Active" || p.status === "Live" ? " active" : ""}`}>{p.status}</span>
+                  <span
+                    className={`ab-project-status${p.status === "Active" || p.status === "Live" ? " active" : ""}`}
+                  >
+                    {p.status}
+                  </span>
                 </div>
                 <div className="ab-project-role">{p.role}</div>
                 <p className="ab-project-desc">{p.desc}</p>
                 <div className="ab-project-tags">
-                  {p.tags.map(t => <span className="ab-project-tag" key={t}>{t}</span>)}
+                  {p.tags.map((t) => (
+                    <span className="ab-project-tag" key={t}>
+                      {t}
+                    </span>
+                  ))}
                 </div>
               </Link>
             ))}
@@ -505,9 +624,13 @@ export default function AboutClient() {
             Career Timeline
           </div>
           <div className="ab-exp-list">
-            {EXPERIENCE.map(e => (
+            {EXPERIENCE.map((e) => (
               <div className="ab-exp-row" key={e.company + e.role}>
-                <div className="ab-exp-period">{e.period.split("—").map((p, i) => <div key={i}>{p.trim()}</div>)}</div>
+                <div className="ab-exp-period">
+                  {e.period.split("—").map((p, i) => (
+                    <div key={i}>{p.trim()}</div>
+                  ))}
+                </div>
                 <div className="ab-exp-body">
                   <div className="ab-exp-role">{e.role}</div>
                   <div className="ab-exp-co">{e.company}</div>
@@ -524,13 +647,68 @@ export default function AboutClient() {
             <span className="ab-eyebrow-sq" />
             Built By Me
           </div>
-          <Link href="/screenshot-builder" style={{ textDecoration: "none", display: "block", border: "1px solid var(--border)", padding: "24px", transition: "background 0.12s", color: "var(--text-1)" }}
-            onMouseEnter={e => (e.currentTarget.style.background = "var(--surface)")}
-            onMouseLeave={e => (e.currentTarget.style.background = "")}>
-            <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", fontFamily: "monospace", color: "var(--fill)", marginBottom: "8px" }}>Active Project</div>
-            <div style={{ fontSize: "20px", fontWeight: 800, letterSpacing: "-0.5px", borderBottom: "2px solid var(--fill)", display: "inline-block", paddingBottom: "2px", marginBottom: "8px" }}>BuildrStudio</div>
-            <p style={{ fontSize: "13px", color: "var(--text-2)", lineHeight: 1.6, margin: "0 0 16px" }}>Paste your App Store URL — get device-framed mockups with AI headlines, ready to submit in seconds. Free tool, no Figma needed.</p>
-            <span style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", fontFamily: "monospace", color: "var(--fill)" }}>Try it free →</span>
+          <Link
+            href="/screenshot-builder"
+            style={{
+              textDecoration: "none",
+              display: "block",
+              border: "1px solid var(--border)",
+              padding: "24px",
+              transition: "background 0.12s",
+              color: "var(--text-1)",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface)")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "")}
+          >
+            <div
+              style={{
+                fontSize: "11px",
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                fontFamily: "monospace",
+                color: "var(--fill)",
+                marginBottom: "8px",
+              }}
+            >
+              Active Project
+            </div>
+            <div
+              style={{
+                fontSize: "20px",
+                fontWeight: 800,
+                letterSpacing: "-0.5px",
+                borderBottom: "2px solid var(--fill)",
+                display: "inline-block",
+                paddingBottom: "2px",
+                marginBottom: "8px",
+              }}
+            >
+              BuildrStudio
+            </div>
+            <p
+              style={{
+                fontSize: "13px",
+                color: "var(--text-2)",
+                lineHeight: 1.6,
+                margin: "0 0 16px",
+              }}
+            >
+              Paste your App Store URL — get device-framed mockups with AI headlines, ready to
+              submit in seconds. Free tool, no Figma needed.
+            </p>
+            <span
+              style={{
+                fontSize: "12px",
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                fontFamily: "monospace",
+                color: "var(--fill)",
+              }}
+            >
+              Try it free →
+            </span>
           </Link>
         </section>
 
@@ -538,22 +716,47 @@ export default function AboutClient() {
         <section>
           <div className="ab-contact">
             <div className="ab-contact-headline">
-              Ready to<br /><span className="ab-headline-hl">Team Up?</span>
+              Ready to
+              <br />
+              <span className="ab-headline-hl">Team Up?</span>
             </div>
             <p className="ab-contact-sub">
-              5+ years in Fintech & SaaS. Available for senior full-stack, React Native, or AI engineering roles — remote or Bengaluru.
+              5+ years in Fintech & SaaS. Available for senior full-stack, React Native, or AI
+              engineering roles — remote or Bengaluru.
             </p>
-            <div style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap" }}>
-              <a href="https://topmate.io/adityakmr/" target="_blank" rel="noopener noreferrer" className="ab-btn ab-btn-fill">Book a Call →</a>
+            <div
+              style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap" }}
+            >
+              <a
+                href="https://cal.com/adityakmr7"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ab-btn ab-btn-fill"
+              >
+                Book a Call →
+              </a>
               <button className="ab-btn ab-btn-outline" onClick={handleCopyEmail}>
                 {copied ? "Copied!" : "Copy Email"}
               </button>
-              <a href="https://linkedin.com/in/adityakmr7" target="_blank" rel="noopener noreferrer" className="ab-btn ab-btn-outline">LinkedIn</a>
-              <a href="https://substack.com/@adityakmr7" target="_blank" rel="noopener noreferrer" className="ab-btn ab-btn-outline">Substack</a>
+              <a
+                href="https://linkedin.com/in/adityakmr7"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ab-btn ab-btn-outline"
+              >
+                LinkedIn
+              </a>
+              <a
+                href="https://substack.com/@adityakmr7"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ab-btn ab-btn-outline"
+              >
+                Substack
+              </a>
             </div>
           </div>
         </section>
-
       </div>
     </div>
   );

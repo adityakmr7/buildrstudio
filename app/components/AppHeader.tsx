@@ -65,33 +65,40 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
           .hdr-logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 9px;
             text-decoration: none;
             flex-shrink: 0;
             z-index: 1001;
-            transition: transform 0.2s ease;
+            transition: opacity 0.2s ease;
           }
           .hdr-logo:hover {
-            transform: scale(1.02);
+            opacity: 0.85;
           }
           .hdr-logo-mark {
-            width: 32px;
-            height: 32px;
-            border-radius: 9px;
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 15px;
-            color: #ffffff;
-            font-weight: 800;
-            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+            flex-shrink: 0;
           }
-          .hdr-logo-text {
-            font-size: 16px;
+          .hdr-logo-wordmark {
+            display: flex;
+            align-items: baseline;
+            gap: 0px;
+            line-height: 1;
+          }
+          .hdr-logo-buildr {
+            font-size: 15px;
             font-weight: 800;
             color: var(--text-1);
-            letter-spacing: -0.5px;
+            letter-spacing: -0.6px;
+          }
+          .hdr-logo-studio {
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--text-3);
+            letter-spacing: -0.3px;
           }
 
           /* Desktop Navigation */
@@ -240,57 +247,48 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
             gap: 10px;
           }
 
-          /* Luxury Upgrade CTA Button */
+          /* Premium Upgrade CTA Button */
           .pro-btn {
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
-            color: #ffffff !important;
+            background: #09090b;
+            color: #fef3c7 !important;
             position: relative;
             overflow: hidden;
-            border: none;
-            padding: 8px 16px;
-            border-radius: var(--r-full);
-            font-weight: 700;
+            border: 1px solid rgba(251, 191, 36, 0.32);
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-weight: 600;
             font-size: 12px;
             display: inline-flex;
             align-items: center;
             gap: 6px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
-            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.4), 0 0 16px rgba(251,191,36,0.06), inset 0 1px 0 rgba(255,255,255,0.06);
+            transition: all 0.2s ease;
             font-family: var(--font);
             text-decoration: none;
             z-index: 10;
+            letter-spacing: 0.01em;
           }
           .pro-btn:hover {
+            background: #111114;
+            border-color: rgba(251, 191, 36, 0.58);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.4), 0 0 24px rgba(251,191,36,0.14), inset 0 1px 0 rgba(255,255,255,0.08);
             transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
-            opacity: 0.95;
           }
           .pro-btn:active {
-            transform: translateY(1px);
+            transform: translateY(0px);
           }
-          .pro-btn::after {
-            content: '';
+          .pro-btn-shimmer {
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-              to bottom right,
-              rgba(255, 255, 255, 0) 0%,
-              rgba(255, 255, 255, 0) 40%,
-              rgba(255, 255, 255, 0.4) 50%,
-              rgba(255, 255, 255, 0) 60%,
-              rgba(255, 255, 255, 0) 100%
-            );
-            transform: rotate(30deg);
-            transition: transform 0.5s;
+            inset: 0;
+            background: linear-gradient(105deg, transparent 35%, rgba(251,191,36,0.07) 50%, transparent 65%);
+            opacity: 0;
+            transition: opacity 0.3s;
             pointer-events: none;
+            border-radius: inherit;
           }
-          .pro-btn:hover::after {
-            transform: translate(50%, 50%) rotate(30deg);
-            transition: transform 0.8s ease-in-out;
+          .pro-btn:hover .pro-btn-shimmer {
+            opacity: 1;
           }
 
           /* Mobile Menu Toggle Burger Button */
@@ -431,7 +429,7 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
           }
 
           @media (max-width: 500px) {
-            .hdr-logo-text {
+            .hdr-logo-wordmark {
               display: none;
             }
           }
@@ -439,8 +437,29 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
 
         {/* Left: Logo */}
         <Link href="/" className="hdr-logo">
-          <div className="hdr-logo-mark">B</div>
-          <span className="hdr-logo-text">BuildrStudio</span>
+          <div className="hdr-logo-mark">
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="30" height="30" rx="8" fill="#09090b"/>
+              {/* Back screen layer */}
+              <rect x="14" y="6" width="11" height="15" rx="2.5" fill="#3f3f46"/>
+              {/* Middle screen layer */}
+              <rect x="11" y="8.5" width="11" height="15" rx="2.5" fill="#52525b"/>
+              {/* Front screen layer — brand indigo */}
+              <rect x="5" y="11" width="13" height="17" rx="2.5" fill="url(#logoFg)"/>
+              {/* Screen notch on front */}
+              <rect x="10" y="11" width="3" height="1.5" rx="0.75" fill="rgba(0,0,0,0.4)"/>
+              <defs>
+                <linearGradient id="logoFg" x1="5" y1="11" x2="18" y2="28" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#818cf8"/>
+                  <stop offset="100%" stopColor="#6366f1"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div className="hdr-logo-wordmark">
+            <span className="hdr-logo-buildr">Buildr</span>
+            <span className="hdr-logo-studio">Studio</span>
+          </div>
         </Link>
 
         {/* Center: Desktop Navigation */}
@@ -501,9 +520,12 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
             type="button"
             onClick={handleProClick}
             className="pro-btn"
-            aria-label="Go Premium Pro"
+            aria-label="Go Pro"
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span className="pro-btn-shimmer" />
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
             <span className="pro-btn-text">Go Pro</span>
           </button>
 
@@ -536,8 +558,25 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
       <div className={`mobile-drawer-panel ${mobileMenuOpen ? "open" : ""}`}>
         <div className="mobile-drawer-header">
           <div className="hdr-logo">
-            <div className="hdr-logo-mark">B</div>
-            <span className="hdr-logo-text">BuildrStudio</span>
+            <div className="hdr-logo-mark">
+              <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="30" height="30" rx="8" fill="#09090b"/>
+                <rect x="14" y="6" width="11" height="15" rx="2.5" fill="#3f3f46"/>
+                <rect x="11" y="8.5" width="11" height="15" rx="2.5" fill="#52525b"/>
+                <rect x="5" y="11" width="13" height="17" rx="2.5" fill="url(#logoFg2)"/>
+                <rect x="10" y="11" width="3" height="1.5" rx="0.75" fill="rgba(0,0,0,0.4)"/>
+                <defs>
+                  <linearGradient id="logoFg2" x1="5" y1="11" x2="18" y2="28" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stopColor="#818cf8"/>
+                    <stop offset="100%" stopColor="#6366f1"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <div className="hdr-logo-wordmark">
+              <span className="hdr-logo-buildr">Buildr</span>
+              <span className="hdr-logo-studio">Studio</span>
+            </div>
           </div>
           <button 
             type="button" 
@@ -592,6 +631,14 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               <span>About Me</span>
             </Link>
+            <Link href="/updates" className="mobile-link">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>What&apos;s New</span>
+            </Link>
+            <Link href="/support" className="mobile-link">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Support</span>
+            </Link>
           </div>
         </div>
 
@@ -606,8 +653,11 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
             handleProClick();
           }}
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <span>Unlock Premium Pro</span>
+          <span className="pro-btn-shimmer" />
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          <span>Unlock Pro</span>
         </button>
       </div>
 

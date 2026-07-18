@@ -18,28 +18,27 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Aditya Kumar — Senior Software Engineer & Indie Maker",
-    description:
-      "5+ years in Fintech & SaaS. Building developer tools. Open to work.",
+    description: "5+ years in Fintech & SaaS. Building developer tools. Open to work.",
   },
 };
 
 const personJsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
-  "name": "Aditya Kumar",
-  "jobTitle": "Senior Software Engineer",
-  "url": "https://buildrstudio.in/about",
-  "image": "https://buildrstudio.in/aditya-avatar.png",
-  "sameAs": [
+  name: "Aditya Kumar",
+  jobTitle: "Senior Software Engineer",
+  url: "https://buildrstudio.in/about",
+  image: "https://buildrstudio.in/aditya-avatar.png",
+  sameAs: [
     "https://github.com/adityakmr7",
-    "https://x.com/adityakmr7",
+    "https://x.com/@dev_adityakmr",
     "https://linkedin.com/in/adityakmr7",
   ],
-  "worksFor": {
+  worksFor: {
     "@type": "Organization",
-    "name": "Groww",
+    name: "Groww",
   },
-  "knowsAbout": ["React Native", "TypeScript", "Next.js", "AI/LLM", "Fintech"],
+  knowsAbout: ["React Native", "TypeScript", "Next.js", "AI/LLM", "Fintech"],
 };
 
 export default function AboutPage() {
