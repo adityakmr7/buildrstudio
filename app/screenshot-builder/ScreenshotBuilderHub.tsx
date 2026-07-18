@@ -86,8 +86,8 @@ function MultiScreenGrid({
               borderRadius: 12, overflow: "hidden",
               border: isActive ? "2.5px solid var(--fill)" : "2px solid transparent",
               boxShadow: isActive
-                ? "0 0 0 4px rgba(99,102,241,0.18), 0 8px 32px rgba(0,0,0,0.2)"
-                : "0 4px 20px rgba(0,0,0,0.14)",
+                ? "0 0 0 4px var(--fill-subtle), 0 8px 32px var(--shadow-md)"
+                : "var(--shadow-md)",
               transition: "all 0.15s ease",
               position: "relative",
             }}>
@@ -1072,7 +1072,7 @@ export default function ScreenshotBuilderHub() {
                     alignItems: "center",
                     justifyContent: "flex-end",
                     padding: "4px",
-                    boxShadow: isActive ? "0 0 0 3px rgba(99,102,241,0.15)" : "none",
+                    boxShadow: isActive ? "0 0 0 3px var(--fill-subtle)" : "none",
                     transition: "all 0.15s ease",
                     overflow: "visible",
                     flexShrink: 0,
@@ -1120,8 +1120,8 @@ export default function ScreenshotBuilderHub() {
                       width: "16px",
                       height: "16px",
                       borderRadius: "50%",
-                      background: "#ef4444",
-                      border: "1.5px solid var(--bg, #fff)",
+                      background: "var(--destructive)",
+                      border: "1.5px solid var(--bg)",
                       color: "#fff",
                       fontSize: "9px",
                       lineHeight: 1,

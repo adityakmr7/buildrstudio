@@ -25,13 +25,15 @@ export default function UserMenu({ onOpenAuth, onOpenPremium }: UserMenuProps) {
 
   if (status === "loading") {
     return (
-      <div style={{
-        width: 32,
-        height: 32,
-        borderRadius: "50%",
-        background: "var(--fill-subtle)",
-        animation: "pulse 1.5s infinite",
-      }} />
+      <div
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: "50%",
+          background: "var(--fill-subtle)",
+          animation: "pulse 1.5s infinite",
+        }}
+      />
     );
   }
 
@@ -75,58 +77,69 @@ export default function UserMenu({ onOpenAuth, onOpenPremium }: UserMenuProps) {
             alt=""
             width={32}
             height={32}
-            style={{ borderRadius: "50%", border: isPro ? "2px solid #a855f7" : "2px solid var(--border)" }}
+            style={{
+              borderRadius: "50%",
+              border: isPro ? "2px solid #a855f7" : "2px solid var(--border)",
+            }}
           />
         ) : (
-          <div style={{
-            width: 32,
-            height: 32,
-            borderRadius: "50%",
-            background: "linear-gradient(135deg, #6366f1, #a855f7)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#fff",
-            fontSize: 14,
-            fontWeight: 700,
-          }}>
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #6366f1, #a855f7)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#fff",
+              fontSize: 14,
+              fontWeight: 700,
+            }}
+          >
             {(session.user.name?.[0] || session.user.email[0]).toUpperCase()}
           </div>
         )}
         {isPro && (
-          <span style={{
-            fontSize: 9,
-            fontWeight: 800,
-            background: "linear-gradient(135deg, #6366f1, #a855f7)",
-            color: "#fff",
-            padding: "2px 6px",
-            borderRadius: "var(--r-full)",
-            letterSpacing: "0.5px",
-          }}>
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 800,
+              background: "linear-gradient(135deg, #6366f1, #a855f7)",
+              color: "#fff",
+              padding: "2px 6px",
+              borderRadius: "var(--r-full)",
+              letterSpacing: "0.5px",
+            }}
+          >
             PRO
           </span>
         )}
       </button>
 
       {menuOpen && (
-        <div style={{
-          position: "absolute",
-          top: "calc(100% + 8px)",
-          right: 0,
-          width: 240,
-          background: "var(--surface)",
-          border: "1px solid var(--border-strong)",
-          borderRadius: "var(--r-md)",
-          boxShadow: "0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.05)",
-          padding: 8,
-          zIndex: 1100,
-          animation: "scaleIn 0.15s ease-out",
-        }}>
-          <div style={{
-            padding: "10px 12px",
-            borderBottom: "1px solid var(--border)",
-            marginBottom: 4,
-          }}>
+        <div
+          style={{
+            position: "absolute",
+            top: "calc(100% + 8px)",
+            right: 0,
+            width: 240,
+            background: "var(--surface)",
+            border: "1px solid var(--border-strong)",
+            borderRadius: "var(--r-md)",
+            boxShadow: "0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.05)",
+            padding: 8,
+            zIndex: 1100,
+            animation: "scaleIn 0.15s ease-out",
+          }}
+        >
+          <div
+            style={{
+              padding: "10px 12px",
+              borderBottom: "1px solid var(--border)",
+              marginBottom: 4,
+            }}
+          >
             <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-1)" }}>
               {session.user.name}
             </div>
@@ -159,11 +172,13 @@ export default function UserMenu({ onOpenAuth, onOpenPremium }: UserMenuProps) {
                 transition: "background 0.15s",
                 textAlign: "left",
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = "var(--fill-subtle)"}
-              onMouseLeave={(e) => e.currentTarget.style.background = "none"}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "var(--fill-subtle)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
             >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <span>Upgrade to Pro — $4/mo</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+              <span>Upgrade to Pro — $9/mo</span>
             </button>
           )}
 
@@ -190,8 +205,8 @@ export default function UserMenu({ onOpenAuth, onOpenPremium }: UserMenuProps) {
               transition: "background 0.15s",
               textAlign: "left",
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "var(--fill-subtle)"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "none"}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "var(--fill-subtle)")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
           >
             <span>Sign out</span>
           </button>

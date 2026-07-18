@@ -86,7 +86,7 @@ export default function SaaSLandingPage() {
         .site-logo-mark {
           width: 34px;
           height: 34px;
-          border-radius: 9px;
+          border-radius: var(--r-sm);
           background: var(--fill);
           display: flex;
           align-items: center;
@@ -135,7 +135,7 @@ export default function SaaSLandingPage() {
           padding: 6px 14px;
           background: var(--fill-subtle);
           border: 1px solid var(--border-strong);
-          border-radius: 20px;
+          border-radius: var(--r-xl);
           font-size: 12px;
           font-weight: 600;
           color: var(--text-1);
@@ -170,7 +170,7 @@ export default function SaaSLandingPage() {
         .hero-import-wrap {
           display: flex;
           width: 100%;
-          border-radius: 12px;
+          border-radius: var(--r-md);
           overflow: hidden;
           border: 1.5px solid var(--border-strong);
           background: var(--surface);
@@ -227,7 +227,7 @@ export default function SaaSLandingPage() {
         .hero-mockup {
           width: 220px;
           height: 320px;
-          border-radius: 20px;
+          border-radius: var(--r-xl);
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -252,17 +252,17 @@ export default function SaaSLandingPage() {
         .hero-mockup-phone {
           width: 100px;
           height: 180px;
-          background: #0a0a0a;
-          border-radius: 16px;
-          border: 2px solid #333;
+          background: var(--fill);
+          border-radius: var(--r-lg);
+          border: 2px solid var(--border-strong);
           position: relative;
           overflow: hidden;
         }
         .hero-phone-notch {
           width: 40px;
           height: 10px;
-          background: #0a0a0a;
-          border-radius: 0 0 8px 8px;
+          background: var(--fill);
+          border-radius: 0 0 var(--r-sm) var(--r-sm);
           position: absolute;
           top: 0;
           left: 50%;
@@ -272,7 +272,7 @@ export default function SaaSLandingPage() {
         .hero-phone-screen {
           position: absolute;
           inset: 4px;
-          border-radius: 12px;
+          border-radius: var(--r-md);
         }
         @keyframes heroFloat {
           0%, 100% { transform: translateY(0); }
@@ -313,7 +313,7 @@ export default function SaaSLandingPage() {
         .tool-card {
           background: var(--surface);
           border: 1px solid var(--border);
-          border-radius: 20px;
+          border-radius: var(--r-xl);
           padding: 32px;
           display: flex;
           flex-direction: column;
@@ -330,7 +330,7 @@ export default function SaaSLandingPage() {
         .tool-icon {
           width: 48px;
           height: 48px;
-          border-radius: 12px;
+          border-radius: var(--r-md);
           background: var(--fill-subtle);
           display: flex;
           align-items: center;
@@ -340,7 +340,7 @@ export default function SaaSLandingPage() {
         }
         .tool-name {
           font-size: 20px;
-          font-weight: 750;
+          font-weight: 800;
           letter-spacing: -0.4px;
           margin: 0;
         }
@@ -360,116 +360,136 @@ export default function SaaSLandingPage() {
           gap: 4px;
         }
 
-        /* ─── MAIN PRODUCT CARD ─── */
-        .main-product-card {
-          display: grid;
-          grid-template-columns: auto 1fr auto;
+        /* ─── LAUNCH FLOW ─── */
+        .launch-flow {
+          display: flex;
           align-items: center;
-          gap: 32px;
+          justify-content: center;
+          gap: 10px;
           max-width: 1200px;
-          margin: 0 auto 28px;
-          padding: 40px 44px;
-          background: linear-gradient(135deg, rgba(99,102,241,0.04) 0%, rgba(168,85,247,0.03) 100%);
+          margin: 0 auto 48px;
+          padding: 0 40px;
+          flex-wrap: nowrap;
+          overflow-x: auto;
+        }
+        .launch-flow-step {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+          padding: 12px 16px;
+          border-radius: var(--r-md);
+          border: 1px solid var(--border);
+          background: var(--surface);
+          min-width: 110px;
+          text-align: center;
+          flex-shrink: 0;
+        }
+        .launch-flow-step.highlight {
+          border-color: var(--fill);
+          background: var(--fill-subtle);
+        }
+        .launch-flow-num {
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0.1em;
+          color: var(--text-3);
+          font-family: monospace;
+        }
+        .launch-flow-step.highlight .launch-flow-num {
+          color: var(--fill);
+        }
+        .launch-flow-label {
+          font-size: 13px;
+          font-weight: 700;
+          color: var(--text-1);
+        }
+        .launch-flow-arrow {
+          color: var(--text-3);
+          flex-shrink: 0;
+        }
+
+        /* ─── TWO TOOL CARDS ─── */
+        .tool-cards-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+          max-width: 1200px;
+          margin: 0 auto 100px;
+          padding: 0 40px;
+        }
+        .tool-card-full {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          padding: 36px;
+          background: var(--surface);
           border: 1.5px solid var(--border-strong);
-          border-radius: 24px;
+          border-radius: var(--r-2xl);
           text-decoration: none;
           color: inherit;
           transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
         }
-        .main-product-card:hover {
-          transform: translateY(-4px);
+        .tool-card-full:hover {
+          transform: translateY(-5px);
           border-color: var(--fill);
-          box-shadow: 0 20px 48px rgba(99,102,241,0.12);
+          box-shadow: 0 20px 48px rgba(99,102,241,0.1);
         }
-        .main-product-icon {
-          width: 80px;
-          height: 80px;
-          border-radius: 20px;
-          background: linear-gradient(135deg, #6366f1, #a855f7);
+        .tool-card-full-icon {
+          width: 56px;
+          height: 56px;
+          border-radius: var(--r-lg);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 38px;
           flex-shrink: 0;
-          box-shadow: 0 12px 28px rgba(99,102,241,0.3);
+          box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
-        .main-product-title {
-          font-size: 26px;
+        .tool-card-full-badge {
+          font-size: 10px;
           font-weight: 800;
-          letter-spacing: -0.6px;
-          margin: 0 0 8px;
-        }
-        .main-product-desc {
-          font-size: 14px;
-          color: var(--text-2);
-          line-height: 1.6;
-          margin: 0 0 16px;
-          max-width: 620px;
-        }
-        .main-product-features {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 6px 20px;
-          font-size: 13px;
-          color: var(--text-2);
-          font-weight: 500;
-        }
-        .main-product-arrow {
-          font-size: 14px;
-          font-weight: 700;
-          color: var(--fill);
-          white-space: nowrap;
-        }
-        .secondary-tools-label {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 40px;
-          font-size: 11px;
-          font-weight: 700;
           letter-spacing: 0.08em;
           text-transform: uppercase;
           color: var(--text-3);
+          margin-bottom: 4px;
         }
-        .secondary-tools-row {
-          display: flex;
-          gap: 16px;
-          max-width: 1200px;
-          margin: 12px auto 100px;
-          padding: 0 40px;
-        }
-        .secondary-tool {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          flex: 1;
-          padding: 16px 20px;
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: 14px;
-          text-decoration: none;
+        .tool-card-full-title {
+          font-size: 22px;
+          font-weight: 800;
+          letter-spacing: -0.5px;
+          margin: 0 0 10px;
           color: var(--text-1);
-          transition: border-color 0.2s, transform 0.2s;
         }
-        .secondary-tool:hover {
-          border-color: var(--text-2);
-          transform: translateY(-2px);
-        }
-        .secondary-tool-icon {
-          font-size: 20px;
-        }
-        .secondary-tool strong {
-          display: block;
+        .tool-card-full-desc {
           font-size: 14px;
+          color: var(--text-2);
+          line-height: 1.65;
+          margin: 0 0 16px;
+        }
+        .tool-card-full-features {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 7px;
+          font-size: 13px;
+          color: var(--text-2);
+          flex: 1;
+        }
+        .tool-card-full-features li::before {
+          content: "✓ ";
+          color: var(--fill);
           font-weight: 700;
         }
-        .secondary-tool-desc {
-          display: block;
-          font-size: 12px;
-          color: var(--text-3);
-          font-weight: 500;
+        .tool-card-full-cta {
+          font-size: 13px;
+          font-weight: 700;
+          color: var(--fill);
+          margin-top: auto;
+        }
+        .tool-card-full-body {
+          flex: 1;
         }
 
         /* ─── FIGMA VS BUILDRSTUDIO ─── */
@@ -491,7 +511,7 @@ export default function SaaSLandingPage() {
         .vs-column {
           background: var(--surface);
           border: 1.5px solid var(--border);
-          border-radius: 18px;
+          border-radius: var(--r-xl);
           padding: 28px;
         }
         .vs-column.better {
@@ -537,7 +557,7 @@ export default function SaaSLandingPage() {
           margin-bottom: 40px;
           background: var(--surface-2);
           padding: 4px 8px;
-          border-radius: 30px;
+          border-radius: var(--r-full);
           border: 1px solid var(--border);
         }
         .toggle-btn {
@@ -546,7 +566,7 @@ export default function SaaSLandingPage() {
           padding: 6px 16px;
           font-size: 12px;
           font-weight: 700;
-          border-radius: 20px;
+          border-radius: var(--r-xl);
           cursor: pointer;
           font-family: var(--font);
           transition: all 0.2s;
@@ -567,7 +587,7 @@ export default function SaaSLandingPage() {
         .price-card {
           background: var(--surface);
           border: 1.5px solid var(--border);
-          border-radius: 24px;
+          border-radius: var(--r-2xl);
           padding: 40px 32px;
           text-align: left;
           display: flex;
@@ -588,7 +608,7 @@ export default function SaaSLandingPage() {
           font-size: 10px;
           font-weight: 700;
           padding: 4px 10px;
-          border-radius: 20px;
+          border-radius: var(--r-xl);
         }
         .price-name {
           font-size: 18px;
@@ -698,14 +718,12 @@ export default function SaaSLandingPage() {
           .vs-container { grid-template-columns: 1fr; }
           .pricing-cards { grid-template-columns: 1fr !important; max-width: 400px !important; }
           .hero-mockup-row { gap: 12px; }
-          .hero-mockup { width: 160px; height: 240px; border-radius: 16px; padding: 16px 12px; gap: 10px; }
+          .hero-mockup { width: 160px; height: 240px; border-radius: var(--r-lg); padding: 16px 12px; gap: 10px; }
           .hero-mockup-text { font-size: 13px; }
-          .hero-mockup-phone { width: 75px; height: 130px; border-radius: 12px; }
-          .main-product-card { grid-template-columns: 1fr; text-align: center; padding: 32px 24px; }
-          .main-product-icon { margin: 0 auto; }
-          .main-product-desc { max-width: 100%; }
-          .main-product-features { grid-template-columns: 1fr; text-align: left; }
-          .secondary-tools-row { flex-direction: column; }
+          .hero-mockup-phone { width: 75px; height: 130px; border-radius: var(--r-md); }
+          .tool-cards-grid { grid-template-columns: 1fr; }
+          .launch-flow { gap: 8px; }
+          .launch-flow-step { min-width: 100px; padding: 10px 12px; }
         }
       `}</style>
 
@@ -779,45 +797,76 @@ export default function SaaSLandingPage() {
         </div>
       </section>
 
-      {/* ── MAIN PRODUCT: SCREENSHOT BUILDER ── */}
+      {/* ── TOOLS SUITE ── */}
       <section id="tools">
         <div className="section-title">
-          <h2>The App Store Screenshot Builder</h2>
-          <p>Everything you need to ship store-ready visuals, in one workspace.</p>
+          <h2>Every visual your launch needs</h2>
+          <p>Two focused tools that take you from build to ship to announce — without Figma.</p>
         </div>
 
-        <Link href="/screenshot-builder" className="main-product-card">
-          <div className="main-product-icon">📱</div>
-          <div className="main-product-body">
-            <h3 className="main-product-title">Screenshot Builder</h3>
-            <p className="main-product-desc">
-              Paste your App Store URL to auto-import screenshots and copy, or upload your own. Pick a device frame, gradient, and headline — export submission-ready PNGs for iOS App Store and Google Play in every required size.
-            </p>
-            <ul className="main-product-features">
-              <li>✓ Auto-import from App Store / Play Store URL</li>
-              <li>✓ AI-generated headlines in 15+ languages</li>
-              <li>✓ Smart resize across all required device sizes</li>
-              <li>✓ 3D device tilts, flat frames, 16+ gradients</li>
-            </ul>
+        {/* Launch workflow connector */}
+        <div className="launch-flow">
+          <div className="launch-flow-step">
+            <span className="launch-flow-num">01</span>
+            <span className="launch-flow-label">Build your app</span>
           </div>
-          <span className="main-product-arrow">Start Building →</span>
-        </Link>
+          <svg className="launch-flow-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <div className="launch-flow-step highlight">
+            <span className="launch-flow-num">02</span>
+            <span className="launch-flow-label">Screenshot Builder</span>
+          </div>
+          <svg className="launch-flow-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <div className="launch-flow-step highlight">
+            <span className="launch-flow-num">03</span>
+            <span className="launch-flow-label">Launch Cards</span>
+          </div>
+          <svg className="launch-flow-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <div className="launch-flow-step">
+            <span className="launch-flow-num">04</span>
+            <span className="launch-flow-label">Post on X / LinkedIn</span>
+          </div>
+        </div>
 
-        <div className="secondary-tools-label">Also available</div>
-        <div className="secondary-tools-row">
-          <Link href="/social-optimizer" className="secondary-tool">
-            <span className="secondary-tool-icon">🎨</span>
-            <span>
-              <strong>Social Optimizer</strong>
-              <span className="secondary-tool-desc">Screenshots → social graphics</span>
-            </span>
+        {/* Two equal tool cards */}
+        <div className="tool-cards-grid">
+          <Link href="/screenshot-builder" className="tool-card-full">
+            <div className="tool-card-full-icon" style={{ background: "linear-gradient(135deg, #6366f1, #a855f7)" }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            </div>
+            <div className="tool-card-full-body">
+              <div className="tool-card-full-badge">App Store · Play Store</div>
+              <h3 className="tool-card-full-title">Screenshot Builder</h3>
+              <p className="tool-card-full-desc">
+                Paste your store URL to auto-import screenshots, or upload your own. Add device frames, headlines, and gradients — export at every required size in one click.
+              </p>
+              <ul className="tool-card-full-features">
+                <li>Auto-import from App Store / Play Store</li>
+                <li>AI headlines in 15+ languages</li>
+                <li>Smart resize across all device sizes</li>
+                <li>iPhone, iPad, Android frames</li>
+              </ul>
+            </div>
+            <span className="tool-card-full-cta">Start Building →</span>
           </Link>
-          <Link href="/change-log" className="secondary-tool">
-            <span className="secondary-tool-icon">⚡</span>
-            <span>
-              <strong>Changelog Generator</strong>
-              <span className="secondary-tool-desc">Release cards for X/LinkedIn</span>
-            </span>
+
+          <Link href="/social-optimizer" className="tool-card-full">
+            <div className="tool-card-full-icon" style={{ background: "linear-gradient(135deg, #f97316, #ec4899)" }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+            </div>
+            <div className="tool-card-full-body">
+              <div className="tool-card-full-badge">X · LinkedIn · Instagram</div>
+              <h3 className="tool-card-full-title">Launch Cards</h3>
+              <p className="tool-card-full-desc">
+                You shipped. Now tell the world. Drop a screenshot, pick a dev frame — browser, terminal, or device — add a headline and export a share-ready card in 30 seconds.
+              </p>
+              <ul className="tool-card-full-features">
+                <li>X/Twitter, LinkedIn & square formats</li>
+                <li>Dev frames: browser, terminal, macOS</li>
+                <li>Mesh gradients + 10+ presets</li>
+                <li>One-click copy to clipboard</li>
+              </ul>
+            </div>
+            <span className="tool-card-full-cta">Make a Launch Card →</span>
           </Link>
         </div>
 
@@ -879,12 +928,6 @@ export default function SaaSLandingPage() {
               after: { bg: "linear-gradient(135deg, #0ea5e9, #38bdf8, #7dd3fc)", title: "Ship faster with AI", subtitle: "Deploy with confidence." },
               tool: "Social Media Post",
               time: "8 sec",
-            },
-            {
-              before: { bg: "#1e1b4b", label: "Plain text notes" },
-              after: { bg: "linear-gradient(135deg, #f97316, #fb923c, #fbbf24)", title: "v2.5 — Batch Export", subtitle: "New: multi-device rendering" },
-              tool: "Changelog Card",
-              time: "15 sec",
             },
           ].map((item, idx) => (
             <div key={idx} style={{
@@ -990,7 +1033,7 @@ export default function SaaSLandingPage() {
         </div>
         <div className="vs-container">
           <div className="vs-column">
-            <div className="vs-header" style={{ color: "#ef4444" }}>
+            <div className="vs-header" style={{ color: "var(--destructive)" }}>
               <span>❌</span> Figma / Photoshop
             </div>
             <ul className="vs-list">
@@ -1010,7 +1053,7 @@ export default function SaaSLandingPage() {
           </div>
 
           <div className="vs-column better">
-            <div className="vs-header" style={{ color: "#10b981" }}>
+            <div className="vs-header" style={{ color: "var(--success)" }}>
               <span>🚀</span> BuildrStudio
             </div>
             <ul className="vs-list">
@@ -1122,9 +1165,7 @@ export default function SaaSLandingPage() {
         </p>
         <div className="footer-links">
           <Link href="/screenshot-builder" className="footer-link">Screenshot Builder</Link>
-          <Link href="/social-optimizer" className="footer-link">Optimizer</Link>
-          <Link href="/change-log" className="footer-link">Changelog Card</Link>
-          <Link href="/roadmap" className="footer-link">Roadmap</Link>
+          <Link href="/social-optimizer" className="footer-link">Launch Cards</Link>
           <Link href="/pricing" className="footer-link">Pricing</Link>
         </div>
         <div className="footer-links" style={{ marginTop: 0 }}>

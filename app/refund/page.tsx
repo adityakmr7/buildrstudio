@@ -1,3 +1,4 @@
+import { siteConfig } from "@/app/lib/siteConfig";
 import type { Metadata } from "next";
 import Script from "next/script";
 import AppHeader from "../components/AppHeader";
@@ -130,7 +131,7 @@ export default function RefundPage() {
         <p>To request a refund:</p>
         <ul>
           <li>
-            Email us at <a href="mailto:adityakmr9672@gmail.com">adityakmr9672@gmail.com</a> with
+            Email us at <a href={`mailto:${siteConfig.author.email}`}>{siteConfig.author.email}</a> with
             your account email and the reason for your refund (optional but helps us improve).
           </li>
           <li>We will process your refund within 5–7 business days.</li>
@@ -160,7 +161,7 @@ export default function RefundPage() {
         <p>You can cancel your Pro subscription at any time:</p>
         <ul>
           <li>Through the Lemon Squeezy customer portal (link in your subscription email).</li>
-          <li>By emailing us at <a href="mailto:adityakmr9672@gmail.com">adityakmr9672@gmail.com</a>.</li>
+          <li>By emailing us at <a href={`mailto:${siteConfig.author.email}`}>{siteConfig.author.email}</a>.</li>
         </ul>
 
         <h2>5. Exceptions</h2>
@@ -177,7 +178,7 @@ export default function RefundPage() {
         <h2>6. Contact</h2>
         <p>
           For refund requests or billing questions, email{" "}
-          <a href="mailto:adityakmr9672@gmail.com">adityakmr9672@gmail.com</a>. We typically respond
+          <a href={`mailto:${siteConfig.author.email}`}>{siteConfig.author.email}</a>. We typically respond
           within 24 hours.
         </p>
 

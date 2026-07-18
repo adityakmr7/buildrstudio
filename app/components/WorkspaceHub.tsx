@@ -292,9 +292,9 @@ function CanvasToolbar({
       {/* Copy */}
       <button type="button" disabled={disabled || isCopying} onClick={handleCopy}
         style={{ ...btnBase, cursor: (disabled || isCopying) ? "not-allowed" : "pointer", minWidth: "110px", justifyContent: "center",
-          background: copyStatus === "ok"  ? "var(--success-subtle, #dcfce7)" : "transparent",
-          borderColor: copyStatus === "ok" ? "var(--success, #22c55e)"        : "var(--border)",
-          color: copyStatus === "ok" ? "#15803d" : copyStatus === "err" ? "#dc2626" : disabled ? "var(--text-3)" : "var(--text-1)",
+          background: copyStatus === "ok"  ? "var(--success-subtle)" : "transparent",
+          borderColor: copyStatus === "ok" ? "var(--success)"        : "var(--border)",
+          color: copyStatus === "ok" ? "var(--success-text)" : copyStatus === "err" ? "var(--destructive)" : disabled ? "var(--text-3)" : "var(--text-1)",
         }}
         onMouseEnter={(e) => { if (!disabled && !isCopying) { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.background = "var(--fill-subtle)"; }}}
         onMouseLeave={(e) => { if (copyStatus !== "ok") { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "transparent"; }}}>
@@ -477,16 +477,7 @@ export default function WorkspaceHub() {
       {/* ── WORKSPACE BODY ── */}
       <div className="workspace-body">
 
-        {/* Left: Tabbed Sidebar */}
-        <TabbedSidebar
-          config={config}
-          setConfig={setConfig}
-          onOpenPremium={() => setIsPremiumOpen(true)}
-          isWatermarkUnlocked={isWatermarkUnlocked}
-          onOpenUnlockWatermark={() => setIsUnlockModalOpen(true)}
-        />
-
-        {/* Right: Canvas Column */}
+        {/* Left: Canvas Column */}
         <div className="canvas-column">
           {/* Toolbar always visible above canvas */}
           <CanvasToolbar
@@ -515,6 +506,15 @@ export default function WorkspaceHub() {
             />
           </div>
         </div>
+
+        {/* Right: Tabbed Sidebar */}
+        <TabbedSidebar
+          config={config}
+          setConfig={setConfig}
+          onOpenPremium={() => setIsPremiumOpen(true)}
+          isWatermarkUnlocked={isWatermarkUnlocked}
+          onOpenUnlockWatermark={() => setIsUnlockModalOpen(true)}
+        />
       </div>
 
       <ToolCrossLinks current="/social-optimizer" />

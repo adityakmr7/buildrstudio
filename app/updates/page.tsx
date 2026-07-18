@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/app/lib/siteConfig";
 import Script from "next/script";
 import Link from "next/link";
 import AppHeader from "../components/AppHeader";
@@ -155,10 +156,10 @@ const TYPE_ICONS = {
   ),
 };
 
-const TYPE_COLORS = {
-  new: "#6366f1",
-  improved: "#f59e0b",
-  fixed: "#10b981",
+const TYPE_COLORS: Record<string, string> = {
+  new: "var(--fill)",
+  improved: "var(--warning)",
+  fixed: "var(--success)",
 };
 
 export default function UpdatesPage() {
@@ -247,7 +248,7 @@ export default function UpdatesPage() {
             color: var(--fill);
             background: var(--fill-subtle);
             padding: 2px 8px;
-            border-radius: 4px;
+            border-radius: var(--r-xs);
           }
           .release-date {
             font-size: 12px;
@@ -259,7 +260,7 @@ export default function UpdatesPage() {
             font-weight: 700;
             letter-spacing: 0.05em;
             padding: 2px 7px;
-            border-radius: 20px;
+            border-radius: var(--r-xl);
             color: #fff;
           }
           .release-title {
@@ -286,7 +287,7 @@ export default function UpdatesPage() {
           .release-item-icon {
             width: 22px;
             height: 22px;
-            border-radius: 6px;
+            border-radius: var(--r-sm);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -298,7 +299,7 @@ export default function UpdatesPage() {
             padding: 28px 32px;
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: var(--r-lg);
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -370,12 +371,12 @@ export default function UpdatesPage() {
 
           <div className="subscribe-banner">
             <p className="subscribe-title">Stay in the loop</p>
-            <p className="subscribe-desc">Have feedback or a feature request? Vote on the roadmap or reach out directly.</p>
+            <p className="subscribe-desc">Have feedback or a feature request? Reach out directly or follow along on X.</p>
             <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginTop: "4px" }}>
-              <Link href="/roadmap" className="subscribe-link">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                Vote on the roadmap
-              </Link>
+              <a href={siteConfig.author.twitterUrl} target="_blank" rel="noopener noreferrer" className="subscribe-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.402 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                Follow @{siteConfig.author.twitter}
+              </a>
               <Link href="/support" className="subscribe-link">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 Contact support

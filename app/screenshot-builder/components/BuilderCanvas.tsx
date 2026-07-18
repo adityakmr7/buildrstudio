@@ -73,7 +73,7 @@ function CaptionBlock({ config, maxWidth, onUpdateConfig }: { config: BuilderCon
             color: config.headlineColor, lineHeight: 1.1, letterSpacing: "-0.03em",
             fontFamily: config.fontFamily || "var(--font)", maxWidth,
             outline: "none", cursor: onUpdateConfig ? "text" : "default",
-            padding: "2px 6px", borderRadius: "6px",
+            padding: "2px 6px", borderRadius: "var(--r-sm)",
             border: onUpdateConfig ? "2px dashed transparent" : "none", transition: "border-color 0.2s",
           }}
           onMouseEnter={(e) => { if (onUpdateConfig) e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)"; }}
@@ -92,7 +92,7 @@ function CaptionBlock({ config, maxWidth, onUpdateConfig }: { config: BuilderCon
             color: config.subtextColor, lineHeight: 1.4,
             fontFamily: config.fontFamily || "var(--font)", maxWidth,
             outline: "none", cursor: onUpdateConfig ? "text" : "default",
-            padding: "2px 6px", borderRadius: "6px",
+            padding: "2px 6px", borderRadius: "var(--r-sm)",
             border: onUpdateConfig ? "2px dashed transparent" : "none", transition: "border-color 0.2s",
           }}
           onMouseEnter={(e) => { if (onUpdateConfig) e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; }}
@@ -244,7 +244,7 @@ function InnerCanvas({ config, spec, scale, innerRef, onUpdateConfig, isWatermar
           style={{
             position: "absolute", bottom: "16px", right: "18px",
             fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.7)",
-            background: "rgba(0,0,0,0.55)", padding: "5px 12px", borderRadius: "6px",
+            background: "rgba(0,0,0,0.55)", padding: "5px 12px", borderRadius: "var(--r-sm)",
             backdropFilter: "blur(4px)", userSelect: "none", cursor: "pointer",
             zIndex: 100, fontFamily: "var(--font)", transition: "all 0.15s ease",
             border: "1px solid rgba(255,255,255,0.1)", letterSpacing: "0.2px",
@@ -514,7 +514,7 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
             position: "absolute", bottom: "16px", left: "50%", transform: "translateX(-50%)",
             fontSize: "10px", color: "var(--text-3)", fontFamily: "var(--font)",
             background: "var(--surface)", border: "1px solid var(--border)",
-            borderRadius: "6px", padding: "3px 10px", pointerEvents: "none",
+            borderRadius: "var(--r-sm)", padding: "3px 10px", pointerEvents: "none",
             whiteSpace: "nowrap",
           }}>
             Drag bezel to move frame · Drag screen to reposition image · Ctrl+scroll to zoom
