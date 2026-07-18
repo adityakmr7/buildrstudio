@@ -16,7 +16,7 @@ export default function PostExportShareModal({
   if (!isOpen) return null;
 
   const appName = projectName && projectName !== "Untitled Project" ? projectName : "my app";
-  const tweetText = `Just built App Store screenshots for ${appName} in seconds using @BuildrStudio — free browser tool, no Figma needed 🚀`;
+  const tweetText = `Just built App Store screenshots for ${appName} in seconds using @BuildrStudio. Free browser tool, no Figma needed 🚀`;
   const tweetUrl = "https://buildrstudio.in";
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(tweetUrl)}`;
   const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(tweetUrl)}`;
@@ -62,7 +62,7 @@ export default function PostExportShareModal({
             {exportCount > 1 ? `${exportCount} screenshots exported!` : "Screenshot exported!"}
           </h2>
           <p style={{ margin: 0, fontSize: "13px", color: "var(--text-3)", lineHeight: 1.5 }}>
-            Help other indie makers find BuildrStudio — takes 10 seconds.
+            Help other indie makers find BuildrStudio. Takes 10 seconds.
           </p>
         </div>
 

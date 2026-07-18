@@ -1,10 +1,8 @@
 "use client";
 
-// ─── SaaSLandingPage.tsx ─────────────────────────────────────────────────────
-// The client-side marketing components, toggles, and FAQs.
-
 import React, { useState, useRef } from "react";
 import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 import PremiumModal from "./PremiumModal";
 import AppHeader from "./AppHeader";
@@ -12,7 +10,7 @@ import AppHeader from "./AppHeader";
 const FAQS = [
   {
     q: "Do I need a credit card to get started?",
-    a: "No! You can use all core features of BuildrStudio completely free without entering any billing details.",
+    a: "No. You can use all core features of BuildrStudio completely free without entering any billing details.",
   },
   {
     q: "How does the Batch Store Exporter work?",
@@ -20,11 +18,11 @@ const FAQS = [
   },
   {
     q: "Can I save my custom brand colors and gradients?",
-    a: "Yes! The Pro tier includes a Brand Presets kit where you can lock in your exact hex codes, brand fonts, and custom watermark text for automatic use on any tool.",
+    a: "Yes. The Pro tier includes a Brand Presets kit where you can lock in your exact hex codes, brand fonts, and custom watermark text for automatic use on any tool.",
   },
   {
     q: "Are you planning to add AI features in the future?",
-    a: "Yes! We are currently researching AI capabilities to auto-detect your app's brand colors, suggest optimized title copywriting, and automatically build visual layouts from a single raw screenshot. These features are in the research phase and will roll out as beta trials in the future.",
+    a: "Yes. We are currently researching AI capabilities to auto-detect your app brand colors, suggest optimized title copywriting, and automatically build visual layouts from a single raw screenshot. These features are in the research phase and will roll out as beta trials.",
   },
 ];
 
@@ -48,10 +46,9 @@ export default function SaaSLandingPage() {
   };
 
   return (
-    <div className="saas-homepage">
-      {/* Dynamic Landing Page Styling */}
+    <div className="slp">
       <style>{`
-        .saas-homepage {
+        .slp {
           min-height: 100vh;
           background-color: var(--bg);
           color: var(--text-1);
@@ -62,125 +59,78 @@ export default function SaaSLandingPage() {
           transition: background-color .3s;
         }
 
-        /* ─── HEADER ─── */
-        .site-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0 40px;
-          border-bottom: 1px solid var(--border);
-          background: var(--surface);
-          height: 64px;
-          position: sticky;
-          top: 0;
-          z-index: 1000;
-          backdrop-filter: blur(8px);
-          transition: background-color .3s, border .3s;
-        }
-        .site-logo {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          text-decoration: none;
-        }
-        .site-logo-mark {
-          width: 34px;
-          height: 34px;
-          border-radius: var(--r-sm);
-          background: var(--fill);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 15px;
-          color: var(--fill-text);
-          font-weight: 800;
-        }
-        .site-logo-text {
-          font-size: 18px;
-          font-weight: 800;
-          color: var(--text-1);
-          letter-spacing: -0.4px;
-        }
-        .header-actions {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-        }
-        .header-link {
-          font-size: 14px;
-          font-weight: 500;
-          color: var(--text-2);
-          text-decoration: none;
-          transition: color 0.15s;
-        }
-        .header-link:hover {
-          color: var(--text-1);
-        }
-
-        /* ─── HERO SECTION ─── */
-        .hero {
-          position: relative;
-          padding: 100px 24px 80px;
-          text-align: center;
-          max-width: 1000px;
+        /* ─── HERO ─── */
+        .slp-hero {
+          max-width: 1280px;
           margin: 0 auto;
+          padding: 80px 48px 72px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 64px;
+          align-items: center;
+        }
+        .slp-hero-left {
           display: flex;
           flex-direction: column;
-          align-items: center;
+          align-items: flex-start;
         }
-        .hero-badge {
+        .slp-badge {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          padding: 6px 14px;
+          padding: 5px 12px;
           background: var(--fill-subtle);
           border: 1px solid var(--border-strong);
           border-radius: var(--r-xl);
-          font-size: 12px;
-          font-weight: 600;
-          color: var(--text-1);
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--fill);
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
           margin-bottom: 24px;
+          animation: slp-fadein 0.5s ease both;
         }
-        .hero-title {
-          font-size: clamp(38px, 6vw, 68px);
-          font-weight: 800;
-          line-height: 1.1;
-          letter-spacing: -2px;
+        .slp-hero-h1 {
+          font-size: clamp(40px, 5.5vw, 72px);
+          font-weight: 900;
+          line-height: 1.0;
+          letter-spacing: -2.5px;
           margin: 0 0 20px;
-          background: linear-gradient(135deg, var(--text-1) 30%, #8b5cf6 70%, #ec4899 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          color: var(--text-1);
+          animation: slp-fadein 0.5s 0.08s ease both;
         }
-        .hero-desc {
-          font-size: clamp(16px, 2.5vw, 20px);
+        .slp-hero-h1 mark {
+          background: var(--fill);
+          color: var(--fill-text);
+          padding: 0 6px;
+          border-radius: 4px;
+          font-style: normal;
+        }
+        .slp-hero-sub {
+          font-size: 17px;
           color: var(--text-2);
-          max-width: 580px;
-          line-height: 1.5;
-          margin: 0 auto 32px;
+          max-width: 480px;
+          line-height: 1.6;
+          margin: 0 0 32px;
+          animation: slp-fadein 0.5s 0.16s ease both;
         }
-        .hero-import-row {
-          width: 100%;
-          max-width: 600px;
-          margin: 0 auto 40px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 10px;
-        }
-        .hero-import-wrap {
+        .slp-import-wrap {
           display: flex;
           width: 100%;
+          max-width: 520px;
           border-radius: var(--r-md);
           overflow: hidden;
           border: 1.5px solid var(--border-strong);
           background: var(--surface);
-          box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-          transition: border-color 0.15s;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+          transition: border-color 0.15s, box-shadow 0.15s;
+          animation: slp-fadein 0.5s 0.22s ease both;
         }
-        .hero-import-wrap:focus-within {
+        .slp-import-wrap:focus-within {
           border-color: var(--fill);
+          box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
         }
-        .hero-import-input {
+        .slp-import-input {
           flex: 1;
           border: none;
           outline: none;
@@ -191,8 +141,8 @@ export default function SaaSLandingPage() {
           padding: 14px 16px;
           min-width: 0;
         }
-        .hero-import-input::placeholder { color: var(--text-3); }
-        .hero-import-btn {
+        .slp-import-input::placeholder { color: var(--text-3); }
+        .slp-import-btn {
           flex-shrink: 0;
           background: var(--fill);
           color: var(--fill-text);
@@ -205,455 +155,574 @@ export default function SaaSLandingPage() {
           white-space: nowrap;
           transition: opacity 0.15s;
         }
-        .hero-import-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .hero-import-btn:hover:not(:disabled) { opacity: 0.88; }
-        .hero-import-hint {
+        .slp-import-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .slp-import-btn:hover:not(:disabled) { opacity: 0.85; }
+        .slp-import-btn:active:not(:disabled) { transform: scale(0.98); }
+        .slp-import-hint {
           font-size: 12px;
           color: var(--text-3);
-          margin: 0;
+          margin: 10px 0 0;
+          animation: slp-fadein 0.5s 0.28s ease both;
         }
-        .hero-visual {
-          width: 100%;
-          max-width: 800px;
-          margin: 0 auto 20px;
-          perspective: 1200px;
+
+        /* ─── HERO RIGHT: product preview ─── */
+        .slp-hero-right {
+          animation: slp-fadein-up 0.6s 0.12s ease both;
         }
-        .hero-mockup-row {
+        .slp-preview-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 20px;
+          overflow: hidden;
+          box-shadow: 0 24px 64px rgba(0,0,0,0.10);
+        }
+        .slp-preview-topbar {
+          background: var(--surface-2);
+          border-bottom: 1px solid var(--border);
+          padding: 10px 16px;
           display: flex;
-          gap: 20px;
-          justify-content: center;
-          padding: 0 20px;
+          align-items: center;
+          gap: 6px;
         }
-        .hero-mockup {
-          width: 220px;
-          height: 320px;
-          border-radius: var(--r-xl);
+        .slp-preview-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+        }
+        .slp-preview-body {
+          padding: 20px;
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 12px;
+        }
+        .slp-mockup-tile {
+          border-radius: 12px;
+          aspect-ratio: 9/16;
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: center;
-          gap: 16px;
-          padding: 24px 16px;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-          animation: heroFloat 3s ease-in-out infinite;
-          flex-shrink: 0;
+          justify-content: flex-end;
+          padding: 12px 8px;
+          position: relative;
+          overflow: hidden;
         }
-        .hero-mockup:nth-child(2) {
-          transform: translateY(-12px);
-        }
-        .hero-mockup-text {
-          font-size: 16px;
+        .slp-mockup-tile-label {
+          font-size: 11px;
           font-weight: 800;
           color: #fff;
           text-align: center;
           line-height: 1.2;
-          letter-spacing: -0.3px;
-        }
-        .hero-mockup-phone {
-          width: 100px;
-          height: 180px;
-          background: var(--fill);
-          border-radius: var(--r-lg);
-          border: 2px solid var(--border-strong);
           position: relative;
-          overflow: hidden;
+          z-index: 1;
         }
-        .hero-phone-notch {
-          width: 40px;
-          height: 10px;
-          background: var(--fill);
-          border-radius: 0 0 var(--r-sm) var(--r-sm);
-          position: absolute;
-          top: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          z-index: 2;
-        }
-        .hero-phone-screen {
-          position: absolute;
-          inset: 4px;
-          border-radius: var(--r-md);
-        }
-        @keyframes heroFloat {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
-        }
-        .hero-mockup:nth-child(2) {
-          animation-delay: 0.5s;
-        }
-        .hero-mockup:nth-child(3) {
-          animation-delay: 1s;
-        }
-
-        /* ─── TOOLS SECTOR ─── */
-        .section-title {
+        .slp-mockup-tile-sub {
+          font-size: 9px;
+          color: rgba(255,255,255,0.7);
           text-align: center;
-          margin-bottom: 48px;
-          padding: 0 24px;
+          margin-top: 3px;
+          position: relative;
+          z-index: 1;
         }
-        .section-title h2 {
-          font-size: 32px;
-          font-weight: 800;
-          letter-spacing: -0.8px;
-          margin: 0 0 10px;
-        }
-        .section-title p {
-          color: var(--text-3);
-          font-size: 15px;
-          margin: 0;
-        }
-        .tools-grid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 28px;
-          max-width: 1200px;
-          margin: 0 auto 100px;
-          padding: 0 40px;
-        }
-        .tool-card {
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: var(--r-xl);
-          padding: 32px;
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-          transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
-          text-decoration: none;
-          color: inherit;
-        }
-        .tool-card:hover {
-          transform: translateY(-6px);
-          border-color: var(--text-1);
-          box-shadow: 0 16px 36px rgba(0,0,0,0.08);
-        }
-        .tool-icon {
-          width: 48px;
-          height: 48px;
-          border-radius: var(--r-md);
-          background: var(--fill-subtle);
+        .slp-preview-status {
+          border-top: 1px solid var(--border);
+          padding: 10px 20px;
           display: flex;
           align-items: center;
-          justify-content: center;
-          font-size: 24px;
-          border: 1px solid var(--border);
+          justify-content: space-between;
+          font-size: 11px;
+          color: var(--text-3);
         }
-        .tool-name {
-          font-size: 20px;
-          font-weight: 800;
-          letter-spacing: -0.4px;
-          margin: 0;
+        .slp-preview-status-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #22c55e;
+          display: inline-block;
+          margin-right: 5px;
         }
-        .tool-desc {
-          font-size: 14px;
+
+        /* ─── SECTION: two tools ─── */
+        .slp-tools-section {
+          border-top: 1px solid var(--border);
+          background: var(--surface-2);
+          padding: 72px 0;
+        }
+        .slp-tools-inner {
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 0 48px;
+        }
+        .slp-tools-heading {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          align-items: end;
+          gap: 24px;
+          margin-bottom: 40px;
+        }
+        .slp-tools-h2 {
+          font-size: clamp(28px, 3.5vw, 44px);
+          font-weight: 900;
+          letter-spacing: -1.5px;
+          margin: 0 0 8px;
+          line-height: 1.05;
+        }
+        .slp-tools-sub {
+          font-size: 15px;
           color: var(--text-2);
-          line-height: 1.5;
           margin: 0;
-          flex: 1;
         }
-        .tool-arrow {
+        .slp-tools-link {
           font-size: 13px;
           font-weight: 700;
           color: var(--fill);
+          white-space: nowrap;
+          text-decoration: none;
+        }
+        .slp-tools-link:hover { opacity: 0.8; }
+
+        /* Launch flow strip */
+        .slp-flow {
           display: flex;
           align-items: center;
-          gap: 4px;
+          gap: 0;
+          margin-bottom: 32px;
+          overflow-x: auto;
+          padding-bottom: 4px;
+        }
+        .slp-flow-step {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 18px;
+          border: 1px solid var(--border);
+          border-right: none;
+          background: var(--surface);
+          font-size: 13px;
+          font-weight: 600;
+          color: var(--text-2);
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+        .slp-flow-step:first-child { border-radius: var(--r-md) 0 0 var(--r-md); }
+        .slp-flow-step:last-child { border-right: 1px solid var(--border); border-radius: 0 var(--r-md) var(--r-md) 0; }
+        .slp-flow-step.active {
+          border-color: var(--fill);
+          background: var(--fill-subtle);
+          color: var(--fill);
+          font-weight: 700;
+          z-index: 1;
+        }
+        .slp-flow-arrow {
+          color: var(--text-3);
+          font-size: 13px;
+          flex-shrink: 0;
+          padding: 0 4px;
         }
 
-        /* ─── LAUNCH FLOW ─── */
-        .launch-flow {
+        /* Two tool cards */
+        .slp-tool-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+        }
+        .slp-tool-card {
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+          padding: 32px;
+          background: var(--bg);
+          border: 1.5px solid var(--border);
+          border-radius: 18px;
+          text-decoration: none;
+          color: inherit;
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .slp-tool-card:hover {
+          border-color: var(--fill);
+          box-shadow: 0 16px 40px rgba(99,102,241,0.08);
+        }
+        .slp-tool-icon {
+          width: 52px;
+          height: 52px;
+          border-radius: 14px;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 10px;
-          max-width: 1200px;
-          margin: 0 auto 48px;
-          padding: 0 40px;
-          flex-wrap: nowrap;
-          overflow-x: auto;
-        }
-        .launch-flow-step {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 4px;
-          padding: 12px 16px;
-          border-radius: var(--r-md);
-          border: 1px solid var(--border);
-          background: var(--surface);
-          min-width: 110px;
-          text-align: center;
           flex-shrink: 0;
         }
-        .launch-flow-step.highlight {
-          border-color: var(--fill);
-          background: var(--fill-subtle);
-        }
-        .launch-flow-num {
+        .slp-tool-badge {
           font-size: 10px;
           font-weight: 800;
           letter-spacing: 0.1em;
-          color: var(--text-3);
-          font-family: monospace;
-        }
-        .launch-flow-step.highlight .launch-flow-num {
-          color: var(--fill);
-        }
-        .launch-flow-label {
-          font-size: 13px;
-          font-weight: 700;
-          color: var(--text-1);
-        }
-        .launch-flow-arrow {
-          color: var(--text-3);
-          flex-shrink: 0;
-        }
-
-        /* ─── TWO TOOL CARDS ─── */
-        .tool-cards-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 24px;
-          max-width: 1200px;
-          margin: 0 auto 100px;
-          padding: 0 40px;
-        }
-        .tool-card-full {
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-          padding: 36px;
-          background: var(--surface);
-          border: 1.5px solid var(--border-strong);
-          border-radius: var(--r-2xl);
-          text-decoration: none;
-          color: inherit;
-          transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
-        }
-        .tool-card-full:hover {
-          transform: translateY(-5px);
-          border-color: var(--fill);
-          box-shadow: 0 20px 48px rgba(99,102,241,0.1);
-        }
-        .tool-card-full-icon {
-          width: 56px;
-          height: 56px;
-          border-radius: var(--r-lg);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-          box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-        .tool-card-full-badge {
-          font-size: 10px;
-          font-weight: 800;
-          letter-spacing: 0.08em;
           text-transform: uppercase;
           color: var(--text-3);
-          margin-bottom: 4px;
+          margin-bottom: 2px;
         }
-        .tool-card-full-title {
+        .slp-tool-name {
           font-size: 22px;
           font-weight: 800;
           letter-spacing: -0.5px;
-          margin: 0 0 10px;
-          color: var(--text-1);
+          margin: 0 0 8px;
         }
-        .tool-card-full-desc {
+        .slp-tool-desc {
           font-size: 14px;
           color: var(--text-2);
-          line-height: 1.65;
-          margin: 0 0 16px;
+          line-height: 1.6;
+          margin: 0 0 14px;
         }
-        .tool-card-full-features {
+        .slp-tool-features {
           list-style: none;
           padding: 0;
           margin: 0;
           display: flex;
           flex-direction: column;
-          gap: 7px;
+          gap: 6px;
           font-size: 13px;
           color: var(--text-2);
           flex: 1;
         }
-        .tool-card-full-features li::before {
-          content: "✓ ";
-          color: var(--fill);
-          font-weight: 700;
-        }
-        .tool-card-full-cta {
+        .slp-tool-features li { display: flex; gap: 8px; }
+        .slp-tool-features li::before { content: "✓"; color: var(--fill); font-weight: 700; flex-shrink: 0; }
+        .slp-tool-cta {
           font-size: 13px;
           font-weight: 700;
           color: var(--fill);
           margin-top: auto;
         }
-        .tool-card-full-body {
-          flex: 1;
-        }
 
-        /* ─── FIGMA VS BUILDRSTUDIO ─── */
-        .vs-section {
-          background: var(--surface-2);
-          border-top: 1px solid var(--border);
-          border-bottom: 1px solid var(--border);
-          padding: 80px 40px;
-          margin-bottom: 100px;
-          transition: background-color .3s, border .3s;
-        }
-        .vs-container {
-          max-width: 1000px;
+        /* ─── SECTION: before/after ─── */
+        .slp-ba-section {
+          max-width: 1280px;
           margin: 0 auto;
+          padding: 80px 48px;
+        }
+        .slp-ba-heading {
+          margin-bottom: 48px;
+        }
+        .slp-ba-h2 {
+          font-size: clamp(28px, 3.5vw, 44px);
+          font-weight: 900;
+          letter-spacing: -1.5px;
+          margin: 0 0 8px;
+        }
+        .slp-ba-sub {
+          font-size: 15px;
+          color: var(--text-2);
+          margin: 0;
+        }
+        .slp-ba-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 40px;
+          gap: 20px;
         }
-        .vs-column {
+        .slp-ba-card {
+          border-radius: 16px;
+          overflow: hidden;
+          border: 1px solid var(--border);
           background: var(--surface);
-          border: 1.5px solid var(--border);
-          border-radius: var(--r-xl);
+          transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .slp-ba-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 12px 32px rgba(0,0,0,0.10);
+        }
+        .slp-ba-visual {
+          display: flex;
+          height: 180px;
+        }
+        .slp-ba-before {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          position: relative;
+        }
+        .slp-ba-after {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          padding: 16px 12px;
+          text-align: center;
+          position: relative;
+        }
+        .slp-ba-label {
+          position: absolute;
+          top: 8px;
+          left: 8px;
+          font-size: 9px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          color: rgba(255,255,255,0.45);
+        }
+        .slp-ba-label.right {
+          left: auto;
+          right: 8px;
+          color: rgba(255,255,255,0.55);
+        }
+        .slp-ba-divider {
+          width: 28px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--surface);
+          font-size: 14px;
+          color: var(--text-3);
+          flex-shrink: 0;
+        }
+        .slp-ba-meta {
+          padding: 12px 16px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-top: 1px solid var(--border);
+        }
+        .slp-ba-meta-tool {
+          font-size: 12px;
+          font-weight: 700;
+          color: var(--text-2);
+        }
+        .slp-ba-meta-time {
+          font-size: 11px;
+          color: var(--fill);
+          font-weight: 600;
+        }
+
+        /* ─── SECTION: AI spotlight ─── */
+        .slp-ai {
+          max-width: 1280px;
+          margin: 0 auto 0;
+          padding: 0 48px 80px;
+        }
+        .slp-ai-card {
+          background: var(--fill-subtle);
+          border: 1.5px solid var(--fill);
+          border-radius: 16px;
+          padding: 28px 32px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          flex-wrap: wrap;
+        }
+        .slp-ai-label {
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--fill);
+          margin-bottom: 6px;
+          display: block;
+        }
+        .slp-ai-title {
+          font-size: 18px;
+          font-weight: 800;
+          margin: 0 0 6px;
+          letter-spacing: -0.3px;
+        }
+        .slp-ai-desc {
+          font-size: 13px;
+          color: var(--text-2);
+          margin: 0;
+          line-height: 1.55;
+        }
+
+        /* ─── SECTION: VS comparison ─── */
+        .slp-vs {
+          background: var(--text-1);
+          color: var(--bg);
+          padding: 80px 48px;
+        }
+        .slp-vs-inner {
+          max-width: 1280px;
+          margin: 0 auto;
+        }
+        .slp-vs-h2 {
+          font-size: clamp(28px, 3.5vw, 44px);
+          font-weight: 900;
+          letter-spacing: -1.5px;
+          margin: 0 0 8px;
+          color: var(--bg);
+        }
+        .slp-vs-sub {
+          font-size: 15px;
+          color: rgba(var(--bg-rgb, 255,255,255), 0.6);
+          margin: 0 0 48px;
+          opacity: 0.65;
+        }
+        .slp-vs-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+        }
+        .slp-vs-col {
+          border-radius: 16px;
           padding: 28px;
         }
-        .vs-column.better {
-          border-color: var(--fill);
-          box-shadow: 0 8px 30px rgba(99, 102, 241, 0.08);
+        .slp-vs-col.bad {
+          background: rgba(255,255,255,0.06);
+          border: 1px solid rgba(255,255,255,0.1);
         }
-        .vs-header {
-          font-size: 18px;
+        .slp-vs-col.good {
+          background: var(--fill);
+          border: 1px solid var(--fill);
+        }
+        .slp-vs-colhead {
+          font-size: 16px;
           font-weight: 800;
           margin-bottom: 18px;
           display: flex;
           align-items: center;
           gap: 8px;
         }
-        .vs-list {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
+        .slp-vs-col.bad .slp-vs-colhead { color: rgba(255,255,255,0.5); }
+        .slp-vs-col.good .slp-vs-colhead { color: var(--fill-text); }
+        .slp-vs-list {
           list-style: none;
           padding: 0;
           margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
         }
-        .vs-item {
+        .slp-vs-item {
           font-size: 14px;
-          color: var(--text-2);
+          line-height: 1.45;
           display: flex;
           gap: 8px;
           align-items: flex-start;
-          line-height: 1.4;
         }
+        .slp-vs-col.bad .slp-vs-item { color: rgba(255,255,255,0.55); }
+        .slp-vs-col.good .slp-vs-item { color: var(--fill-text); opacity: 0.92; }
+        .slp-vs-marker { flex-shrink: 0; font-size: 13px; }
 
-        /* ─── PRICING ─── */
-        .pricing {
-          max-width: 900px;
-          margin: 0 auto 100px;
-          padding: 0 40px;
-          text-align: center;
+        /* ─── SECTION: pricing ─── */
+        .slp-pricing {
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 80px 48px;
         }
-        .toggle-wrapper {
-          display: inline-flex;
-          align-items: center;
-          gap: 12px;
-          margin-bottom: 40px;
-          background: var(--surface-2);
-          padding: 4px 8px;
-          border-radius: var(--r-full);
-          border: 1px solid var(--border);
+        .slp-pricing-heading {
+          margin-bottom: 48px;
         }
-        .toggle-btn {
-          border: none;
-          background: none;
-          padding: 6px 16px;
-          font-size: 12px;
-          font-weight: 700;
-          border-radius: var(--r-xl);
-          cursor: pointer;
-          font-family: var(--font);
-          transition: all 0.2s;
+        .slp-pricing-h2 {
+          font-size: clamp(28px, 3.5vw, 44px);
+          font-weight: 900;
+          letter-spacing: -1.5px;
+          margin: 0 0 8px;
         }
-        .toggle-btn.active {
-          background: var(--surface);
-          box-shadow: var(--shadow-sm);
-          color: var(--text-1);
+        .slp-pricing-sub {
+          font-size: 15px;
+          color: var(--text-2);
+          margin: 0;
         }
-        .pricing-cards {
+        .slp-price-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 24px;
-          align-items: start;
+          gap: 20px;
           max-width: 700px;
-          margin: 0 auto;
         }
-        .price-card {
+        .slp-price-card {
           background: var(--surface);
           border: 1.5px solid var(--border);
-          border-radius: var(--r-2xl);
-          padding: 40px 32px;
-          text-align: left;
+          border-radius: 18px;
+          padding: 36px 28px;
           display: flex;
           flex-direction: column;
-          gap: 24px;
+          gap: 20px;
           position: relative;
         }
-        .price-card.pro {
+        .slp-price-card.pro {
           border-color: var(--fill);
-          box-shadow: 0 12px 40px rgba(99, 102, 241, 0.08);
+          box-shadow: 0 12px 40px rgba(99,102,241,0.1);
         }
-        .badge-pro {
+        .slp-badge-pro {
           position: absolute;
-          top: 20px;
-          right: 20px;
+          top: 18px;
+          right: 18px;
           background: var(--fill);
           color: var(--fill-text);
           font-size: 10px;
           font-weight: 700;
           padding: 4px 10px;
           border-radius: var(--r-xl);
+          letter-spacing: 0.04em;
         }
-        .price-name {
+        .slp-price-name {
           font-size: 18px;
           font-weight: 800;
           margin: 0;
         }
-        .price-val {
-          font-size: 40px;
-          font-weight: 800;
-          letter-spacing: -1px;
+        .slp-price-val {
+          font-size: 44px;
+          font-weight: 900;
+          letter-spacing: -2px;
           color: var(--text-1);
+          line-height: 1;
         }
-        .price-period {
+        .slp-price-period {
           font-size: 13px;
           color: var(--text-3);
-          font-weight: 500;
         }
-        .price-features {
+        .slp-price-desc {
+          font-size: 13px;
+          color: var(--text-3);
+          margin: 0;
+        }
+        .slp-price-feats {
           list-style: none;
           padding: 0;
           margin: 0;
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 10px;
           flex: 1;
         }
-        .price-feature {
-          font-size: 14px;
+        .slp-price-feat {
+          font-size: 13px;
           color: var(--text-2);
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           gap: 8px;
         }
+        .slp-price-feat-mark {
+          color: var(--fill);
+          font-weight: 700;
+          flex-shrink: 0;
+        }
 
-        /* ─── FAQS ─── */
-        .faqs {
-          max-width: 700px;
-          margin: 0 auto 120px;
-          padding: 0 24px;
+        /* ─── SECTION: FAQs ─── */
+        .slp-faq {
+          border-top: 1px solid var(--border);
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 80px 48px;
+          display: grid;
+          grid-template-columns: 1fr 1.6fr;
+          gap: 80px;
+          align-items: start;
         }
-        .faq-item {
+        .slp-faq-left h2 {
+          font-size: clamp(28px, 3vw, 40px);
+          font-weight: 900;
+          letter-spacing: -1.5px;
+          margin: 0 0 12px;
+        }
+        .slp-faq-left p {
+          font-size: 14px;
+          color: var(--text-2);
+          line-height: 1.6;
+          margin: 0;
+        }
+        .slp-faq-item {
           border-bottom: 1px solid var(--border);
-          padding: 16px 0;
         }
-        .faq-q {
+        .slp-faq-q {
           width: 100%;
           background: none;
           border: none;
@@ -665,437 +734,355 @@ export default function SaaSLandingPage() {
           color: var(--text-1);
           cursor: pointer;
           text-align: left;
-          padding: 8px 0;
+          padding: 16px 0;
           font-family: var(--font);
+          gap: 16px;
         }
-        .faq-a {
+        .slp-faq-q:hover { color: var(--fill); }
+        .slp-faq-icon { flex-shrink: 0; font-size: 18px; font-weight: 400; color: var(--text-3); }
+        .slp-faq-a {
           font-size: 14px;
           color: var(--text-2);
-          line-height: 1.5;
-          padding: 10px 0;
+          line-height: 1.6;
+          padding: 0 0 16px;
         }
 
         /* ─── FOOTER ─── */
-        .footer {
+        .slp-footer {
           margin-top: auto;
           background: var(--surface-2);
           border-top: 1px solid var(--border);
-          padding: 48px 40px;
-          text-align: center;
-          transition: background-color .3s, border .3s;
+          padding: 40px 48px;
         }
-        .footer-logo {
+        .slp-footer-inner {
+          max-width: 1280px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          flex-wrap: wrap;
+        }
+        .slp-footer-brand {
           font-size: 16px;
           font-weight: 800;
-          margin-bottom: 12px;
           color: var(--text-1);
         }
-        .footer-desc {
-          font-size: 13px;
+        .slp-footer-desc {
+          font-size: 12px;
           color: var(--text-3);
-          max-width: 400px;
-          margin: 0 auto 24px;
-          line-height: 1.4;
+          margin: 4px 0 0;
         }
-        .footer-links {
+        .slp-footer-links {
           display: flex;
-          justify-content: center;
-          gap: 20px;
-          margin-bottom: 24px;
+          flex-wrap: wrap;
+          gap: 16px;
         }
-        .footer-link {
+        .slp-footer-link {
           font-size: 13px;
           color: var(--text-3);
           text-decoration: none;
           transition: color 0.15s;
         }
-        .footer-link:hover {
-          color: var(--text-1);
+        .slp-footer-link:hover { color: var(--text-1); }
+        .slp-footer-copy {
+          font-size: 11px;
+          color: var(--text-3);
+          white-space: nowrap;
         }
 
+        /* ─── ANIMATIONS ─── */
+        @keyframes slp-fadein {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slp-fadein-up {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── RESPONSIVE ─── */
         @media (max-width: 900px) {
-          .tools-grid { grid-template-columns: 1fr; gap: 20px; }
-          .vs-container { grid-template-columns: 1fr; }
-          .pricing-cards { grid-template-columns: 1fr !important; max-width: 400px !important; }
-          .hero-mockup-row { gap: 12px; }
-          .hero-mockup { width: 160px; height: 240px; border-radius: var(--r-lg); padding: 16px 12px; gap: 10px; }
-          .hero-mockup-text { font-size: 13px; }
-          .hero-mockup-phone { width: 75px; height: 130px; border-radius: var(--r-md); }
-          .tool-cards-grid { grid-template-columns: 1fr; }
-          .launch-flow { gap: 8px; }
-          .launch-flow-step { min-width: 100px; padding: 10px 12px; }
+          .slp-hero { grid-template-columns: 1fr; gap: 40px; padding: 48px 24px 56px; }
+          .slp-hero-right { display: none; }
+          .slp-tools-inner { padding: 0 24px; }
+          .slp-tool-grid { grid-template-columns: 1fr; }
+          .slp-tools-heading { grid-template-columns: 1fr; }
+          .slp-ba-section { padding: 56px 24px; }
+          .slp-ba-grid { grid-template-columns: 1fr; }
+          .slp-vs { padding: 56px 24px; }
+          .slp-vs-grid { grid-template-columns: 1fr; }
+          .slp-pricing { padding: 56px 24px; }
+          .slp-price-grid { grid-template-columns: 1fr; max-width: 400px; }
+          .slp-faq { grid-template-columns: 1fr; gap: 32px; padding: 56px 24px; }
+          .slp-ai { padding: 0 24px 56px; }
+          .slp-footer { padding: 32px 24px; }
+          .slp-footer-inner { flex-direction: column; align-items: flex-start; }
+          .slp-flow { margin-bottom: 20px; }
         }
       `}</style>
 
-      {/* ── HEADER ── */}
+      {/* HEADER */}
       <AppHeader activeRoute="home" onOpenPremium={() => setIsPremiumOpen(true)} />
 
-      {/* ── HERO ── */}
-      <section className="hero">
-        <div className="hero-badge">
-          <span>📱 Free App Store Screenshot Generator</span>
-        </div>
-        <h1 className="hero-title">App Store Screenshots That Actually Convert</h1>
-        <p className="hero-desc">
-          Paste your App Store URL — get device-framed mockups with AI headlines ready to submit in seconds.
-        </p>
-
-        {/* Hero URL import */}
-        <div className="hero-import-row">
-          <div className="hero-import-wrap">
-            <input
-              ref={heroInputRef}
-              type="url"
-              className="hero-import-input"
-              placeholder="https://apps.apple.com/app/your-app/id…"
-              value={heroUrl}
-              onChange={(e) => setHeroUrl(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleHeroImport()}
-            />
-            <button
-              type="button"
-              className="hero-import-btn"
-              onClick={handleHeroImport}
-              disabled={heroLoading}
-            >
-              {heroLoading ? "Loading…" : "Generate Screenshots"}
-            </button>
-          </div>
-          <p className="hero-import-hint">
-            Supports apps.apple.com and play.google.com ·{" "}
-            <Link href="/screenshot-builder" style={{ color: "var(--text-3)", textDecoration: "underline" }}>
-              or start from scratch
-            </Link>
+      {/* HERO */}
+      <section className="slp-hero">
+        <div className="slp-hero-left">
+          <div className="slp-badge">Free Screenshot Generator</div>
+          <h1 className="slp-hero-h1">
+            App Store Screenshots<br />
+            That <mark>Convert</mark>
+          </h1>
+          <p className="slp-hero-sub">
+            Paste your App Store URL, get device-framed mockups with AI headlines ready to submit in seconds.
           </p>
+          <div style={{ width: "100%", maxWidth: "520px" }}>
+            <div className="slp-import-wrap">
+              <input
+                ref={heroInputRef}
+                type="url"
+                className="slp-import-input"
+                placeholder="https://apps.apple.com/app/your-app/id..."
+                value={heroUrl}
+                onChange={(e) => setHeroUrl(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleHeroImport()}
+              />
+              <button
+                type="button"
+                className="slp-import-btn"
+                onClick={handleHeroImport}
+                disabled={heroLoading}
+              >
+                {heroLoading ? "Loading..." : "Generate"}
+              </button>
+            </div>
+            <p className="slp-import-hint">
+              Supports apps.apple.com and play.google.com.{" "}
+              <Link href="/screenshot-builder" style={{ color: "var(--text-3)", textDecoration: "underline" }}>
+                Start from scratch
+              </Link>
+            </p>
+          </div>
         </div>
 
-        {/* Hero visual — animated product showcase */}
-        <div className="hero-visual">
-          <div className="hero-mockup-row">
-            <div className="hero-mockup" style={{ background: "linear-gradient(135deg, #6366f1, #a855f7, #ec4899)", animationDelay: "0s" }}>
-              <div className="hero-mockup-text">Your App.<br/>Your Story.</div>
-              <div className="hero-mockup-phone">
-                <div className="hero-phone-notch" />
-                <div className="hero-phone-screen" style={{ background: "linear-gradient(180deg, #1e1b4b 0%, #312e81 100%)" }} />
+        {/* Product preview — right side */}
+        <div className="slp-hero-right">
+          <div className="slp-preview-card">
+            <div className="slp-preview-topbar">
+              <div className="slp-preview-dot" style={{ background: "#ef4444" }} />
+              <div className="slp-preview-dot" style={{ background: "#f59e0b" }} />
+              <div className="slp-preview-dot" style={{ background: "#22c55e" }} />
+              <span style={{ marginLeft: "8px", fontSize: "11px", color: "var(--text-3)" }}>Screenshot Builder</span>
+            </div>
+            <div className="slp-preview-body">
+              <div className="slp-mockup-tile" style={{ background: "linear-gradient(155deg, #4f46e5, #7c3aed)" }}>
+                <div className="slp-mockup-tile-label">Track Every Rep.</div>
+                <div className="slp-mockup-tile-sub">Fitness companion</div>
+              </div>
+              <div className="slp-mockup-tile" style={{ background: "linear-gradient(155deg, #0891b2, #0ea5e9)" }}>
+                <div className="slp-mockup-tile-label">Ship Faster.</div>
+                <div className="slp-mockup-tile-sub">Task manager</div>
+              </div>
+              <div className="slp-mockup-tile" style={{ background: "linear-gradient(155deg, #d97706, #f97316)" }}>
+                <div className="slp-mockup-tile-label">Grow Smarter.</div>
+                <div className="slp-mockup-tile-sub">Finance tracker</div>
               </div>
             </div>
-            <div className="hero-mockup" style={{ background: "linear-gradient(135deg, #0ea5e9, #38bdf8, #7dd3fc)", animationDelay: "0.15s" }}>
-              <div className="hero-mockup-text">Advanced<br/>Features</div>
-              <div className="hero-mockup-phone">
-                <div className="hero-phone-notch" />
-                <div className="hero-phone-screen" style={{ background: "linear-gradient(180deg, #0c4a6e 0%, #075985 100%)" }} />
-              </div>
-            </div>
-            <div className="hero-mockup" style={{ background: "linear-gradient(135deg, #f97316, #fb923c, #fbbf24)", animationDelay: "0.3s" }}>
-              <div className="hero-mockup-text">Beautiful<br/>Mockups</div>
-              <div className="hero-mockup-phone">
-                <div className="hero-phone-notch" />
-                <div className="hero-phone-screen" style={{ background: "linear-gradient(180deg, #431407 0%, #7c2d12 100%)" }} />
-              </div>
+            <div className="slp-preview-status">
+              <span>
+                <span className="slp-preview-status-dot" />
+                3 screenshots ready
+              </span>
+              <span style={{ color: "var(--fill)", fontWeight: 700 }}>Export PNG</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── TOOLS SUITE ── */}
-      <section id="tools">
-        <div className="section-title">
-          <h2>Every visual your launch needs</h2>
-          <p>Two focused tools that take you from build to ship to announce — without Figma.</p>
+      {/* TOOLS SECTION */}
+      <section className="slp-tools-section" id="tools">
+        <div className="slp-tools-inner">
+          <div className="slp-tools-heading">
+            <div>
+              <h2 className="slp-tools-h2">Every visual your launch needs</h2>
+              <p className="slp-tools-sub">Two focused tools. From build to ship to announce, without Figma.</p>
+            </div>
+            <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+              <div className="slp-flow">
+                <div className="slp-flow-step">Build your app</div>
+                <span className="slp-flow-arrow">→</span>
+                <div className="slp-flow-step active">Screenshot Builder</div>
+                <span className="slp-flow-arrow">→</span>
+                <div className="slp-flow-step active">Launch Cards</div>
+                <span className="slp-flow-arrow">→</span>
+                <div className="slp-flow-step">Post on X / LinkedIn</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="slp-tool-grid">
+            <Link href="/screenshot-builder" className="slp-tool-card">
+              <div className="slp-tool-icon" style={{ background: "linear-gradient(135deg, #6366f1, #a855f7)" }}>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              </div>
+              <div>
+                <div className="slp-tool-badge">App Store · Play Store</div>
+                <h3 className="slp-tool-name">Screenshot Builder</h3>
+                <p className="slp-tool-desc">
+                  Paste your store URL to auto-import screenshots, or upload your own. Add device frames, headlines, and gradients. Export at every required size in one click.
+                </p>
+                <ul className="slp-tool-features">
+                  <li>Auto-import from App Store / Play Store</li>
+                  <li>AI headlines in 15+ languages</li>
+                  <li>Smart resize across all device sizes</li>
+                  <li>iPhone, iPad, Android frames</li>
+                </ul>
+              </div>
+              <span className="slp-tool-cta">Start Building →</span>
+            </Link>
+
+            <Link href="/social-optimizer" className="slp-tool-card">
+              <div className="slp-tool-icon" style={{ background: "linear-gradient(135deg, #f97316, #ec4899)" }}>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+              </div>
+              <div>
+                <div className="slp-tool-badge">X · LinkedIn · Instagram</div>
+                <h3 className="slp-tool-name">Launch Cards</h3>
+                <p className="slp-tool-desc">
+                  You shipped. Now tell the world. Drop a screenshot, pick a dev frame, add a headline, and export a share-ready card in 30 seconds.
+                </p>
+                <ul className="slp-tool-features">
+                  <li>X/Twitter, LinkedIn and square formats</li>
+                  <li>Dev frames: browser, terminal, macOS</li>
+                  <li>Mesh gradients and 10+ presets</li>
+                  <li>One-click copy to clipboard</li>
+                </ul>
+              </div>
+              <span className="slp-tool-cta">Make a Launch Card →</span>
+            </Link>
+          </div>
         </div>
+      </section>
 
-        {/* Launch workflow connector */}
-        <div className="launch-flow">
-          <div className="launch-flow-step">
-            <span className="launch-flow-num">01</span>
-            <span className="launch-flow-label">Build your app</span>
-          </div>
-          <svg className="launch-flow-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          <div className="launch-flow-step highlight">
-            <span className="launch-flow-num">02</span>
-            <span className="launch-flow-label">Screenshot Builder</span>
-          </div>
-          <svg className="launch-flow-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          <div className="launch-flow-step highlight">
-            <span className="launch-flow-num">03</span>
-            <span className="launch-flow-label">Launch Cards</span>
-          </div>
-          <svg className="launch-flow-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          <div className="launch-flow-step">
-            <span className="launch-flow-num">04</span>
-            <span className="launch-flow-label">Post on X / LinkedIn</span>
-          </div>
-        </div>
-
-        {/* Two equal tool cards */}
-        <div className="tool-cards-grid">
-          <Link href="/screenshot-builder" className="tool-card-full">
-            <div className="tool-card-full-icon" style={{ background: "linear-gradient(135deg, #6366f1, #a855f7)" }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-            </div>
-            <div className="tool-card-full-body">
-              <div className="tool-card-full-badge">App Store · Play Store</div>
-              <h3 className="tool-card-full-title">Screenshot Builder</h3>
-              <p className="tool-card-full-desc">
-                Paste your store URL to auto-import screenshots, or upload your own. Add device frames, headlines, and gradients — export at every required size in one click.
-              </p>
-              <ul className="tool-card-full-features">
-                <li>Auto-import from App Store / Play Store</li>
-                <li>AI headlines in 15+ languages</li>
-                <li>Smart resize across all device sizes</li>
-                <li>iPhone, iPad, Android frames</li>
-              </ul>
-            </div>
-            <span className="tool-card-full-cta">Start Building →</span>
-          </Link>
-
-          <Link href="/social-optimizer" className="tool-card-full">
-            <div className="tool-card-full-icon" style={{ background: "linear-gradient(135deg, #f97316, #ec4899)" }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
-            </div>
-            <div className="tool-card-full-body">
-              <div className="tool-card-full-badge">X · LinkedIn · Instagram</div>
-              <h3 className="tool-card-full-title">Launch Cards</h3>
-              <p className="tool-card-full-desc">
-                You shipped. Now tell the world. Drop a screenshot, pick a dev frame — browser, terminal, or device — add a headline and export a share-ready card in 30 seconds.
-              </p>
-              <ul className="tool-card-full-features">
-                <li>X/Twitter, LinkedIn & square formats</li>
-                <li>Dev frames: browser, terminal, macOS</li>
-                <li>Mesh gradients + 10+ presets</li>
-                <li>One-click copy to clipboard</li>
-              </ul>
-            </div>
-            <span className="tool-card-full-cta">Make a Launch Card →</span>
-          </Link>
-        </div>
-
-        {/* AI research spotlight */}
-        <div className="ai-spotlight" style={{ maxWidth: "1200px", margin: "40px auto 0", padding: "0 40px" }}>
-          <div style={{
-            background: "linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%)",
-            border: "1.5px dashed var(--border-strong)",
-            borderRadius: "20px",
-            padding: "28px 36px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "24px",
-            flexWrap: "wrap",
-          }}>
-            <div style={{ flex: 1, minWidth: "280px" }}>
-              <span className="badge-pill" style={{ background: "var(--fill-subtle)", color: "var(--fill)", fontSize: "10px", fontWeight: 700, marginBottom: "10px", display: "inline-block" }}>
-                ✨ Now Live
-              </span>
-              <h3 style={{ fontSize: "18px", fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.3px" }}>AI-Powered Copywriter</h3>
-              <p style={{ fontSize: "13px", color: "var(--text-2)", margin: 0, lineHeight: 1.5 }}>
-                Generate high-converting App Store headlines in 15+ languages. Describe your app, pick a tone, and get 5 ready-to-use copy suggestions powered by AI — built into every tool.
+      {/* AI SPOTLIGHT */}
+      <div className="slp-ai" style={{ marginTop: "32px" }}>
+        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0" }}>
+          <div className="slp-ai-card">
+            <div style={{ flex: 1, minWidth: "260px" }}>
+              <span className="slp-ai-label">Now Live</span>
+              <h3 className="slp-ai-title">AI-Powered Copywriter</h3>
+              <p className="slp-ai-desc">
+                Generate high-converting App Store headlines in 15+ languages. Describe your app, pick a tone, get 5 ready-to-use copy suggestions powered by AI, built into every tool.
               </p>
             </div>
             <button
               type="button"
               onClick={() => setIsPremiumOpen(true)}
               className="btn-outline btn-sm"
-              style={{ display: "flex", gap: "8px", alignItems: "center", fontWeight: 700, cursor: "pointer" }}
+              style={{ display: "flex", gap: "8px", alignItems: "center", fontWeight: 700, cursor: "pointer", flexShrink: 0 }}
             >
-              <span>🔔</span> Get AI Updates
+              Get AI Updates
             </button>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* ── SOCIAL PROOF / BEFORE → AFTER ── */}
-      <section style={{ maxWidth: "1200px", margin: "80px auto 0", padding: "0 40px" }}>
-        <div className="section-title">
-          <h2>Raw Screenshot → Store-Ready in Seconds</h2>
-          <p>See what BuildrStudio does to plain app screenshots.</p>
+      {/* BEFORE / AFTER */}
+      <section className="slp-ba-section">
+        <div className="slp-ba-heading">
+          <h2 className="slp-ba-h2">Raw Screenshot, Store-Ready in Seconds</h2>
+          <p className="slp-ba-sub">See what BuildrStudio does to plain app screenshots.</p>
         </div>
-        <div className="examples-grid" style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: "24px",
-          marginBottom: "100px",
-        }}>
+        <div className="slp-ba-grid">
           {[
             {
-              before: { bg: "#1a1a2e", label: "Raw screenshot" },
-              after: { bg: "linear-gradient(135deg, #6366f1, #a855f7, #ec4899)", title: "Track Every Rep.", subtitle: "Your personal fitness companion." },
+              before: "#1a1a2e",
+              after: "linear-gradient(135deg, #6366f1, #a855f7, #ec4899)",
+              afterTitle: "Track Every Rep.",
+              afterSub: "Your personal fitness companion.",
               tool: "App Store Screenshot",
               time: "12 sec",
             },
             {
-              before: { bg: "#0f172a", label: "Terminal output" },
-              after: { bg: "linear-gradient(135deg, #0ea5e9, #38bdf8, #7dd3fc)", title: "Ship faster with AI", subtitle: "Deploy with confidence." },
+              before: "#0f172a",
+              after: "linear-gradient(135deg, #0ea5e9, #38bdf8)",
+              afterTitle: "Ship Faster with AI",
+              afterSub: "Deploy with confidence.",
               tool: "Social Media Post",
               time: "8 sec",
             },
           ].map((item, idx) => (
-            <div key={idx} style={{
-              borderRadius: "20px",
-              overflow: "hidden",
-              border: "1px solid var(--border)",
-              background: "var(--surface)",
-              transition: "transform 0.25s, box-shadow 0.25s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-4px)";
-              e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.12)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "none";
-            }}
-            >
-              {/* Before → After visual */}
-              <div style={{ display: "flex", height: "200px" }}>
-                {/* Before side */}
-                <div style={{
-                  flex: 1,
-                  background: item.before.bg,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  position: "relative",
-                }}>
-                  <div style={{ width: "40px", height: "70px", borderRadius: "8px", border: "1.5px dashed rgba(255,255,255,0.2)" }} />
-                  <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>{item.before.label}</span>
-                  <span style={{
-                    position: "absolute", top: "8px", left: "8px",
-                    fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.3)",
-                    textTransform: "uppercase", letterSpacing: "0.5px",
-                  }}>Before</span>
+            <div key={idx} className="slp-ba-card">
+              <div className="slp-ba-visual">
+                <div className="slp-ba-before" style={{ background: item.before }}>
+                  <span className="slp-ba-label">Before</span>
+                  <div style={{ width: "36px", height: "64px", borderRadius: "8px", border: "1.5px dashed rgba(255,255,255,0.2)" }} />
+                  <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)", fontWeight: 600 }}>Raw screenshot</span>
                 </div>
-                {/* Arrow divider */}
-                <div style={{
-                  width: "32px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: "var(--surface)",
-                  fontSize: "16px",
-                  color: "var(--text-3)",
-                  flexShrink: 0,
-                }}>→</div>
-                {/* After side */}
-                <div style={{
-                  flex: 1,
-                  background: item.after.bg,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "6px",
-                  padding: "16px 12px",
-                  textAlign: "center",
-                  position: "relative",
-                }}>
-                  <div style={{ fontSize: "13px", fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>{item.after.title}</div>
-                  <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.8)" }}>{item.after.subtitle}</div>
-                  <div style={{
-                    width: "32px", height: "56px", borderRadius: "6px",
-                    border: "1.5px solid rgba(255,255,255,0.3)", background: "rgba(0,0,0,0.2)", marginTop: "4px",
-                  }} />
-                  <span style={{
-                    position: "absolute", top: "8px", right: "8px",
-                    fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.5)",
-                    textTransform: "uppercase", letterSpacing: "0.5px",
-                  }}>After</span>
+                <div className="slp-ba-divider">→</div>
+                <div className="slp-ba-after" style={{ background: item.after }}>
+                  <span className="slp-ba-label right">After</span>
+                  <div style={{ fontSize: "13px", fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>{item.afterTitle}</div>
+                  <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.8)" }}>{item.afterSub}</div>
+                  <div style={{ width: "28px", height: "50px", borderRadius: "6px", border: "1.5px solid rgba(255,255,255,0.3)", background: "rgba(0,0,0,0.2)", marginTop: "6px" }} />
                 </div>
               </div>
-              <div style={{
-                padding: "14px 18px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                borderTop: "1px solid var(--border)",
-              }}>
-                <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--text-2)" }}>{item.tool}</span>
-                <span style={{ fontSize: "11px", color: "var(--fill)", fontWeight: 600 }}>⚡ {item.time}</span>
+              <div className="slp-ba-meta">
+                <span className="slp-ba-meta-tool">{item.tool}</span>
+                <span className="slp-ba-meta-time">Ready in {item.time}</span>
               </div>
             </div>
           ))}
         </div>
-
-        <style>{`
-          @media (max-width: 900px) {
-            .examples-grid { grid-template-columns: 1fr !important; }
-          }
-        `}</style>
       </section>
 
-      {/* ── FIGMA VS BUILDRSTUDIO ── */}
-      <section className="vs-section">
-        <div className="section-title">
-          <h2>Built For Builders</h2>
-          <p>Why indie makers choose BuildrStudio over general design platforms.</p>
-        </div>
-        <div className="vs-container">
-          <div className="vs-column">
-            <div className="vs-header" style={{ color: "var(--destructive)" }}>
-              <span>❌</span> Figma / Photoshop
+      {/* VS SECTION — inverted background for contrast */}
+      <section className="slp-vs">
+        <div className="slp-vs-inner">
+          <h2 className="slp-vs-h2">Built for Builders</h2>
+          <p className="slp-vs-sub">Why indie makers choose BuildrStudio over general design platforms.</p>
+          <div className="slp-vs-grid">
+            <div className="slp-vs-col bad">
+              <div className="slp-vs-colhead">Figma / Photoshop</div>
+              <ul className="slp-vs-list">
+                <li className="slp-vs-item"><span className="slp-vs-marker">-</span>Infinite canvas leads to layout paralysis</li>
+                <li className="slp-vs-item"><span className="slp-vs-marker">-</span>Manual sizing and aspect ratios are error-prone</li>
+                <li className="slp-vs-item"><span className="slp-vs-marker">-</span>Mockups require complex device templates</li>
+                <li className="slp-vs-item"><span className="slp-vs-marker">-</span>Drag-and-drop handles are slow and finicky</li>
+              </ul>
             </div>
-            <ul className="vs-list">
-              <li className="vs-item">
-                <span>·</span> Infinite canvas leads to layout paralysis
-              </li>
-              <li className="vs-item">
-                <span>·</span> Manual sizing and aspect ratios are error-prone
-              </li>
-              <li className="vs-item">
-                <span>·</span> Creating mockups requires complex device templates
-              </li>
-              <li className="vs-item">
-                <span>·</span> Drag-and-drop handles are slow and finicky
-              </li>
-            </ul>
-          </div>
-
-          <div className="vs-column better">
-            <div className="vs-header" style={{ color: "var(--success)" }}>
-              <span>🚀</span> BuildrStudio
+            <div className="slp-vs-col good">
+              <div className="slp-vs-colhead">BuildrStudio</div>
+              <ul className="slp-vs-list">
+                <li className="slp-vs-item"><span className="slp-vs-marker">+</span>Purpose-built templates ensure gorgeous alignment</li>
+                <li className="slp-vs-item"><span className="slp-vs-marker">+</span>Pre-loaded resolutions match store requirements automatically</li>
+                <li className="slp-vs-item"><span className="slp-vs-marker">+</span>Toggleable 3D device perspective frames instantly</li>
+                <li className="slp-vs-item"><span className="slp-vs-marker">+</span>Copy directly to clipboard or export high-res 4K PNGs</li>
+              </ul>
             </div>
-            <ul className="vs-list">
-              <li className="vs-item">
-                <span>·</span> Purpose-built templates ensure gorgeous alignment
-              </li>
-              <li className="vs-item">
-                <span>·</span> Pre-loaded resolutions match store requirements automatically
-              </li>
-              <li className="vs-item">
-                <span>·</span> Toggleable 3D device perspective frames instantly
-              </li>
-              <li className="vs-item">
-                <span>·</span> Copy directly to clipboard or export high-res 4K PNGs
-              </li>
-            </ul>
           </div>
         </div>
       </section>
 
-      {/* ── PRICING ── */}
-      <section className="pricing">
-        <div className="section-title">
-          <h2>Simple, honest pricing</h2>
-          <p>One plan. Everything included. No tiers to decode.</p>
+      {/* PRICING */}
+      <section className="slp-pricing">
+        <div className="slp-pricing-heading">
+          <h2 className="slp-pricing-h2">Simple, honest pricing</h2>
+          <p className="slp-pricing-sub">One plan. Everything included. No tiers to decode.</p>
         </div>
-        <div className="pricing-cards" style={{ marginTop: "20px" }}>
-          {/* Free */}
-          <div className="price-card">
-            <h3 className="price-name">Free</h3>
+        <div className="slp-price-grid">
+          <div className="slp-price-card">
+            <h3 className="slp-price-name">Free</h3>
             <div>
-              <span className="price-val">$0</span>
-              <span className="price-period"> / forever</span>
+              <span className="slp-price-val">$0</span>
+              <span className="slp-price-period"> / forever</span>
             </div>
-            <p style={{ fontSize: "13px", color: "var(--text-3)", margin: 0 }}>
-              Build and export screenshots with no account required.
-            </p>
-            <ul className="price-features">
-              <li className="price-feature"><span>✓</span> All device frames & templates</li>
-              <li className="price-feature"><span>✓</span> Gradients, solid colors & mesh</li>
-              <li className="price-feature"><span>✓</span> PNG export (with watermark)</li>
-              <li className="price-feature"><span>✓</span> 5 AI headline generations</li>
+            <p className="slp-price-desc">Build and export screenshots with no account required.</p>
+            <ul className="slp-price-feats">
+              <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> All device frames and templates</li>
+              <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> Gradients, solid colors and mesh</li>
+              <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> PNG export (with watermark)</li>
+              <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> 5 AI headline generations</li>
             </ul>
             <Link
               href="/screenshot-builder"
@@ -1105,26 +1092,22 @@ export default function SaaSLandingPage() {
               Start for free
             </Link>
           </div>
-
-          {/* Pro */}
-          <div className="price-card pro">
-            <span className="badge-pro">Everything included</span>
-            <h3 className="price-name" style={{ color: "var(--fill)" }}>Pro</h3>
+          <div className="slp-price-card pro">
+            <span className="slp-badge-pro">Everything included</span>
+            <h3 className="slp-price-name" style={{ color: "var(--fill)" }}>Pro</h3>
             <div>
-              <span className="price-val">$9</span>
-              <span className="price-period"> /month</span>
+              <span className="slp-price-val">$9</span>
+              <span className="slp-price-period"> /month</span>
             </div>
-            <p style={{ fontSize: "13px", color: "var(--text-3)", margin: 0 }}>
-              Clean exports, batch sizing, and unlimited AI — all in one plan.
-            </p>
-            <ul className="price-features">
-              <li className="price-feature" style={{ fontWeight: 600 }}><span>✦</span> Watermark-free exports</li>
-              <li className="price-feature"><span>✓</span> Batch export — all Apple & Google sizes</li>
-              <li className="price-feature"><span>✓</span> Canonical store filenames (ready to upload)</li>
-              <li className="price-feature"><span>✓</span> 3D device tilts & 4K PNG</li>
-              <li className="price-feature"><span>✓</span> Unlimited AI headline generation</li>
-              <li className="price-feature"><span>✓</span> AI translation — 15+ languages</li>
-              <li className="price-feature"><span>✓</span> Custom brand presets & swatches</li>
+            <p className="slp-price-desc">Clean exports, batch sizing, and unlimited AI, all in one plan.</p>
+            <ul className="slp-price-feats">
+              <li className="slp-price-feat" style={{ fontWeight: 600 }}><span className="slp-price-feat-mark">✦</span> Watermark-free exports</li>
+              <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> Batch export: all Apple and Google sizes</li>
+              <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> Canonical store filenames, ready to upload</li>
+              <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> 3D device tilts and 4K PNG</li>
+              <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> Unlimited AI headline generation</li>
+              <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> AI translation in 15+ languages</li>
+              <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> Custom brand presets and swatches</li>
             </ul>
             <button
               type="button"
@@ -1132,55 +1115,53 @@ export default function SaaSLandingPage() {
               className="btn-fill btn-md"
               style={{ width: "100%", justifyContent: "center", fontWeight: 700, cursor: "pointer", border: "none" }}
             >
-              Get Pro — $9/mo
+              Get Pro · $9/mo
             </button>
           </div>
         </div>
       </section>
 
-      {/* ── FAQS ── */}
-      <section className="faqs">
-        <div className="section-title">
-          <h2>Frequently Asked Questions</h2>
-          <p>Everything you need to know about BuildrStudio.</p>
+      {/* FAQs — split layout */}
+      <section className="slp-faq">
+        <div className="slp-faq-left">
+          <h2>Frequently asked questions</h2>
+          <p>Everything you need to know about BuildrStudio. Can&apos;t find the answer? Reach out on X.</p>
         </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div>
           {FAQS.map((faq, idx) => (
-            <div key={idx} className="faq-item">
-              <button onClick={() => toggleFaq(idx)} className="faq-q">
+            <div key={idx} className="slp-faq-item">
+              <button onClick={() => toggleFaq(idx)} className="slp-faq-q">
                 <span>{faq.q}</span>
-                <span>{faqOpen === idx ? "−" : "+"}</span>
+                <span className="slp-faq-icon">{faqOpen === idx ? "−" : "+"}</span>
               </button>
-              {faqOpen === idx && <div className="faq-a">{faq.a}</div>}
+              {faqOpen === idx && <div className="slp-faq-a">{faq.a}</div>}
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
-      <footer className="footer">
-        <div className="footer-logo">BuildrStudio</div>
-        <p className="footer-desc">
-          Craft beautiful launch visual assets for your apps, Twitter accounts, and store consoles in minutes.
-        </p>
-        <div className="footer-links">
-          <Link href="/screenshot-builder" className="footer-link">Screenshot Builder</Link>
-          <Link href="/social-optimizer" className="footer-link">Launch Cards</Link>
-          <Link href="/pricing" className="footer-link">Pricing</Link>
-        </div>
-        <div className="footer-links" style={{ marginTop: 0 }}>
-          <Link href="/updates" className="footer-link">What&apos;s New</Link>
-          <Link href="/support" className="footer-link">Support</Link>
-          <Link href="/terms" className="footer-link">Terms</Link>
-          <Link href="/privacy" className="footer-link">Privacy</Link>
-          <Link href="/refund" className="footer-link">Refund Policy</Link>
-        </div>
-        <div style={{ fontSize: "11px", color: "var(--text-3)" }}>
-          © {new Date().getFullYear()} BuildrStudio. All rights reserved.
+      {/* FOOTER */}
+      <footer className="slp-footer">
+        <div className="slp-footer-inner">
+          <div>
+            <div className="slp-footer-brand">BuildrStudio</div>
+            <div className="slp-footer-desc">Launch visuals for indie developers.</div>
+          </div>
+          <div className="slp-footer-links">
+            <Link href="/screenshot-builder" className="slp-footer-link">Screenshot Builder</Link>
+            <Link href="/social-optimizer" className="slp-footer-link">Launch Cards</Link>
+            <Link href="/updates" className="slp-footer-link">What&apos;s New</Link>
+            <Link href="/support" className="slp-footer-link">Support</Link>
+            <Link href="/terms" className="slp-footer-link">Terms</Link>
+            <Link href="/privacy" className="slp-footer-link">Privacy</Link>
+            <Link href="/refund" className="slp-footer-link">Refund Policy</Link>
+          </div>
+          <div className="slp-footer-copy">
+            &copy; {new Date().getFullYear()} BuildrStudio
+          </div>
         </div>
       </footer>
 
-      {/* Premium interest waitlist popup */}
       <PremiumModal isOpen={isPremiumOpen} onClose={() => setIsPremiumOpen(false)} />
     </div>
   );

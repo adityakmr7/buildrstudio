@@ -452,7 +452,7 @@ export default function ScreenshotBuilderHub() {
       setShareModal({ isOpen: true, count: 1 });
     }).catch((err) => {
       console.error("Export failed:", err);
-      toast("Export failed — please try again", "error");
+      toast("Export failed. Please try again", "error");
     }).finally(() => setIsExporting(false));
   };
 
@@ -509,7 +509,7 @@ export default function ScreenshotBuilderHub() {
       setShareModal({ isOpen: true, count: totalFiles });
     } catch (err) {
       console.error("Batch export failed:", err);
-      toast("Batch export failed — please try again", "error");
+      toast("Batch export failed. Please try again", "error");
     } finally {
       setIsExporting(false);
     }
@@ -521,7 +521,7 @@ export default function ScreenshotBuilderHub() {
         toast("Copied to clipboard!", "success");
       }).catch((err) => {
         console.error("Copy failed:", err);
-        toast("Copy failed — try exporting instead", "error");
+        toast("Copy failed. Try exporting instead", "error");
       });
     }
   };
@@ -550,7 +550,7 @@ export default function ScreenshotBuilderHub() {
         .then(data => {
           if (data.suggestion) {
             const s = data.suggestion;
-            toast("AI suggested a layout — applied!", "success");
+            toast("AI suggested a layout, applied!", "success");
             setDeck(prev => {
               const updated = [...prev.screens];
               const idx = prev.activeScreenIndex;

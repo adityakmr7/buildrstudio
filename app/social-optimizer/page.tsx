@@ -3,14 +3,14 @@ import Script from "next/script";
 import WorkspaceHub from "../components/WorkspaceHub";
 
 export const metadata: Metadata = {
-  title: "Social Media Graphic Optimizer — BuildrStudio",
+  title: "Social Media Graphic Optimizer | BuildrStudio",
   description:
     "Turn screenshots into stunning social media graphics for Twitter/X and LinkedIn. Add gradients, frames, and captions in seconds. Free, no signup.",
   alternates: {
     canonical: "https://buildrstudio.in/social-optimizer",
   },
   openGraph: {
-    title: "Social Media Graphic Optimizer — BuildrStudio",
+    title: "Social Media Graphic Optimizer | BuildrStudio",
     description:
       "Convert developer screenshots into beautiful social media images. Add gradients, frames, captions, and export in one click.",
     type: "website",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Social Media Graphic Optimizer — BuildrStudio",
+    title: "Social Media Graphic Optimizer | BuildrStudio",
     description:
       "Turn raw developer screenshots into beautiful social media images with gradients, frames, and captions.",
   },
@@ -63,7 +63,7 @@ export default function SocialOptimizerPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <h1 className="sr-only">Free Social Media Screenshot Optimizer — Twitter &amp; LinkedIn Graphics</h1>
+      <h1 className="sr-only">Free Social Media Screenshot Optimizer: Twitter &amp; LinkedIn Graphics</h1>
       <WorkspaceHub />
     </>
   );
