@@ -1352,7 +1352,7 @@ function TabExport({ onExport, onExportAll, onExportAllSizes, onCopy, isExportin
 
       <div className="ctrl-divider" style={{ margin: "16px 0" }} />
 
-      <SectionLabel>Smart Resize — All Device Sizes</SectionLabel>
+      <SectionLabel>Smart Resize: All Device Sizes</SectionLabel>
       <p style={{ fontSize: "11px", color: "var(--text-3)", margin: "0 0 8px", lineHeight: 1.4 }}>
         Auto-export every screen across all required App Store or Play Store device sizes. One click, store-ready ZIP.
       </p>

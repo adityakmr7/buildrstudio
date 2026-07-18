@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/app/lib/siteConfig";
+import { Envelope, Copy, XLogo, ArrowRight } from "@phosphor-icons/react";
 
 export default function AboutClient() {
   const [copied, setCopied] = useState(false);
@@ -27,16 +28,6 @@ export default function AboutClient() {
           max-width: 680px;
           margin: 0 auto;
           padding: 80px 32px 120px;
-        }
-
-        /* Eyebrow */
-        .abp-eyebrow {
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          color: var(--fill);
-          margin-bottom: 16px;
         }
 
         /* Hero */
@@ -88,22 +79,30 @@ export default function AboutClient() {
           margin: 0;
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 24px;
         }
         .abp-value {
           display: flex;
-          gap: 16px;
+          gap: 20px;
           align-items: flex-start;
+          padding-bottom: 24px;
+          border-bottom: 1px solid var(--border);
         }
-        .abp-value-num {
-          font-size: 11px;
-          font-weight: 800;
-          letter-spacing: 0.06em;
-          color: var(--fill);
-          font-family: monospace;
-          padding-top: 2px;
+        .abp-value:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+        .abp-value-icon {
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          background: var(--fill-subtle);
+          display: flex;
+          align-items: center;
+          justify-content: center;
           flex-shrink: 0;
-          width: 24px;
+          color: var(--fill);
+          margin-top: 1px;
         }
         .abp-value-text {
           font-size: 15px;
@@ -125,7 +124,9 @@ export default function AboutClient() {
           border-radius: var(--r-lg);
           background: var(--surface);
           text-decoration: none;
+          transition: background 0.15s;
         }
+        .abp-maker:hover { background: var(--surface-2, var(--border)); }
         .abp-maker-avatar {
           width: 56px;
           height: 56px;
@@ -183,6 +184,12 @@ export default function AboutClient() {
           background: transparent;
           color: var(--text-1);
         }
+        .abp-email-helper {
+          font-size: 12px;
+          color: var(--text-3);
+          margin-top: 8px;
+          display: block;
+        }
 
         @media (max-width: 640px) {
           .ab-product-inner { padding: 48px 20px 80px; }
@@ -193,26 +200,24 @@ export default function AboutClient() {
 
       <div className="ab-product-inner">
 
-        {/* Hero */}
-        <p className="abp-eyebrow">About BuildrStudio</p>
+        {/* Hero — no eyebrow, headline stands alone */}
         <h1 className="abp-headline">
           Launch-ready visuals,<br />without the design tax.
         </h1>
         <p className="abp-lead">
           BuildrStudio is a suite of free browser-based tools that help indie developers and
-          small teams create polished App Store screenshots and social graphics — without
+          small teams create polished App Store screenshots and social graphics, without
           Figma, Photoshop, or a designer on retainer.
         </p>
 
         <hr className="abp-divider" />
 
-        {/* Origin story */}
+        {/* Origin story — no eyebrow, section is self-evident */}
         <section className="abp-section">
-          <p className="abp-section-label">Why it exists</p>
           <p className="abp-body">
             Every time I shipped a side project, the last mile was the same painful bottleneck:
             making it <em>look</em> good enough to share. App Store screenshots, product launch
-            graphics, social cards — all of it required either expensive tools I didn&apos;t want
+            graphics, social cards: all of it required either expensive tools I didn&apos;t want
             to pay for, or hours in Figma templates I had to wrestle with.
           </p>
           <p className="abp-body">
@@ -233,28 +238,36 @@ export default function AboutClient() {
           <p className="abp-section-label">What we believe</p>
           <ul className="abp-values">
             <li className="abp-value">
-              <span className="abp-value-num">01</span>
+              <div className="abp-value-icon">
+                <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm40-68a28,28,0,0,1-28,28H116v8a8,8,0,0,1-16,0v-8H88a8,8,0,0,1,0-16h12V120H88a8,8,0,0,1,0-16h12V96a28,28,0,0,1,28-28h12a28,28,0,0,1,28,28,8,8,0,0,1-16,0,12,12,0,0,0-12-12H128a12,12,0,0,0-12,12v8h24a8,8,0,0,1,0,16H116v40h24a12,12,0,0,0,12-12,8,8,0,0,1,16,0Z"/></svg>
+              </div>
               <span className="abp-value-text">
                 <strong>Free first.</strong> The core tools are and will stay free. Pro unlocks
                 extras, but you should never be blocked from getting your work out into the world.
               </span>
             </li>
             <li className="abp-value">
-              <span className="abp-value-num">02</span>
+              <div className="abp-value-icon">
+                <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M208,40H48A16,16,0,0,0,32,56V200a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V56A16,16,0,0,0,208,40Zm0,160H48V56H208V200ZM96,88a8,8,0,0,1,8-8h48a8,8,0,0,1,0,16H104A8,8,0,0,1,96,88Zm0,32a8,8,0,0,1,8-8h48a8,8,0,0,1,0,16H104A8,8,0,0,1,96,120Zm0,32a8,8,0,0,1,8-8h48a8,8,0,0,1,0,16H104A8,8,0,0,1,96,152Z"/></svg>
+              </div>
               <span className="abp-value-text">
                 <strong>Your files stay yours.</strong> All image processing happens in your browser.
                 Nothing you create is uploaded to our servers.
               </span>
             </li>
             <li className="abp-value">
-              <span className="abp-value-num">03</span>
+              <div className="abp-value-icon">
+                <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>
+              </div>
               <span className="abp-value-text">
                 <strong>One tool that does the job well</strong> beats ten that do it
                 passably. We ship focused tools, not feature soup.
               </span>
             </li>
             <li className="abp-value">
-              <span className="abp-value-num">04</span>
+              <div className="abp-value-icon">
+                <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8C53.06,194,78.06,176,104,168.68V224a8,8,0,0,0,16,0V168.68C146,176,171,194,185.08,220a8,8,0,1,0,13.84-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"/></svg>
+              </div>
               <span className="abp-value-text">
                 <strong>Built by a developer, for developers.</strong> The defaults are sensible,
                 the exports hit exact store specs, and nothing requires a design background to use.
@@ -268,10 +281,7 @@ export default function AboutClient() {
         {/* Maker */}
         <section className="abp-section">
           <p className="abp-section-label">Who&apos;s behind it</p>
-          <a
-            href="/adityakmr7"
-            className="abp-maker"
-          >
+          <a href="/adityakmr7" className="abp-maker">
             <div className="abp-maker-avatar">
               <Image
                 src="/aditya-avatar.png"
@@ -289,9 +299,7 @@ export default function AboutClient() {
                 Building BuildrStudio on the side.
               </div>
             </div>
-            <svg className="abp-maker-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-            </svg>
+            <ArrowRight className="abp-maker-arrow" size={16} />
           </a>
         </section>
 
@@ -306,22 +314,23 @@ export default function AboutClient() {
           </p>
           <div className="abp-ctas">
             <a href={`mailto:${siteConfig.author.support}`} className="abp-btn abp-btn-fill">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                <polyline points="22,6 12,13 2,6"/>
-              </svg>
+              <Envelope size={14} weight="bold" />
               Email us
             </a>
-            <button className="abp-btn abp-btn-outline" onClick={handleCopyEmail}>
-              {copied ? "Copied!" : "Copy email"}
-            </button>
             <a href={siteConfig.author.twitterUrl} target="_blank" rel="noopener noreferrer" className="abp-btn abp-btn-outline">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.843L1.255 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-              </svg>
+              <XLogo size={13} weight="bold" />
               X / Twitter
             </a>
           </div>
+          <span className="abp-email-helper">
+            Or copy the address:{" "}
+            <button
+              style={{ background: "none", border: "none", cursor: "pointer", fontSize: "12px", color: "var(--fill)", fontWeight: 600, padding: 0, fontFamily: "monospace" }}
+              onClick={handleCopyEmail}
+            >
+              {copied ? "Copied!" : siteConfig.author.support}
+            </button>
+          </span>
         </section>
 
       </div>

@@ -4,14 +4,14 @@ import { Suspense } from "react";
 import ScreenshotBuilderHub from "./ScreenshotBuilderHub";
 
 export const metadata: Metadata = {
-  title: "App Store Screenshot Builder — iOS & Play Store Mockups",
+  title: "App Store Screenshot Builder: iOS & Play Store Mockups",
   description:
     "Create App Store & Play Store screenshots in seconds. Paste your app URL, get polished mockups with AI headlines and device frames. Free.",
   alternates: {
     canonical: "https://buildrstudio.in/screenshot-builder",
   },
   openGraph: {
-    title: "App Store Screenshot Builder — BuildrStudio",
+    title: "App Store Screenshot Builder | BuildrStudio",
     description:
       "Generate beautiful, store-compliant app screenshots for iOS and Google Play Store instantly in correct aspect ratios with marketing text and realistic frames.",
     type: "website",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "App Store Screenshot Builder — BuildrStudio",
+    title: "App Store Screenshot Builder | BuildrStudio",
     description:
       "Generate beautiful, store-compliant app screenshots for iOS and Play Store in seconds.",
   },
@@ -73,7 +73,7 @@ export default function ScreenshotBuilderPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <h1 className="sr-only">Free App Store Screenshot Builder — Create iOS &amp; Play Store Mockups</h1>
+      <h1 className="sr-only">Free App Store Screenshot Builder: Create iOS &amp; Play Store Mockups</h1>
       <Suspense>
         <ScreenshotBuilderHub />
       </Suspense>

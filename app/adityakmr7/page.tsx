@@ -4,7 +4,7 @@ import AppHeader from "@/app/components/AppHeader";
 import AboutClient from "./PortfolioClient";
 
 export const metadata: Metadata = {
-  title: "Aditya Kumar — Senior Software Engineer & Indie Maker",
+  title: "Aditya Kumar | Senior Software Engineer & Indie Maker",
   description:
     "Senior Software Engineer with 5+ years in Fintech & SaaS. Creator of BuildrStudio, Anchor, and Flowzy. Open to full-time and freelance opportunities.",
   robots: { index: false, follow: false },
