@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { siteConfig } from "@/app/lib/siteConfig";
 
 const FAQS = [
   {
@@ -25,11 +26,11 @@ const FAQS = [
   },
   {
     q: "I paid but my account still shows Free. What do I do?",
-    a: "Sign out and sign back in — the Pro status is read fresh on each login. If the problem persists after that, email support@buildrstudio.in with your payment email and we'll sort it out within a few hours.",
+    a: `Sign out and sign back in — the Pro status is read fresh on each login. If the problem persists after that, email ${siteConfig.author.support} with your payment email and we'll sort it out within a few hours.`,
   },
   {
     q: "Can I get a refund?",
-    a: "Yes — if you're not satisfied within 7 days of purchase, email support@buildrstudio.in and we'll process a full refund, no questions asked. See the full refund policy for details.",
+    a: `Yes — if you're not satisfied within 7 days of purchase, email ${siteConfig.author.support} and we'll process a full refund, no questions asked. See the full refund policy for details.`,
   },
   {
     q: "Is there a team or agency plan?",

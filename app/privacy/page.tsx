@@ -1,3 +1,4 @@
+import { siteConfig } from "@/app/lib/siteConfig";
 import type { Metadata } from "next";
 import Script from "next/script";
 import AppHeader from "../components/AppHeader";
@@ -238,7 +239,7 @@ export default function PrivacyPage() {
         <h2>12. Contact</h2>
         <p>
           For privacy-related questions or data requests, contact us at{" "}
-          <a href="mailto:adityakmr9672@gmail.com">adityakmr9672@gmail.com</a>.
+          <a href={`mailto:${siteConfig.author.email}`}>{siteConfig.author.email}</a>.
         </p>
 
         <div className="legal-footer">

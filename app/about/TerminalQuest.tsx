@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { siteConfig } from "@/app/lib/siteConfig";
 
 const FILE_SYSTEM: Record<string, string> = {
   "help": `Available commands:
@@ -106,22 +107,22 @@ GraphQL     ████████████████░░░░ 82`,
    Stack: React Native, TypeScript
    XP: +1,200`,
 
-  "cat contact.txt": `📧 Email: adityakmr9672@gmail.com
-🐙 GitHub: github.com/adityakmr7
-𝕏 Twitter: x.com/adityakmr7
-💼 LinkedIn: linkedin.com/in/adityakmr7
-✍️ Substack: substack.com/@adityakmr7
+  "cat contact.txt": `📧 Email: ${siteConfig.author.email}
+🐙 GitHub: github.com/${siteConfig.author.github}
+𝕏 Twitter: x.com/${siteConfig.author.twitter}
+💼 LinkedIn: linkedin.com/in/${siteConfig.author.linkedin}
+✍️ Substack: substack.com/@${siteConfig.author.substack}
 
 💡 Currently open to:
   → Senior Full-Stack roles (remote or Bengaluru)
   → React Native / AI Engineering
   → Freelance consulting`,
 
-  "contact": `📧 Email: adityakmr9672@gmail.com
-🐙 GitHub: github.com/adityakmr7
-𝕏 Twitter: x.com/adityakmr7
-💼 LinkedIn: linkedin.com/in/adityakmr7
-✍️ Substack: substack.com/@adityakmr7
+  "contact": `📧 Email: ${siteConfig.author.email}
+🐙 GitHub: github.com/${siteConfig.author.github}
+𝕏 Twitter: x.com/${siteConfig.author.twitter}
+💼 LinkedIn: linkedin.com/in/${siteConfig.author.linkedin}
+✍️ Substack: substack.com/@${siteConfig.author.substack}
 
 💡 Currently open to:
   → Senior Full-Stack roles (remote or Bengaluru)
@@ -130,7 +131,7 @@ GraphQL     ████████████████░░░░ 82`,
 
   "cat resume.pdf": `Error: Nice try! 😄
 Send me an email and I'll share the real one.
-→ adityakmr9672@gmail.com`,
+→ ${siteConfig.author.email}`,
 
   "ls secret/": `🔒 Permission denied.
 Just kidding — there's nothing here.
@@ -146,7 +147,7 @@ Just kidding — there's nothing here.
   ║                                  ║
   ║   You've made the right choice.  ║
   ║                                  ║
-  ║   Email: adityakmr9672@gmail.com ║
+  ║   Email: ${siteConfig.author.email} ║
   ║   Let's build something epic.    ║
   ╚══════════════════════════════════╝`,
 

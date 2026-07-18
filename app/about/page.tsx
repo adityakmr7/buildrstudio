@@ -4,50 +4,40 @@ import AppHeader from "@/app/components/AppHeader";
 import AboutClient from "./AboutClient";
 
 export const metadata: Metadata = {
-  title: "About — Aditya Kumar",
+  title: "About — BuildrStudio",
   description:
-    "Senior Software Engineer & Indie Maker. 5+ years in Fintech & SaaS. Creator of BuildrStudio, Anchor, and Flowzy. Open to full-time and freelance.",
+    "BuildrStudio is a free browser-based toolkit for indie developers — polished App Store screenshots and social graphics, no Figma required.",
   alternates: { canonical: "https://buildrstudio.in/about" },
   openGraph: {
-    title: "Aditya Kumar — Senior Software Engineer & Indie Maker",
+    title: "About — BuildrStudio",
     description:
-      "5+ years building fintech and SaaS products. Creator of BuildrStudio, Anchor, and Flowzy. Open to work.",
+      "Why BuildrStudio exists, what we believe, and who's behind it.",
     url: "https://buildrstudio.in/about",
-    type: "profile",
+    type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Aditya Kumar — Senior Software Engineer & Indie Maker",
-    description: "5+ years in Fintech & SaaS. Building developer tools. Open to work.",
+    title: "About — BuildrStudio",
+    description: "Free browser-based tools for launch-ready app visuals. Built by a developer, for developers.",
   },
 };
 
-const personJsonLd = {
+const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "Person",
-  name: "Aditya Kumar",
-  jobTitle: "Senior Software Engineer",
-  url: "https://buildrstudio.in/about",
-  image: "https://buildrstudio.in/aditya-avatar.png",
-  sameAs: [
-    "https://github.com/adityakmr7",
-    "https://x.com/@dev_adityakmr",
-    "https://linkedin.com/in/adityakmr7",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "BuildrStudio", item: "https://buildrstudio.in" },
+    { "@type": "ListItem", position: 2, name: "About", item: "https://buildrstudio.in/about" },
   ],
-  worksFor: {
-    "@type": "Organization",
-    name: "Groww",
-  },
-  knowsAbout: ["React Native", "TypeScript", "Next.js", "AI/LLM", "Fintech"],
 };
 
 export default function AboutPage() {
   return (
     <>
       <Script
-        id="json-ld-person"
+        id="json-ld-about"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <AppHeader activeRoute="home" />
       <AboutClient />

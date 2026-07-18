@@ -58,7 +58,7 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
             width: 100%;
             box-sizing: border-box;
             transition: background-color .3s, border .3s;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            box-shadow: var(--shadow-sm);
           }
 
           /* Logo */
@@ -207,7 +207,7 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
           .dropdown-item-icon-wrap {
             width: 30px;
             height: 30px;
-            border-radius: 8px;
+            border-radius: var(--r-sm);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -255,7 +255,7 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
             overflow: hidden;
             border: 1px solid rgba(251, 191, 36, 0.32);
             padding: 7px 14px;
-            border-radius: 8px;
+            border-radius: var(--r-sm);
             font-weight: 600;
             font-size: 12px;
             display: inline-flex;
@@ -277,6 +277,15 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
           }
           .pro-btn:active {
             transform: translateY(0px);
+          }
+          [data-theme="dark"] .pro-btn {
+            background: #1a1400;
+            border-color: rgba(251, 191, 36, 0.45);
+            box-shadow: 0 0 0 1px rgba(251,191,36,0.15), 0 1px 2px rgba(0,0,0,0.6), 0 0 20px rgba(251,191,36,0.1), inset 0 1px 0 rgba(255,255,255,0.04);
+          }
+          [data-theme="dark"] .pro-btn:hover {
+            background: #261d00;
+            border-color: rgba(251, 191, 36, 0.7);
           }
           .pro-btn-shimmer {
             position: absolute;
@@ -489,26 +498,15 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
               </Link>
 
               <Link href="/social-optimizer" className="dropdown-item">
-                <div className="dropdown-item-icon-wrap icon-social"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
+                <div className="dropdown-item-icon-wrap icon-social"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
                 <div className="dropdown-item-info">
-                  <span className="dropdown-item-title">Social Optimizer</span>
-                  <span className="dropdown-item-desc">Screenshots to social posts</span>
-                </div>
-              </Link>
-
-              <Link href="/change-log" className="dropdown-item">
-                <div className="dropdown-item-icon-wrap icon-change"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
-                <div className="dropdown-item-info">
-                  <span className="dropdown-item-title">Changelog Maker</span>
-                  <span className="dropdown-item-desc">Release log social graphics</span>
+                  <span className="dropdown-item-title">Launch Cards</span>
+                  <span className="dropdown-item-desc">Share-ready graphics for X & LinkedIn</span>
                 </div>
               </Link>
             </div>
           </div>
 
-          <Link href="/roadmap" className={`hdr-link ${activeRoute === "roadmap" ? "active" : ""}`}>
-            Roadmap
-          </Link>
           <Link href="/about" className="hdr-link">
             About
           </Link>
@@ -557,7 +555,7 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
       {/* Mobile Navigation Drawer Panel */}
       <div className={`mobile-drawer-panel ${mobileMenuOpen ? "open" : ""}`}>
         <div className="mobile-drawer-header">
-          <div className="hdr-logo">
+          <Link href="/" className="hdr-logo" onClick={() => setMobileMenuOpen(false)}>
             <div className="hdr-logo-mark">
               <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="30" height="30" rx="8" fill="#09090b"/>
@@ -577,9 +575,9 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
               <span className="hdr-logo-buildr">Buildr</span>
               <span className="hdr-logo-studio">Studio</span>
             </div>
-          </div>
-          <button 
-            type="button" 
+          </Link>
+          <button
+            type="button"
             className="mobile-drawer-close"
             onClick={() => setMobileMenuOpen(false)}
             aria-label="Close menu"
@@ -595,8 +593,8 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
               href="/social-optimizer"
               className={`mobile-link ${activeRoute === "social-optimizer" ? "active" : ""}`}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-              <span>Social Optimizer</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              <span>Launch Cards</span>
             </Link>
             <Link
               href="/screenshot-builder"
@@ -604,13 +602,6 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
               <span>Screenshot Builder</span>
-            </Link>
-            <Link
-              href="/change-log"
-              className={`mobile-link ${activeRoute === "change-log" ? "active" : ""}`}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              <span>Changelog Maker</span>
             </Link>
           </div>
         </div>
@@ -620,13 +611,6 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
         <div>
           <span className="mobile-section-label">General</span>
           <div className="mobile-grid">
-            <Link
-              href="/roadmap"
-              className={`mobile-link ${activeRoute === "roadmap" ? "active" : ""}`}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-              <span>Product Roadmap</span>
-            </Link>
             <Link href="/about" className="mobile-link">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               <span>About Me</span>

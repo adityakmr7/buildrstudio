@@ -799,6 +799,9 @@ export default function TabbedSidebar({
         ))}
       </nav>
 
+      {/* Right column: content + pro banner stacked vertically */}
+      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", height: "100%" }}>
+
       {/* Tab content */}
       <div className="sidebar-tab-content" role="tabpanel">
         {activeTab === "bg"          && <TabBackground    config={config} update={update} />}
@@ -814,11 +817,11 @@ export default function TabbedSidebar({
       <div style={{ padding: "10px 14px", borderTop: "1px solid var(--border)", flexShrink: 0 }}>
         {isWatermarkUnlocked ? (
           <button type="button" onClick={onOpenPremium}
-            style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", borderRadius: "var(--r-md)", background: "var(--success-subtle, #dcfce7)", border: "1.5px solid var(--success, #22c55e)", cursor: "pointer", fontFamily: "var(--font)", transition: "all .12s" }}
+            style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", borderRadius: "var(--r-md)", background: "var(--success-subtle)", border: "1.5px solid var(--success)", cursor: "pointer", fontFamily: "var(--font)", transition: "all .12s" }}
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--text-1)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--success, #22c55e)"; }}>
-            <span style={{ fontSize: "12px", fontWeight: 600, color: "#15803d" }}>Watermark Unlocked! (24h)</span>
-            <span className="badge-pill" style={{ background: "var(--success, #22c55e)", color: "white", fontSize: "10px" }}>Active</span>
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--success)"; }}>
+            <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--success-text)" }}>Watermark Unlocked! (24h)</span>
+            <span className="badge-pill" style={{ background: "var(--success)", color: "white", fontSize: "10px" }}>Active</span>
           </button>
         ) : (
           <button type="button" onClick={onOpenUnlockWatermark}
@@ -830,6 +833,8 @@ export default function TabbedSidebar({
           </button>
         )}
       </div>
+
+      </div>{/* end right column */}
     </aside>
   );
 }

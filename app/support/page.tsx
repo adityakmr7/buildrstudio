@@ -4,6 +4,7 @@ import Link from "next/link";
 import AppHeader from "../components/AppHeader";
 import ToolCrossLinks from "../components/ToolCrossLinks";
 import FaqAccordion from "./FaqAccordion";
+import { siteConfig } from "@/app/lib/siteConfig";
 
 export const metadata: Metadata = {
   title: "Support — BuildrStudio",
@@ -78,7 +79,7 @@ export default function SupportPage() {
           .contact-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 14px;
+            border-radius: var(--r-lg);
             padding: 22px 20px;
             text-decoration: none;
             display: flex;
@@ -94,7 +95,7 @@ export default function SupportPage() {
           .contact-card-icon {
             width: 36px;
             height: 36px;
-            border-radius: 10px;
+            border-radius: var(--r-sm);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -129,7 +130,7 @@ export default function SupportPage() {
           }
           .faq-item {
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: var(--r-md);
             overflow: hidden;
             background: var(--surface);
           }
@@ -181,7 +182,7 @@ export default function SupportPage() {
             margin-top: 52px;
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: var(--r-lg);
             padding: 32px;
             display: flex;
             flex-direction: column;
@@ -221,45 +222,22 @@ export default function SupportPage() {
 
           {/* Contact options */}
           <div className="contact-grid">
-            <a href="mailto:support@buildrstudio.in" className="contact-card">
+            <a href={`mailto:${siteConfig.author.support}`} className="contact-card">
               <div className="contact-card-icon">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                   <polyline points="22,6 12,13 2,6" />
                 </svg>
               </div>
               <p className="contact-card-title">Email Support</p>
               <p className="contact-card-desc">
-                support@buildrstudio.in — replies within a few hours
+                {siteConfig.author.support} — replies within a few hours
               </p>
             </a>
 
-            <a
-              href="https://cal.com/adityakmr7"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="contact-card"
-            >
+            <a href={siteConfig.author.calUrl} target="_blank" rel="noopener noreferrer" className="contact-card">
               <div className="contact-card-icon">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" />
                   <line x1="16" y1="2" x2="16" y2="6" />
                   <line x1="8" y1="2" x2="8" y2="6" />
@@ -272,12 +250,7 @@ export default function SupportPage() {
               </p>
             </a>
 
-            <a
-              href="https://twitter.com/adityakmr7"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="contact-card"
-            >
+            <a href={siteConfig.author.twitterUrl} target="_blank" rel="noopener noreferrer" className="contact-card">
               <div className="contact-card-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.843L1.255 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -285,35 +258,21 @@ export default function SupportPage() {
               </div>
               <p className="contact-card-title">DM on X</p>
               <p className="contact-card-desc">
-                @buildrstudio — quick questions and feedback welcome
+                @{siteConfig.author.twitter} — quick questions and feedback welcome
               </p>
             </a>
 
-            <Link href="/roadmap" className="contact-card">
+            <a href={siteConfig.author.linkedinUrl} target="_blank" rel="noopener noreferrer" className="contact-card">
               <div className="contact-card-icon">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="8" y1="6" x2="21" y2="6" />
-                  <line x1="8" y1="12" x2="21" y2="12" />
-                  <line x1="8" y1="18" x2="21" y2="18" />
-                  <line x1="3" y1="6" x2="3.01" y2="6" />
-                  <line x1="3" y1="12" x2="3.01" y2="12" />
-                  <line x1="3" y1="18" x2="3.01" y2="18" />
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
                 </svg>
               </div>
               <p className="contact-card-title">Feature Requests</p>
               <p className="contact-card-desc">
-                Vote on what gets built next on the public roadmap
+                Share feedback or ideas on LinkedIn
               </p>
-            </Link>
+            </a>
           </div>
 
           {/* FAQ */}
@@ -327,7 +286,7 @@ export default function SupportPage() {
               If you didn&apos;t find what you needed above, just email — every message is read and
               replied to by the founder directly.
             </p>
-            <a href="mailto:support@buildrstudio.in" className="stuck-email">
+            <a href={`mailto:${siteConfig.author.support}`} className="stuck-email">
               <svg
                 width="15"
                 height="15"
@@ -341,7 +300,7 @@ export default function SupportPage() {
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                 <polyline points="22,6 12,13 2,6" />
               </svg>
-              support@buildrstudio.in
+              {siteConfig.author.support}
             </a>
           </div>
         </div>
