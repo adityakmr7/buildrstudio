@@ -2,7 +2,8 @@
 
 // ─── BuilderCanvas.tsx ───────────────────────────────────────────────────────
 // Live preview canvas for the App Store Screenshot Builder.
-// Uses forwardRef + useImperativeHandle so the parent can trigger PNG export.
+// Supports zoom (ctrl+scroll / buttons), pan (drag on empty space),
+// and image drag-to-reposition within the device frame.
 
 import React, {
   forwardRef,
@@ -12,27 +13,16 @@ import React, {
   useState,
   useEffect,
 } from "react";
-import { domToPng } from "modern-screenshot";
-import type {
-  BuilderConfig,
-  DeviceSpec,
-  GradDir,
-} from "../lib/deviceSpecs";
-import {
-  getDevice,
-  GRADIENT_PRESETS,
-} from "../lib/deviceSpecs";
+import { toPng } from "html-to-image";
+import type { BuilderConfig, DeviceSpec, GradDir } from "../lib/deviceSpecs";
+import { getDevice, GRADIENT_PRESETS } from "../lib/deviceSpecs";
 import DeviceFrame from "./DeviceFrame";
-
-// ── Public handle ─────────────────────────────────────────────────────────────
 
 export interface BuilderCanvasHandle {
   exportPng: (filename?: string) => Promise<void>;
   copyToClipboard: () => Promise<void>;
   getCapture: () => Promise<string>;
 }
-
-// ── Props ─────────────────────────────────────────────────────────────────────
 
 interface BuilderCanvasProps {
   config: BuilderConfig;
@@ -45,9 +35,7 @@ interface BuilderCanvasProps {
 
 function gradientCss(preset: string, dir: GradDir): string {
   const p = GRADIENT_PRESETS.find((g) => g.name === preset) ?? GRADIENT_PRESETS[0];
-  if (p.via) {
-    return `linear-gradient(${dir}, ${p.from}, ${p.via}, ${p.to})`;
-  }
+  if (p.via) return `linear-gradient(${dir}, ${p.from}, ${p.via}, ${p.to})`;
   return `linear-gradient(${dir}, ${p.from}, ${p.to})`;
 }
 
@@ -62,110 +50,53 @@ function meshCss(c1: string, c2: string, c3: string, c4: string): string {
 
 function computeBg(config: BuilderConfig): React.CSSProperties {
   switch (config.bgType) {
-    case "gradient":
-      return { background: gradientCss(config.gradientPreset, config.gradientDir) };
-    case "solid":
-      return { background: config.solidColor };
-    case "mesh":
-      return { background: meshCss(config.meshColor1, config.meshColor2, config.meshColor3, config.meshColor4) };
-    default:
-      return { background: "#0f172a" };
+    case "gradient": return { background: gradientCss(config.gradientPreset, config.gradientDir) };
+    case "solid":    return { background: config.solidColor };
+    case "mesh":     return { background: meshCss(config.meshColor1, config.meshColor2, config.meshColor3, config.meshColor4) };
+    default:         return { background: "#0f172a" };
   }
 }
 
 // ── Caption block ─────────────────────────────────────────────────────────────
 
-function CaptionBlock({
-  config,
-  maxWidth,
-  onUpdateConfig,
-}: {
-  config: BuilderConfig;
-  maxWidth: number;
-  onUpdateConfig?: (key: keyof BuilderConfig, val: any) => void;
-}) {
-  const displayHeadline = config.headline;
-  const displaySubtext = config.subtext;
-
-  if (!displayHeadline && !displaySubtext) return null;
-
+function CaptionBlock({ config, maxWidth, onUpdateConfig }: { config: BuilderConfig; maxWidth: number; onUpdateConfig?: (key: keyof BuilderConfig, val: any) => void }) {
+  if (!config.headline && !config.subtext) return null;
   return (
-    <div style={{
-      width: "100%",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: "0.35em",
-      padding: "0.8em 1.2em",
-      textAlign: "center",
-    }}>
-      {displayHeadline && (
+    <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.35em", padding: "0.8em 1.2em", textAlign: "center" }}>
+      {config.headline && (
         <p
           contentEditable={!!onUpdateConfig}
           suppressContentEditableWarning
-          onBlur={(e) => {
-            const text = e.currentTarget.textContent || "";
-            if (onUpdateConfig) {
-              onUpdateConfig("headline", text);
-            }
-          }}
+          onBlur={(e) => { if (onUpdateConfig) onUpdateConfig("headline", e.currentTarget.textContent || ""); }}
           style={{
-            margin: 0,
-            fontSize: `${config.headlineSize}em`,
-            fontWeight: 800,
-            color: config.headlineColor,
-            lineHeight: 1.1,
-            letterSpacing: "-0.03em",
-            fontFamily: config.fontFamily || "var(--font)",
-            maxWidth,
-            outline: "none",
-            cursor: onUpdateConfig ? "text" : "default",
-            padding: "2px 6px",
-            borderRadius: "6px",
-            border: onUpdateConfig ? "2px dashed transparent" : "none",
-            transition: "border-color 0.2s",
+            margin: 0, fontSize: `${config.headlineSize}em`, fontWeight: 800,
+            color: config.headlineColor, lineHeight: 1.1, letterSpacing: "-0.03em",
+            fontFamily: config.fontFamily || "var(--font)", maxWidth,
+            outline: "none", cursor: onUpdateConfig ? "text" : "default",
+            padding: "2px 6px", borderRadius: "6px",
+            border: onUpdateConfig ? "2px dashed transparent" : "none", transition: "border-color 0.2s",
           }}
-          onMouseEnter={(e) => {
-            if (onUpdateConfig) e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)";
-          }}
-          onMouseLeave={(e) => {
-            if (onUpdateConfig) e.currentTarget.style.borderColor = "transparent";
-          }}
+          onMouseEnter={(e) => { if (onUpdateConfig) e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)"; }}
+          onMouseLeave={(e) => { if (onUpdateConfig) e.currentTarget.style.borderColor = "transparent"; }}
         >
           {config.headline}
         </p>
       )}
-      {displaySubtext && (
+      {config.subtext && (
         <p
           contentEditable={!!onUpdateConfig}
           suppressContentEditableWarning
-          onBlur={(e) => {
-            const text = e.currentTarget.textContent || "";
-            if (onUpdateConfig) {
-              onUpdateConfig("subtext", text);
-            }
-          }}
+          onBlur={(e) => { if (onUpdateConfig) onUpdateConfig("subtext", e.currentTarget.textContent || ""); }}
           style={{
-            margin: 0,
-            fontSize: `${config.subtextSize}em`,
-            fontWeight: 500,
-            color: config.subtextColor,
-            lineHeight: 1.4,
-            fontFamily: config.fontFamily || "var(--font)",
-            maxWidth,
-            outline: "none",
-            cursor: onUpdateConfig ? "text" : "default",
-            padding: "2px 6px",
-            borderRadius: "6px",
-            border: onUpdateConfig ? "2px dashed transparent" : "none",
-            transition: "border-color 0.2s",
+            margin: 0, fontSize: `${config.subtextSize}em`, fontWeight: 500,
+            color: config.subtextColor, lineHeight: 1.4,
+            fontFamily: config.fontFamily || "var(--font)", maxWidth,
+            outline: "none", cursor: onUpdateConfig ? "text" : "default",
+            padding: "2px 6px", borderRadius: "6px",
+            border: onUpdateConfig ? "2px dashed transparent" : "none", transition: "border-color 0.2s",
           }}
-          onMouseEnter={(e) => {
-            if (onUpdateConfig) e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
-          }}
-          onMouseLeave={(e) => {
-            if (onUpdateConfig) e.currentTarget.style.borderColor = "transparent";
-          }}
+          onMouseEnter={(e) => { if (onUpdateConfig) e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; }}
+          onMouseLeave={(e) => { if (onUpdateConfig) e.currentTarget.style.borderColor = "transparent"; }}
         >
           {config.subtext}
         </p>
@@ -179,203 +110,147 @@ function CaptionBlock({
 interface InnerCanvasProps {
   config: BuilderConfig;
   spec: DeviceSpec;
-  /** Scale factor: preview is scaled down from actual canvas size */
   scale: number;
   innerRef: React.RefObject<HTMLDivElement | null>;
   onUpdateConfig?: (key: keyof BuilderConfig, val: any) => void;
   isWatermarkUnlocked: boolean;
   onOpenUnlockWatermark: () => void;
+  onImageDragStart?: (e: React.MouseEvent) => void;
+  onFrameDragStart?: (e: React.MouseEvent) => void;
 }
 
-function InnerCanvas({
-  config,
-  spec,
-  scale,
-  innerRef,
-  onUpdateConfig,
-  isWatermarkUnlocked,
-  onOpenUnlockWatermark,
-}: InnerCanvasProps) {
+function InnerCanvas({ config, spec, scale, innerRef, onUpdateConfig, isWatermarkUnlocked, onOpenUnlockWatermark, onImageDragStart, onFrameDragStart }: InnerCanvasProps) {
   const bgStyle = computeBg(config);
   const hasTop = config.textPosition === "top";
 
-  // Determine normalized frame dimensions
-  let frameW = 300;
-  let frameH = 620;
-  if (spec.frameType === "iphone-dynamic" || spec.frameType === "iphone-notch") {
-    frameW = 300;
-    frameH = 620;
-  } else if (spec.frameType === "ipad") {
-    frameW = 300;
-    frameH = 420;
-  } else if (spec.frameType === "android") {
-    frameW = 290;
-    frameH = 600;
-  } else if (spec.frameType === "android-tab") {
-    if (spec.isLandscape) {
-      frameW = 500;
-      frameH = 320;
-    } else {
-      frameW = 320;
-      frameH = 440;
-    }
+  let frameW = 300, frameH = 620;
+  if (spec.frameType === "ipad") { frameW = 300; frameH = 420; }
+  else if (spec.frameType === "android") { frameW = 290; frameH = 600; }
+  else if (spec.frameType === "android-tab") {
+    if (spec.isLandscape) { frameW = 500; frameH = 320; } else { frameW = 320; frameH = 440; }
   }
 
-  // Scale the frame to occupy a reasonable percentage of the canvas height (e.g. 65%)
   const targetFrameH = spec.canvasH * 0.65;
   const frameScale = targetFrameH / frameH;
-
   const scaledFrameW = frameW * frameScale;
   const scaledFrameH = frameH * frameScale;
 
   let panoramicTransform = "";
-  if (config.panoramic === "left") {
-    panoramicTransform = "translateX(35%)";
-  } else if (config.panoramic === "right") {
-    panoramicTransform = "translateX(-35%)";
-  }
+  if (config.panoramic === "left") panoramicTransform = "translateX(35%)";
+  else if (config.panoramic === "right") panoramicTransform = "translateX(-35%)";
+
+  const hasDrag = !!config.screenshotUrl && !!onUpdateConfig;
+  const frameOffX = config.frameOffsetX ?? 0;
+  const frameOffY = config.frameOffsetY ?? 0;
+  const frameTransform = [
+    panoramicTransform,
+    (frameOffX !== 0 || frameOffY !== 0) ? `translate(${frameOffX}px, ${frameOffY}px)` : "",
+  ].filter(Boolean).join(" ");
 
   return (
     <div
       ref={innerRef}
       className="builder-canvas-capture"
       style={{
-        width: spec.canvasW,
-        height: spec.canvasH,
-        transform: `scale(${scale})`,
-        transformOrigin: "top left",
-        flexShrink: 0,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        ...bgStyle,
-        position: "relative",
-        overflow: "hidden",
+        width: spec.canvasW, height: spec.canvasH,
+        transform: `scale(${scale})`, transformOrigin: "top left",
+        flexShrink: 0, display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        ...bgStyle, position: "relative", overflow: "hidden",
       }}
     >
-      {/* Caption top */}
       {hasTop && (
         <div style={{ width: "100%", paddingBottom: "2em", zIndex: 1 }}>
           <CaptionBlock config={config} maxWidth={spec.canvasW * 0.85} onUpdateConfig={onUpdateConfig} />
         </div>
       )}
 
-      {/* Device frame */}
       {config.frameVisible ? (
-        <div style={{
-          width: scaledFrameW,
-          height: scaledFrameH,
-          position: "relative",
-          zIndex: 1,
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          transform: panoramicTransform || undefined,
-        }}>
+        <div
+          onMouseDown={onUpdateConfig ? onFrameDragStart : undefined}
+          style={{
+            width: scaledFrameW, height: scaledFrameH, position: "relative",
+            zIndex: 1, flexShrink: 0, display: "flex",
+            alignItems: "center", justifyContent: "center",
+            transform: frameTransform || undefined,
+            cursor: onUpdateConfig ? "grab" : "default",
+          }}
+        >
           <div style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: frameW,
-            height: frameH,
-            transform: `scale(${frameScale})`,
-            transformOrigin: "top left",
+            position: "absolute", top: 0, left: 0,
+            width: frameW, height: frameH,
+            transform: `scale(${frameScale})`, transformOrigin: "top left",
           }}>
             <DeviceFrame
-              spec={spec}
-              shadow={config.frameShadow}
+              spec={spec} shadow={config.frameShadow}
               tilt3d={config.frameMode === "tilt3d"}
-              tiltX={config.tiltX}
-              tiltY={config.tiltY}
+              tiltX={config.tiltX} tiltY={config.tiltY}
               imageScale={config.imageScale}
               imageOffsetX={config.imageOffsetX}
               imageOffsetY={config.imageOffsetY}
             >
               {config.screenshotUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={config.screenshotUrl}
-                  alt="App screenshot"
-                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                />
+                <div
+                  onMouseDown={hasDrag ? onImageDragStart : undefined}
+                  style={{ width: "100%", height: "100%", cursor: hasDrag ? "move" : "default", overflow: "hidden" }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={config.screenshotUrl}
+                    alt="App screenshot"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      objectPosition: `${config.imageOffsetX}% ${config.imageOffsetY}%`,
+                      display: "block",
+                      pointerEvents: "none",
+                      transform: config.imageScale !== 1 ? `scale(${config.imageScale})` : undefined,
+                      transformOrigin: "center center",
+                    }}
+                  />
+                </div>
               ) : null}
             </DeviceFrame>
           </div>
         </div>
       ) : (
-        /* No frame — just the screenshot */
         config.screenshotUrl && (
           <div style={{
-            width: spec.canvasW * 0.85,
-            height: spec.canvasH * 0.75,
-            borderRadius: 40,
-            overflow: "hidden",
-            zIndex: 1,
+            width: spec.canvasW * 0.85, height: spec.canvasH * 0.75,
+            borderRadius: 40, overflow: "hidden", zIndex: 1,
             transform: `scale(${config.imageScale})` + (config.panoramic === "left" ? " translateX(35%)" : config.panoramic === "right" ? " translateX(-35%)" : ""),
             boxShadow: config.frameShadow ? "0 40px 120px rgba(0,0,0,0.5)" : undefined,
           }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={config.screenshotUrl}
-              alt="App screenshot"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                display: "block",
-                objectPosition: `${config.imageOffsetX}% ${config.imageOffsetY}%`
-              }}
-            />
+            <img src={config.screenshotUrl} alt="App screenshot" style={{
+              width: "100%", height: "100%", objectFit: "cover", display: "block",
+              objectPosition: `${config.imageOffsetX}% ${config.imageOffsetY}%`,
+            }} />
           </div>
         )
       )}
 
-      {/* Caption bottom */}
       {!hasTop && (
         <div style={{ width: "100%", paddingTop: "2em", zIndex: 1 }}>
           <CaptionBlock config={config} maxWidth={spec.canvasW * 0.85} onUpdateConfig={onUpdateConfig} />
         </div>
       )}
 
-      {/* Watermark */}
       {!isWatermarkUnlocked && (
         <div
-          onClick={(e) => {
-            e.stopPropagation();
-            onOpenUnlockWatermark();
-          }}
+          onClick={(e) => { e.stopPropagation(); onOpenUnlockWatermark(); }}
           title="Click to remove watermark"
           style={{
-            position: "absolute",
-            bottom: "16px",
-            right: "18px",
-            fontSize: "12px",
-            fontWeight: 700,
-            color: "rgba(255, 255, 255, 0.7)",
-            background: "rgba(0, 0, 0, 0.55)",
-            padding: "5px 12px",
-            borderRadius: "6px",
-            backdropFilter: "blur(4px)",
-            userSelect: "none",
-            cursor: "pointer",
-            zIndex: 100,
-            fontFamily: "var(--font)",
-            transition: "all 0.15s ease",
-            border: "1px solid rgba(255,255,255,0.1)",
-            letterSpacing: "0.2px",
+            position: "absolute", bottom: "16px", right: "18px",
+            fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.7)",
+            background: "rgba(0,0,0,0.55)", padding: "5px 12px", borderRadius: "6px",
+            backdropFilter: "blur(4px)", userSelect: "none", cursor: "pointer",
+            zIndex: 100, fontFamily: "var(--font)", transition: "all 0.15s ease",
+            border: "1px solid rgba(255,255,255,0.1)", letterSpacing: "0.2px",
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = "#fff";
-            e.currentTarget.style.background = "rgba(0,0,0,0.7)";
-            e.currentTarget.style.transform = "scale(1.05)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = "rgba(255, 255, 255, 0.7)";
-            e.currentTarget.style.background = "rgba(0, 0, 0, 0.55)";
-            e.currentTarget.style.transform = "scale(1)";
-          }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = "rgba(0,0,0,0.7)"; e.currentTarget.style.transform = "scale(1.05)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.7)"; e.currentTarget.style.background = "rgba(0,0,0,0.55)"; e.currentTarget.style.transform = "scale(1)"; }}
         >
           Made with buildrstudio.in
         </div>
@@ -387,55 +262,123 @@ function InnerCanvas({
 // ── Exported component ────────────────────────────────────────────────────────
 
 const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
-  function BuilderCanvas({
-    config,
-    onUpdateConfig,
-    isWatermarkUnlocked = false,
-    onOpenUnlockWatermark = () => {},
-  }, ref) {
+  function BuilderCanvas({ config, onUpdateConfig, isWatermarkUnlocked = false, onOpenUnlockWatermark = () => {} }, ref) {
     const spec = getDevice(config.deviceId);
     const captureRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [containerWidth, setContainerWidth] = useState(600);
 
+    // Viewport zoom + pan
+    const [userZoom, setUserZoom] = useState(1.0);
+    const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+    const viewportPanRef = useRef<{ startX: number; startY: number; panX: number; panY: number } | null>(null);
+    const isViewportPanning = viewportPanRef.current !== null;
+
+    // Image drag-to-reposition within frame
+    const imageDragRef = useRef<{ startX: number; startY: number; startOffX: number; startOffY: number } | null>(null);
+    // Frame drag to reposition the entire device frame on the canvas
+    const frameDragRef = useRef<{ startX: number; startY: number; startFrameX: number; startFrameY: number } | null>(null);
+
+    // Keep live refs so window event handlers don't go stale
+    const scaleRef = useRef(1);
+    const userZoomRef = useRef(1);
+    const specRef = useRef(spec);
+    const onUpdateConfigRef = useRef(onUpdateConfig);
+    const panOffsetRef = useRef({ x: 0, y: 0 });
+
     useEffect(() => {
       const el = containerRef.current;
       if (!el) return;
-
       setContainerWidth(el.getBoundingClientRect().width || 600);
-
-      const resizeObserver = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          setContainerWidth(entry.contentRect.width || 600);
-        }
+      const ro = new ResizeObserver((entries) => {
+        for (const e of entries) setContainerWidth(e.contentRect.width || 600);
       });
-      resizeObserver.observe(el);
-      return () => resizeObserver.disconnect();
+      ro.observe(el);
+      return () => ro.disconnect();
+    }, []);
+
+    // Ctrl+wheel = zoom, plain wheel = pan the viewport
+    useEffect(() => {
+      const el = containerRef.current;
+      if (!el) return;
+      const onWheel = (e: WheelEvent) => {
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          const factor = e.deltaY > 0 ? 0.92 : 1.09;
+          setUserZoom(prev => Math.min(3, Math.max(0.25, prev * factor)));
+        } else {
+          e.preventDefault();
+          setPanOffset(prev => ({ x: prev.x - e.deltaX * 0.6, y: prev.y - e.deltaY * 0.6 }));
+        }
+      };
+      el.addEventListener("wheel", onWheel, { passive: false });
+      return () => el.removeEventListener("wheel", onWheel);
+    }, []);
+
+    // Window-level drag handlers — reliable even when cursor leaves the container
+    useEffect(() => {
+      const onMove = (e: MouseEvent) => {
+        const s = scaleRef.current;
+        const uz = userZoomRef.current;
+        const sp = specRef.current;
+        const update = onUpdateConfigRef.current;
+
+        if (imageDragRef.current) {
+          const dx = e.clientX - imageDragRef.current.startX;
+          const dy = e.clientY - imageDragRef.current.startY;
+          // 1 screen px = 1/(s*uz) canvas px. Map canvas px → % of canvas dimension.
+          const newX = Math.min(100, Math.max(0, imageDragRef.current.startOffX + (dx / (s * uz)) / sp.canvasW * 100));
+          const newY = Math.min(100, Math.max(0, imageDragRef.current.startOffY + (dy / (s * uz)) / sp.canvasH * 100));
+          update?.("imageOffsetX", Math.round(newX * 10) / 10);
+          update?.("imageOffsetY", Math.round(newY * 10) / 10);
+          return;
+        }
+        if (frameDragRef.current) {
+          const dx = e.clientX - frameDragRef.current.startX;
+          const dy = e.clientY - frameDragRef.current.startY;
+          update?.("frameOffsetX", Math.round(frameDragRef.current.startFrameX + dx / (s * uz)));
+          update?.("frameOffsetY", Math.round(frameDragRef.current.startFrameY + dy / (s * uz)));
+          return;
+        }
+        if (viewportPanRef.current) {
+          const dx = e.clientX - viewportPanRef.current.startX;
+          const dy = e.clientY - viewportPanRef.current.startY;
+          setPanOffset({ x: panOffsetRef.current.x + dx, y: panOffsetRef.current.y + dy });
+        }
+      };
+      const onUp = () => {
+        imageDragRef.current = null;
+        frameDragRef.current = null;
+        viewportPanRef.current = null;
+      };
+      window.addEventListener("mousemove", onMove);
+      window.addEventListener("mouseup", onUp);
+      return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
     }, []);
 
     const targetH = spec.isLandscape ? 400 : 640;
     let scale = targetH / spec.canvasH;
-
-    // Prevent horizontal overflow on smaller viewports
-    const padding = 64; // 32px padding on each side
+    const padding = 64;
     const maxW = Math.max(200, containerWidth - padding);
-    if (spec.canvasW * scale > maxW) {
-      scale = maxW / spec.canvasW;
-    }
+    if (spec.canvasW * scale > maxW) scale = maxW / spec.canvasW;
 
-    // The scaled-down display dimensions
+    // Keep refs in sync each render
+    scaleRef.current = scale;
+    userZoomRef.current = userZoom;
+    specRef.current = spec;
+    onUpdateConfigRef.current = onUpdateConfig;
+    panOffsetRef.current = panOffset;
+
     const displayW = spec.canvasW * scale;
     const displayH = spec.canvasH * scale;
 
     const getCapture = useCallback(async (): Promise<string> => {
       if (!captureRef.current) throw new Error("Canvas ref not ready");
-      // Temporarily scale to 1 for full-res capture
       const el = captureRef.current;
       const original = el.style.transform;
       el.style.transform = "scale(1)";
       try {
-        const dataUrl = await domToPng(el, { scale: 1, quality: 1 });
-        return dataUrl;
+        return await toPng(el, { pixelRatio: 1, quality: 1, skipFonts: false });
       } finally {
         el.style.transform = original;
       }
@@ -456,64 +399,127 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
           const res = await fetch(dataUrl);
           const blob = await res.blob();
           await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-        } catch {
-          console.warn("Clipboard write failed");
-        }
+        } catch { console.warn("Clipboard write failed"); }
       },
     }), [getCapture, spec.id]);
 
+    const handleImageDragStart = useCallback((e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      imageDragRef.current = {
+        startX: e.clientX, startY: e.clientY,
+        startOffX: config.imageOffsetX ?? 50,
+        startOffY: config.imageOffsetY ?? 50,
+      };
+    }, [config.imageOffsetX, config.imageOffsetY]);
+
+    const handleFrameDragStart = useCallback((e: React.MouseEvent) => {
+      e.preventDefault();
+      frameDragRef.current = {
+        startX: e.clientX, startY: e.clientY,
+        startFrameX: config.frameOffsetX ?? 0,
+        startFrameY: config.frameOffsetY ?? 0,
+      };
+    }, [config.frameOffsetX, config.frameOffsetY]);
+
+    const handleViewportMouseDown = useCallback((e: React.MouseEvent) => {
+      if ((e.target as HTMLElement).closest(".builder-canvas-capture")) return;
+      viewportPanRef.current = { startX: e.clientX, startY: e.clientY, panX: panOffset.x, panY: panOffset.y };
+    }, [panOffset]);
+
+    const resetZoom = () => { setUserZoom(1.0); setPanOffset({ x: 0, y: 0 }); };
+
     return (
-      <div ref={containerRef} style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        flex: 1,
-        minHeight: 0,
-        padding: "20px 24px",
-        gap: 16,
-        overflowY: "auto",
-        background: "var(--surface-2)",
-      }}>
-        {/* Canvas wrapper — shows exact scaled display */}
+      <div
+        ref={containerRef}
+        onMouseDown={handleViewportMouseDown}
+        style={{
+          display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center",
+          flex: 1, minHeight: 0, position: "relative",
+          overflow: "hidden", background: "var(--surface-2)",
+          cursor: isViewportPanning ? "grabbing" : "default",
+          userSelect: "none",
+        }}
+      >
+        {/* Zoomed + panned canvas */}
         <div style={{
-          width: displayW,
-          height: displayH,
-          position: "relative",
-          overflow: "hidden",
-          borderRadius: 14,
-          boxShadow: "0 12px 48px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.08)",
-          transition: "opacity 0.2s ease",
+          transform: `scale(${userZoom}) translate(${panOffset.x / userZoom}px, ${panOffset.y / userZoom}px)`,
+          transformOrigin: "center center",
+          display: "flex", flexDirection: "column", alignItems: "center", gap: 16, padding: "20px 24px",
         }}>
-          <InnerCanvas
-            config={config}
-            spec={spec}
-            scale={scale}
-            innerRef={captureRef}
-            onUpdateConfig={onUpdateConfig}
-            isWatermarkUnlocked={isWatermarkUnlocked}
-            onOpenUnlockWatermark={onOpenUnlockWatermark}
-          />
+          <div style={{
+            width: displayW, height: displayH,
+            position: "relative", overflow: "hidden",
+            borderRadius: 14,
+            boxShadow: "0 12px 48px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.08)",
+          }}>
+            <InnerCanvas
+              config={config} spec={spec} scale={scale}
+              innerRef={captureRef} onUpdateConfig={onUpdateConfig}
+              isWatermarkUnlocked={isWatermarkUnlocked}
+              onOpenUnlockWatermark={onOpenUnlockWatermark}
+              onImageDragStart={handleImageDragStart}
+              onFrameDragStart={handleFrameDragStart}
+            />
+          </div>
+
+          {/* Dimension label */}
+          <div style={{
+            fontSize: 11, color: "var(--text-3)", fontFamily: "var(--font)",
+            letterSpacing: "0.4px", display: "flex", alignItems: "center", gap: 8,
+          }}>
+            <span>{spec.label}</span>
+            <span style={{ color: "var(--border-strong)" }}>·</span>
+            <span>{spec.canvasW} × {spec.canvasH}</span>
+            <span style={{ color: "var(--border-strong)" }}>·</span>
+            <span style={{ color: spec.platform === "appstore" ? "#007AFF" : "#34A853" }}>
+              {spec.platform === "appstore" ? "App Store" : "Play Store"}
+            </span>
+          </div>
         </div>
 
-        {/* Dimension label */}
+        {/* Floating zoom controls — bottom right */}
         <div style={{
-          fontSize: 11,
-          color: "var(--text-3)",
-          fontFamily: "var(--font)",
-          letterSpacing: "0.4px",
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
+          position: "absolute", bottom: "16px", right: "16px",
+          display: "flex", alignItems: "center", gap: "2px",
+          background: "var(--surface)", border: "1px solid var(--border)",
+          borderRadius: "8px", padding: "3px 5px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.12)", zIndex: 10,
         }}>
-          <span>{spec.label}</span>
-          <span style={{ color: "var(--border-strong)" }}>·</span>
-          <span>{spec.canvasW} × {spec.canvasH}</span>
-          <span style={{ color: "var(--border-strong)" }}>·</span>
-          <span style={{ color: spec.platform === "appstore" ? "#007AFF" : "#34A853" }}>
-            {spec.platform === "appstore" ? "App Store" : "Play Store"}
-          </span>
+          {[
+            { label: "−", title: "Zoom out", action: () => setUserZoom(p => Math.max(0.25, p * 0.85)) },
+          ].map(btn => (
+            <button key={btn.label} type="button" onClick={btn.action} title={btn.title}
+              style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-2)", width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "4px", fontSize: "17px", lineHeight: 1 }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "var(--fill-subtle)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "none"; }}
+            >{btn.label}</button>
+          ))}
+          <button type="button" onClick={resetZoom} title="Reset zoom"
+            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-2)", minWidth: "44px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "4px", fontSize: "11px", fontFamily: "var(--font)", fontWeight: 600, letterSpacing: "0.3px" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--fill-subtle)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "none"; }}
+          >{Math.round(userZoom * 100)}%</button>
+          <button type="button" onClick={() => setUserZoom(p => Math.min(3, p * 1.18))} title="Zoom in"
+            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-2)", width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "4px", fontSize: "17px", lineHeight: 1 }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--fill-subtle)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "none"; }}
+          >+</button>
         </div>
+
+        {/* Drag hint */}
+        {config.screenshotUrl && onUpdateConfig && (
+          <div style={{
+            position: "absolute", bottom: "16px", left: "50%", transform: "translateX(-50%)",
+            fontSize: "10px", color: "var(--text-3)", fontFamily: "var(--font)",
+            background: "var(--surface)", border: "1px solid var(--border)",
+            borderRadius: "6px", padding: "3px 10px", pointerEvents: "none",
+            whiteSpace: "nowrap",
+          }}>
+            Drag bezel to move frame · Drag screen to reposition image · Ctrl+scroll to zoom
+          </div>
+        )}
       </div>
     );
   }

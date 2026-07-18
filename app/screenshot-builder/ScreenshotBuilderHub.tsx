@@ -11,6 +11,7 @@ import type { BuilderConfig, DeviceId } from "./lib/deviceSpecs";
 import { DEFAULT_CONFIG, APPSTORE_DEVICES, PLAYSTORE_DEVICES, getStoreFilename, getDevice } from "./lib/deviceSpecs";
 import BuilderSidebar from "./components/BuilderSidebar";
 import BuilderCanvas, { BuilderCanvasHandle } from "./components/BuilderCanvas";
+import DeviceFrame from "./components/DeviceFrame";
 import PremiumModal from "../components/PremiumModal";
 import AppHeader from "../components/AppHeader";
 import UnlockWatermarkModal from "../components/UnlockWatermarkModal";
@@ -20,6 +21,166 @@ import PostExportShareModal from "./components/PostExportShareModal";
 import OnboardingTour from "../components/OnboardingTour";
 import ToolCrossLinks from "../components/ToolCrossLinks";
 import { useToast } from "../components/Toast";
+
+// ── Multi-screen grid view ────────────────────────────────────────────────────
+
+function MultiScreenGrid({
+  screens,
+  activeIndex,
+  onSelectScreen,
+  onUpdateConfig,
+  isWatermarkUnlocked,
+}: {
+  screens: BuilderConfig[];
+  activeIndex: number;
+  onSelectScreen: (idx: number) => void;
+  onUpdateConfig: (idx: number, key: keyof BuilderConfig, val: any) => void;
+  isWatermarkUnlocked: boolean;
+}) {
+  const CARD_H = 320;
+
+  function getCardBg(scr: BuilderConfig): string {
+    if (scr.bgType === "solid") return scr.solidColor;
+    if (scr.bgType === "gradient") {
+      const presets: Record<string, { from: string; to: string }> = {
+        "Indigo Dusk": { from: "#6366f1", to: "#ec4899" },
+        "Ocean Breeze": { from: "#0ea5e9", to: "#7dd3fc" },
+        "Sunset Blaze": { from: "#f97316", to: "#fbbf24" },
+        "Arctic White": { from: "#f8fafc", to: "#e2e8f0" },
+        "Midnight": { from: "#111827", to: "#374151" },
+      };
+      const p = presets[scr.gradientPreset] ?? { from: "#6366f1", to: "#ec4899" };
+      return `linear-gradient(160deg, ${p.from}, ${p.to})`;
+    }
+    if (scr.bgType === "mesh") {
+      return `radial-gradient(ellipse at 0% 0%, ${scr.meshColor1} 0%, transparent 60%), radial-gradient(ellipse at 100% 100%, ${scr.meshColor3} 0%, transparent 60%), ${scr.meshColor4}`;
+    }
+    return "#0f172a";
+  }
+
+  return (
+    <div style={{
+      flex: 1, minHeight: 0, overflowY: "auto", overflowX: "auto",
+      display: "flex", flexWrap: "wrap", gap: "24px",
+      padding: "32px", alignContent: "flex-start",
+      background: "var(--surface-2)",
+    }}>
+      {screens.map((scr, idx) => {
+        const spec = getDevice(scr.deviceId);
+        const scale = CARD_H / spec.canvasH;
+        const cardW = spec.canvasW * scale;
+        const isActive = idx === activeIndex;
+
+        return (
+          <div
+            key={idx}
+            onClick={() => onSelectScreen(idx)}
+            style={{
+              display: "flex", flexDirection: "column", alignItems: "center", gap: "10px",
+              cursor: "pointer", flexShrink: 0,
+            }}
+          >
+            {/* Frame preview */}
+            <div style={{
+              width: cardW, height: CARD_H,
+              borderRadius: 12, overflow: "hidden",
+              border: isActive ? "2.5px solid var(--fill)" : "2px solid transparent",
+              boxShadow: isActive
+                ? "0 0 0 4px rgba(99,102,241,0.18), 0 8px 32px rgba(0,0,0,0.2)"
+                : "0 4px 20px rgba(0,0,0,0.14)",
+              transition: "all 0.15s ease",
+              position: "relative",
+            }}>
+              {/* Background */}
+              <div style={{
+                width: spec.canvasW, height: spec.canvasH,
+                transform: `scale(${scale})`, transformOrigin: "top left",
+                background: getCardBg(scr),
+                display: "flex", flexDirection: "column",
+                alignItems: "center", justifyContent: "center",
+                position: "relative", overflow: "hidden",
+              }}>
+                {/* Headline */}
+                {(scr.textPosition === "top") && scr.headline && (
+                  <div style={{
+                    width: "100%", textAlign: "center", padding: "0.8em 1.2em",
+                    fontSize: `${scr.headlineSize}em`, fontWeight: 800,
+                    color: scr.headlineColor, lineHeight: 1.1,
+                    letterSpacing: "-0.03em", fontFamily: "var(--font)",
+                  }}>{scr.headline}</div>
+                )}
+
+                {/* Device frame */}
+                {scr.frameVisible && (() => {
+                  let frameW = 300, frameH = 620;
+                  if (spec.frameType === "ipad") { frameW = 300; frameH = 420; }
+                  else if (spec.frameType === "android") { frameW = 290; frameH = 600; }
+                  else if (spec.frameType === "android-tab") {
+                    if (spec.isLandscape) { frameW = 500; frameH = 320; } else { frameW = 320; frameH = 440; }
+                  }
+                  const targetFrameH = spec.canvasH * 0.65;
+                  const fs = targetFrameH / frameH;
+                  return (
+                    <div style={{ width: frameW * fs, height: frameH * fs, position: "relative", flexShrink: 0 }}>
+                      <div style={{ position: "absolute", top: 0, left: 0, width: frameW, height: frameH, transform: `scale(${fs})`, transformOrigin: "top left" }}>
+                        <DeviceFrame spec={spec} shadow={scr.frameShadow} imageScale={scr.imageScale} imageOffsetX={scr.imageOffsetX} imageOffsetY={scr.imageOffsetY}>
+                          {scr.screenshotUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={scr.screenshotUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          ) : null}
+                        </DeviceFrame>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Bottom headline */}
+                {scr.textPosition !== "top" && scr.headline && (
+                  <div style={{
+                    width: "100%", textAlign: "center", padding: "0.8em 1.2em",
+                    fontSize: `${scr.headlineSize}em`, fontWeight: 800,
+                    color: scr.headlineColor, lineHeight: 1.1,
+                    letterSpacing: "-0.03em", fontFamily: "var(--font)",
+                  }}>{scr.headline}</div>
+                )}
+
+                {/* Watermark */}
+                {!isWatermarkUnlocked && (
+                  <div style={{
+                    position: "absolute", bottom: 8, right: 10,
+                    fontSize: "10px", fontWeight: 700, color: "rgba(255,255,255,0.6)",
+                    background: "rgba(0,0,0,0.5)", padding: "3px 8px", borderRadius: "4px",
+                    fontFamily: "var(--font)",
+                  }}>Made with buildrstudio.in</div>
+                )}
+              </div>
+
+              {/* Active indicator overlay */}
+              {isActive && (
+                <div style={{
+                  position: "absolute", inset: 0, pointerEvents: "none",
+                  border: "2px solid var(--fill)", borderRadius: 10,
+                }} />
+              )}
+            </div>
+
+            {/* Screen label */}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: isActive ? "var(--fill)" : "var(--text-2)", fontFamily: "var(--font)" }}>
+                Screen {idx + 1}
+              </span>
+              <span style={{ fontSize: "10px", color: "var(--text-3)", fontFamily: "var(--font)" }}>
+                {spec.canvasW} × {spec.canvasH}
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Main Hub ──────────────────────────────────────────────────────────────────
 
 export default function ScreenshotBuilderHub() {
   const { data: session } = useSession();
@@ -56,6 +217,8 @@ export default function ScreenshotBuilderHub() {
   const [importStoreInitialUrl, setImportStoreInitialUrl] = useState<string | undefined>(undefined);
   const [shareModal, setShareModal] = useState<{ isOpen: boolean; count: number }>({ isOpen: false, count: 1 });
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isDeckCollapsed, setIsDeckCollapsed] = useState(false);
+  const [isGridView, setIsGridView] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [projectName, setProjectName] = useState("Untitled Project");
   const [isSaving, setIsSaving] = useState(false);
@@ -764,6 +927,27 @@ export default function ScreenshotBuilderHub() {
 
             <div style={{ flex: 1 }} />
 
+            {/* Grid view toggle */}
+            <button
+              type="button"
+              onClick={() => setIsGridView(v => !v)}
+              title={isGridView ? "Single screen view" : "View all screens"}
+              style={{
+                background: isGridView ? "var(--fill-subtle)" : "none",
+                color: isGridView ? "var(--fill)" : "var(--text-2)",
+                border: "1px solid var(--border)", borderRadius: "6px",
+                width: "28px", height: "28px", display: "flex", alignItems: "center",
+                justifyContent: "center", cursor: "pointer", flexShrink: 0,
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="1" y="1" width="5" height="5" rx="1"/><rect x="8" y="1" width="5" height="5" rx="1"/>
+                <rect x="1" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/>
+              </svg>
+            </button>
+
+            <div style={{ width: "1px", height: "20px", background: "var(--border)", flexShrink: 0 }} />
+
             {/* Action buttons */}
             {(["Templates", "Import App", "Share"] as const).map((label) => (
               <button
@@ -824,14 +1008,35 @@ export default function ScreenshotBuilderHub() {
             display: "flex",
             alignItems: "center",
             gap: "8px",
-            padding: "14px 16px 8px",
+            padding: isDeckCollapsed ? "6px 16px" : "10px 16px 8px",
             overflowX: "auto",
             overflowY: "visible",
             scrollbarWidth: "none",
           }}>
-            <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.06em", flexShrink: 0 }}>
-              Screens
-            </span>
+            {/* Deck collapse toggle */}
+            <button
+              type="button"
+              onClick={() => setIsDeckCollapsed(!isDeckCollapsed)}
+              title={isDeckCollapsed ? "Show screens" : "Hide screens"}
+              style={{
+                background: "none", border: "none", cursor: "pointer",
+                display: "flex", alignItems: "center", gap: "4px",
+                color: "var(--text-3)", padding: "2px 4px", borderRadius: "4px",
+                flexShrink: 0,
+              }}
+            >
+              <svg
+                width="10" height="10" viewBox="0 0 10 10" fill="none"
+                style={{ transform: isDeckCollapsed ? "rotate(-90deg)" : "rotate(0deg)", transition: "transform 0.15s ease" }}
+              >
+                <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                Screens {isDeckCollapsed ? `(${screens.length})` : ""}
+              </span>
+            </button>
+
+            {isDeckCollapsed ? null : (<>
 
             {screens.map((scr, idx) => {
               const isActive = idx === activeScreenIndex;
@@ -960,17 +1165,34 @@ export default function ScreenshotBuilderHub() {
               </svg>
               <span style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.04em" }}>ADD</span>
             </button>
+          </>)}
           </div>
           </div>
 
-          {/* Right canvas live preview */}
-          <BuilderCanvas
-            ref={canvasRef}
-            config={activeScreenConfig}
-            onUpdateConfig={(key, val) => handleSetSingleConfig((prev) => ({ ...prev, [key]: val }))}
-            isWatermarkUnlocked={isWatermarkUnlocked}
-            onOpenUnlockWatermark={() => setIsUnlockModalOpen(true)}
-          />
+          {/* Canvas area — single or grid view */}
+          {isGridView ? (
+            <MultiScreenGrid
+              screens={screens}
+              activeIndex={activeScreenIndex}
+              onSelectScreen={(idx) => setDeck(prev => ({ ...prev, activeScreenIndex: idx }))}
+              onUpdateConfig={(idx, key, val) => {
+                setDeck(prev => {
+                  const updated = [...prev.screens];
+                  if (updated[idx]) updated[idx] = { ...updated[idx], [key]: val };
+                  return { ...prev, screens: updated };
+                });
+              }}
+              isWatermarkUnlocked={isWatermarkUnlocked}
+            />
+          ) : (
+            <BuilderCanvas
+              ref={canvasRef}
+              config={activeScreenConfig}
+              onUpdateConfig={(key, val) => handleSetSingleConfig((prev) => ({ ...prev, [key]: val }))}
+              isWatermarkUnlocked={isWatermarkUnlocked}
+              onOpenUnlockWatermark={() => setIsUnlockModalOpen(true)}
+            />
+          )}
         </div>
       </div>
 
