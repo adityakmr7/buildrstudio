@@ -25,7 +25,7 @@ function IPhoneDynamic({ children, shadow }: { children: React.ReactNode; shadow
   const W = 300, H = 620;
   const cornerR = 46;
   const si = 11; // screen inset
-  const scR = cornerR - 7; // screen corner radius
+  const scR = cornerR - 4; // screen corner radius — close to body radius like real iPhone
   const pill = { w: 96, h: 30, x: (W - 96) / 2, y: 19 };
 
   return (
@@ -39,15 +39,15 @@ function IPhoneDynamic({ children, shadow }: { children: React.ReactNode; shadow
       <svg viewBox={`0 0 ${W} ${H}`} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0 }}>
         <defs>
           <linearGradient id="df-body-h" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#3c3c3e" />
-            <stop offset="18%" stopColor="#2c2c2e" />
+            <stop offset="0%" stopColor="#3a3a3c" />
+            <stop offset="15%" stopColor="#2a2a2c" />
             <stop offset="50%" stopColor="#1c1c1e" />
-            <stop offset="82%" stopColor="#2a2a2c" />
+            <stop offset="85%" stopColor="#2a2a2c" />
             <stop offset="100%" stopColor="#3a3a3c" />
           </linearGradient>
           <linearGradient id="df-body-v" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="rgba(255,255,255,0.04)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.08)" />
+            <stop offset="0%" stopColor="rgba(255,255,255,0.07)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.10)" />
           </linearGradient>
           <linearGradient id="df-btn-l" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#484848" />
@@ -58,21 +58,15 @@ function IPhoneDynamic({ children, shadow }: { children: React.ReactNode; shadow
             <stop offset="100%" stopColor="#484848" />
           </linearGradient>
         </defs>
-        {/* Body fill */}
         <rect x="0" y="0" width={W} height={H} rx={cornerR} ry={cornerR} fill="url(#df-body-h)" />
         <rect x="0" y="0" width={W} height={H} rx={cornerR} ry={cornerR} fill="url(#df-body-v)" />
-        {/* Screen recess */}
         <rect x={si} y={si} width={W - si * 2} height={H - si * 2} rx={scR} ry={scR} fill="#090909" />
-        {/* Side buttons */}
         <rect x={-3} y="138" width="5" height="38" rx="2.5" fill="url(#df-btn-l)" />
         <rect x={-3} y="192" width="5" height="62" rx="2.5" fill="url(#df-btn-l)" />
         <rect x={-3} y="268" width="5" height="62" rx="2.5" fill="url(#df-btn-l)" />
         <rect x={W - 2} y="168" width="5" height="100" rx="2.5" fill="url(#df-btn-r)" />
-        {/* Body outer edge highlight */}
-        <rect x="0" y="0" width={W} height={H} rx={cornerR} ry={cornerR} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="0.75" />
-        {/* Body inner shadow edge */}
-        <rect x="1" y="1" width={W - 2} height={H - 2} rx={cornerR - 1} ry={cornerR - 1} fill="none" stroke="rgba(0,0,0,0.4)" strokeWidth="1.5" />
-        {/* Screen ring subtle glow */}
+        <rect x="0" y="0" width={W} height={H} rx={cornerR} ry={cornerR} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="0.75" />
+        <rect x="1" y="1" width={W - 2} height={H - 2} rx={cornerR - 1} ry={cornerR - 1} fill="none" stroke="rgba(0,0,0,0.5)" strokeWidth="1.5" />
         <rect x={si} y={si} width={W - si * 2} height={H - si * 2} rx={scR} ry={scR} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
       </svg>
 
@@ -124,7 +118,7 @@ function IPhoneNotch({ children, shadow }: { children: React.ReactNode; shadow?:
   const W = 300, H = 620;
   const cornerR = 42;
   const si = 11;
-  const scR = cornerR - 7;
+  const scR = cornerR - 4;
   const notch = { w: 130, h: 28 };
 
   return (
@@ -137,11 +131,15 @@ function IPhoneNotch({ children, shadow }: { children: React.ReactNode; shadow?:
       <svg viewBox={`0 0 ${W} ${H}`} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0 }}>
         <defs>
           <linearGradient id="df2-body" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#3c3c3e" />
-            <stop offset="18%" stopColor="#2c2c2e" />
+            <stop offset="0%" stopColor="#3a3a3c" />
+            <stop offset="15%" stopColor="#2a2a2c" />
             <stop offset="50%" stopColor="#1c1c1e" />
-            <stop offset="82%" stopColor="#2a2a2c" />
+            <stop offset="85%" stopColor="#2a2a2c" />
             <stop offset="100%" stopColor="#3a3a3c" />
+          </linearGradient>
+          <linearGradient id="df2-body-v" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.07)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.10)" />
           </linearGradient>
           <linearGradient id="df2-btn-l" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#484848" />
@@ -153,13 +151,15 @@ function IPhoneNotch({ children, shadow }: { children: React.ReactNode; shadow?:
           </linearGradient>
         </defs>
         <rect x="0" y="0" width={W} height={H} rx={cornerR} ry={cornerR} fill="url(#df2-body)" />
+        <rect x="0" y="0" width={W} height={H} rx={cornerR} ry={cornerR} fill="url(#df2-body-v)" />
         <rect x={si} y={si} width={W - si * 2} height={H - si * 2} rx={scR} ry={scR} fill="#090909" />
         <rect x={-3} y="138" width="5" height="38" rx="2.5" fill="url(#df2-btn-l)" />
         <rect x={-3} y="192" width="5" height="62" rx="2.5" fill="url(#df2-btn-l)" />
         <rect x={-3} y="268" width="5" height="62" rx="2.5" fill="url(#df2-btn-l)" />
         <rect x={W - 2} y="168" width="5" height="100" rx="2.5" fill="url(#df2-btn-r)" />
-        <rect x="0" y="0" width={W} height={H} rx={cornerR} ry={cornerR} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="0.75" />
-        <rect x="1" y="1" width={W - 2} height={H - 2} rx={cornerR - 1} ry={cornerR - 1} fill="none" stroke="rgba(0,0,0,0.4)" strokeWidth="1.5" />
+        <rect x="0" y="0" width={W} height={H} rx={cornerR} ry={cornerR} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="0.75" />
+        <rect x="1" y="1" width={W - 2} height={H - 2} rx={cornerR - 1} ry={cornerR - 1} fill="none" stroke="rgba(0,0,0,0.5)" strokeWidth="1.5" />
+        <rect x={si} y={si} width={W - si * 2} height={H - si * 2} rx={scR} ry={scR} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
       </svg>
 
       <div style={{
@@ -206,7 +206,7 @@ function IPadFrame({ children, shadow }: { children: React.ReactNode; shadow?: b
   const W = 300, H = 420;
   const cornerR = 22;
   const si = 14;
-  const scR = cornerR - 5;
+  const scR = cornerR - 4;
 
   return (
     <div style={{
@@ -260,7 +260,7 @@ function AndroidPhoneFrame({ children, shadow }: { children: React.ReactNode; sh
   const W = 290, H = 600;
   const cornerR = 36;
   const si = 12;
-  const scR = cornerR - 8;
+  const scR = cornerR - 4;
 
   return (
     <div style={{
@@ -323,7 +323,7 @@ function AndroidTabFrame({ children, shadow, landscape }: { children: React.Reac
   const H = landscape ? 320 : 440;
   const cornerR = 18;
   const si = 14;
-  const scR = cornerR - 5;
+  const scR = cornerR - 4;
 
   return (
     <div style={{
@@ -388,31 +388,24 @@ function Tilt3DWrapper({ children, enable, tiltX = 4, tiltY = -14 }: { children:
 
 export default function DeviceFrame({ spec, children, shadow, tilt3d, tiltX, tiltY, imageScale = 1, imageOffsetX = 50, imageOffsetY = 50 }: DeviceFrameProps) {
   const screenshotContent = (
-    <div style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden", backgroundColor: "#0a0a0a" }}>
+    <div style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden", backgroundColor: "#ffffff" }}>
       {children ? (
-        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-          <div style={{
-            width: `${imageScale * 100}%`,
-            height: `${imageScale * 100}%`,
-            transform: `translate(${imageOffsetX - 50}%, ${imageOffsetY - 50}%)`,
-            flexShrink: 0,
-          }}>
-            {children}
-          </div>
+        <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+          {children}
         </div>
       ) : (
         <div style={{
           width: "100%", height: "100%",
           display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center",
-          background: "linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
-          gap: 8,
+          background: "#ffffff",
+          gap: 10,
         }}>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.18)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
           </svg>
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "var(--font)", textAlign: "center", padding: "0 12px" }}>
-            Upload a screenshot
+          <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(0,0,0,0.22)", fontFamily: "var(--font)", textAlign: "center", padding: "0 16px", lineHeight: 1.4 }}>
+            Upload Image Here
           </span>
         </div>
       )}

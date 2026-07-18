@@ -207,6 +207,10 @@ export interface BuilderConfig {
   tiltX: number;
   tiltY: number;
 
+  // Frame position (canvas pixel offsets from centre, default 0,0)
+  frameOffsetX: number;
+  frameOffsetY: number;
+
   // Spanning / Deck sync settings
   panoramic: "none" | "left" | "right";
   autoSyncTheme: boolean;
@@ -215,7 +219,7 @@ export interface BuilderConfig {
 export const DEFAULT_CONFIG: BuilderConfig = {
   deviceId: "iphone-67",
   screenshotUrl: null,
-  imageScale: 0.9,
+  imageScale: 1.0,
   imageOffsetX: 50,
   imageOffsetY: 50,
   headline: "Your App. Your Story.",
@@ -239,6 +243,8 @@ export const DEFAULT_CONFIG: BuilderConfig = {
   frameShadow: true,
   tiltX: 4,
   tiltY: -14,
+  frameOffsetX: 0,
+  frameOffsetY: 0,
   panoramic: "none",
   autoSyncTheme: true,
 };

@@ -13,7 +13,7 @@ import React, {
   useState,
   useEffect,
 } from "react";
-import { domToPng } from "modern-screenshot";
+import { toPng } from "html-to-image";
 import type { BuilderConfig, DeviceSpec, GradDir } from "../lib/deviceSpecs";
 import { getDevice, GRADIENT_PRESETS } from "../lib/deviceSpecs";
 import DeviceFrame from "./DeviceFrame";
@@ -116,9 +116,10 @@ interface InnerCanvasProps {
   isWatermarkUnlocked: boolean;
   onOpenUnlockWatermark: () => void;
   onImageDragStart?: (e: React.MouseEvent) => void;
+  onFrameDragStart?: (e: React.MouseEvent) => void;
 }
 
-function InnerCanvas({ config, spec, scale, innerRef, onUpdateConfig, isWatermarkUnlocked, onOpenUnlockWatermark, onImageDragStart }: InnerCanvasProps) {
+function InnerCanvas({ config, spec, scale, innerRef, onUpdateConfig, isWatermarkUnlocked, onOpenUnlockWatermark, onImageDragStart, onFrameDragStart }: InnerCanvasProps) {
   const bgStyle = computeBg(config);
   const hasTop = config.textPosition === "top";
 
@@ -139,6 +140,12 @@ function InnerCanvas({ config, spec, scale, innerRef, onUpdateConfig, isWatermar
   else if (config.panoramic === "right") panoramicTransform = "translateX(-35%)";
 
   const hasDrag = !!config.screenshotUrl && !!onUpdateConfig;
+  const frameOffX = config.frameOffsetX ?? 0;
+  const frameOffY = config.frameOffsetY ?? 0;
+  const frameTransform = [
+    panoramicTransform,
+    (frameOffX !== 0 || frameOffY !== 0) ? `translate(${frameOffX}px, ${frameOffY}px)` : "",
+  ].filter(Boolean).join(" ");
 
   return (
     <div
@@ -160,13 +167,13 @@ function InnerCanvas({ config, spec, scale, innerRef, onUpdateConfig, isWatermar
 
       {config.frameVisible ? (
         <div
-          onMouseDown={hasDrag ? onImageDragStart : undefined}
+          onMouseDown={onUpdateConfig ? onFrameDragStart : undefined}
           style={{
             width: scaledFrameW, height: scaledFrameH, position: "relative",
             zIndex: 1, flexShrink: 0, display: "flex",
             alignItems: "center", justifyContent: "center",
-            transform: panoramicTransform || undefined,
-            cursor: hasDrag ? "grab" : "default",
+            transform: frameTransform || undefined,
+            cursor: onUpdateConfig ? "grab" : "default",
           }}
         >
           <div style={{
@@ -183,8 +190,26 @@ function InnerCanvas({ config, spec, scale, innerRef, onUpdateConfig, isWatermar
               imageOffsetY={config.imageOffsetY}
             >
               {config.screenshotUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={config.screenshotUrl} alt="App screenshot" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                <div
+                  onMouseDown={hasDrag ? onImageDragStart : undefined}
+                  style={{ width: "100%", height: "100%", cursor: hasDrag ? "move" : "default", overflow: "hidden" }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={config.screenshotUrl}
+                    alt="App screenshot"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      objectPosition: `${config.imageOffsetX}% ${config.imageOffsetY}%`,
+                      display: "block",
+                      pointerEvents: "none",
+                      transform: config.imageScale !== 1 ? `scale(${config.imageScale})` : undefined,
+                      transformOrigin: "center center",
+                    }}
+                  />
+                </div>
               ) : null}
             </DeviceFrame>
           </div>
@@ -251,6 +276,15 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
 
     // Image drag-to-reposition within frame
     const imageDragRef = useRef<{ startX: number; startY: number; startOffX: number; startOffY: number } | null>(null);
+    // Frame drag to reposition the entire device frame on the canvas
+    const frameDragRef = useRef<{ startX: number; startY: number; startFrameX: number; startFrameY: number } | null>(null);
+
+    // Keep live refs so window event handlers don't go stale
+    const scaleRef = useRef(1);
+    const userZoomRef = useRef(1);
+    const specRef = useRef(spec);
+    const onUpdateConfigRef = useRef(onUpdateConfig);
+    const panOffsetRef = useRef({ x: 0, y: 0 });
 
     useEffect(() => {
       const el = containerRef.current;
@@ -281,11 +315,59 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
       return () => el.removeEventListener("wheel", onWheel);
     }, []);
 
+    // Window-level drag handlers — reliable even when cursor leaves the container
+    useEffect(() => {
+      const onMove = (e: MouseEvent) => {
+        const s = scaleRef.current;
+        const uz = userZoomRef.current;
+        const sp = specRef.current;
+        const update = onUpdateConfigRef.current;
+
+        if (imageDragRef.current) {
+          const dx = e.clientX - imageDragRef.current.startX;
+          const dy = e.clientY - imageDragRef.current.startY;
+          // 1 screen px = 1/(s*uz) canvas px. Map canvas px → % of canvas dimension.
+          const newX = Math.min(100, Math.max(0, imageDragRef.current.startOffX + (dx / (s * uz)) / sp.canvasW * 100));
+          const newY = Math.min(100, Math.max(0, imageDragRef.current.startOffY + (dy / (s * uz)) / sp.canvasH * 100));
+          update?.("imageOffsetX", Math.round(newX * 10) / 10);
+          update?.("imageOffsetY", Math.round(newY * 10) / 10);
+          return;
+        }
+        if (frameDragRef.current) {
+          const dx = e.clientX - frameDragRef.current.startX;
+          const dy = e.clientY - frameDragRef.current.startY;
+          update?.("frameOffsetX", Math.round(frameDragRef.current.startFrameX + dx / (s * uz)));
+          update?.("frameOffsetY", Math.round(frameDragRef.current.startFrameY + dy / (s * uz)));
+          return;
+        }
+        if (viewportPanRef.current) {
+          const dx = e.clientX - viewportPanRef.current.startX;
+          const dy = e.clientY - viewportPanRef.current.startY;
+          setPanOffset({ x: panOffsetRef.current.x + dx, y: panOffsetRef.current.y + dy });
+        }
+      };
+      const onUp = () => {
+        imageDragRef.current = null;
+        frameDragRef.current = null;
+        viewportPanRef.current = null;
+      };
+      window.addEventListener("mousemove", onMove);
+      window.addEventListener("mouseup", onUp);
+      return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+    }, []);
+
     const targetH = spec.isLandscape ? 400 : 640;
     let scale = targetH / spec.canvasH;
     const padding = 64;
     const maxW = Math.max(200, containerWidth - padding);
     if (spec.canvasW * scale > maxW) scale = maxW / spec.canvasW;
+
+    // Keep refs in sync each render
+    scaleRef.current = scale;
+    userZoomRef.current = userZoom;
+    specRef.current = spec;
+    onUpdateConfigRef.current = onUpdateConfig;
+    panOffsetRef.current = panOffset;
 
     const displayW = spec.canvasW * scale;
     const displayH = spec.canvasH * scale;
@@ -296,7 +378,7 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
       const original = el.style.transform;
       el.style.transform = "scale(1)";
       try {
-        return await domToPng(el, { scale: 1, quality: 1 });
+        return await toPng(el, { pixelRatio: 1, quality: 1, skipFonts: false });
       } finally {
         el.style.transform = original;
       }
@@ -323,6 +405,7 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
 
     const handleImageDragStart = useCallback((e: React.MouseEvent) => {
       e.preventDefault();
+      e.stopPropagation();
       imageDragRef.current = {
         startX: e.clientX, startY: e.clientY,
         startOffX: config.imageOffsetX ?? 50,
@@ -330,30 +413,14 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
       };
     }, [config.imageOffsetX, config.imageOffsetY]);
 
-    const handleMouseMove = useCallback((e: React.MouseEvent) => {
-      if (imageDragRef.current) {
-        const dx = e.clientX - imageDragRef.current.startX;
-        const dy = e.clientY - imageDragRef.current.startY;
-        const sens = 0.12 / userZoom;
-        const newX = Math.min(100, Math.max(0, imageDragRef.current.startOffX + dx * sens));
-        const newY = Math.min(100, Math.max(0, imageDragRef.current.startOffY + dy * sens));
-        if (onUpdateConfig) {
-          onUpdateConfig("imageOffsetX", Math.round(newX * 10) / 10);
-          onUpdateConfig("imageOffsetY", Math.round(newY * 10) / 10);
-        }
-        return;
-      }
-      if (viewportPanRef.current) {
-        const dx = e.clientX - viewportPanRef.current.startX;
-        const dy = e.clientY - viewportPanRef.current.startY;
-        setPanOffset({ x: viewportPanRef.current.panX + dx, y: viewportPanRef.current.panY + dy });
-      }
-    }, [onUpdateConfig, userZoom]);
-
-    const handleMouseUp = useCallback(() => {
-      imageDragRef.current = null;
-      viewportPanRef.current = null;
-    }, []);
+    const handleFrameDragStart = useCallback((e: React.MouseEvent) => {
+      e.preventDefault();
+      frameDragRef.current = {
+        startX: e.clientX, startY: e.clientY,
+        startFrameX: config.frameOffsetX ?? 0,
+        startFrameY: config.frameOffsetY ?? 0,
+      };
+    }, [config.frameOffsetX, config.frameOffsetY]);
 
     const handleViewportMouseDown = useCallback((e: React.MouseEvent) => {
       if ((e.target as HTMLElement).closest(".builder-canvas-capture")) return;
@@ -365,9 +432,6 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
     return (
       <div
         ref={containerRef}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
         onMouseDown={handleViewportMouseDown}
         style={{
           display: "flex", flexDirection: "column",
@@ -396,6 +460,7 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
               isWatermarkUnlocked={isWatermarkUnlocked}
               onOpenUnlockWatermark={onOpenUnlockWatermark}
               onImageDragStart={handleImageDragStart}
+              onFrameDragStart={handleFrameDragStart}
             />
           </div>
 
@@ -452,7 +517,7 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
             borderRadius: "6px", padding: "3px 10px", pointerEvents: "none",
             whiteSpace: "nowrap",
           }}>
-            Drag frame to reposition · Ctrl+scroll to zoom
+            Drag bezel to move frame · Drag screen to reposition image · Ctrl+scroll to zoom
           </div>
         )}
       </div>
