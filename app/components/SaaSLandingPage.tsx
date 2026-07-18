@@ -206,6 +206,19 @@ export default function SaaSLandingPage() {
           position: relative;
           overflow: hidden;
         }
+        .slp-mockup-tile-img {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: top center;
+        }
+        .slp-mockup-tile-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.0) 55%);
+        }
         .slp-mockup-tile-label {
           font-size: 11px;
           font-weight: 800;
@@ -428,7 +441,8 @@ export default function SaaSLandingPage() {
         }
         .slp-ba-visual {
           display: flex;
-          height: 180px;
+          height: 220px;
+          overflow: hidden;
         }
         .slp-ba-before {
           flex: 1;
@@ -436,8 +450,17 @@ export default function SaaSLandingPage() {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          gap: 0;
           position: relative;
+          background: #0a0a0f;
+          overflow: hidden;
+        }
+        .slp-ba-before img {
+          width: 72px;
+          height: auto;
+          border-radius: 10px;
+          opacity: 0.9;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.6);
         }
         .slp-ba-after {
           flex: 1;
@@ -445,10 +468,31 @@ export default function SaaSLandingPage() {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 4px;
-          padding: 16px 12px;
-          text-align: center;
+          gap: 0;
           position: relative;
+          overflow: hidden;
+        }
+        .slp-ba-after-frame {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .slp-ba-after-frame img {
+          width: 56px;
+          height: auto;
+          border-radius: 8px;
+          position: relative;
+          z-index: 2;
+        }
+        .slp-ba-after-bezel {
+          position: absolute;
+          inset: -5px -4px;
+          border-radius: 14px;
+          border: 2px solid rgba(255,255,255,0.35);
+          background: rgba(0,0,0,0.15);
+          z-index: 1;
+          pointer-events: none;
         }
         .slp-ba-label {
           position: absolute;
@@ -459,11 +503,24 @@ export default function SaaSLandingPage() {
           text-transform: uppercase;
           letter-spacing: 0.06em;
           color: rgba(255,255,255,0.45);
+          z-index: 3;
         }
         .slp-ba-label.right {
           left: auto;
           right: 8px;
-          color: rgba(255,255,255,0.55);
+          color: rgba(255,255,255,0.7);
+        }
+        .slp-ba-after-tag {
+          position: absolute;
+          bottom: 8px;
+          left: 0; right: 0;
+          text-align: center;
+          font-size: 9px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          color: rgba(255,255,255,0.6);
+          z-index: 3;
         }
         .slp-ba-divider {
           width: 28px;
@@ -474,6 +531,7 @@ export default function SaaSLandingPage() {
           font-size: 14px;
           color: var(--text-3);
           flex-shrink: 0;
+          z-index: 1;
         }
         .slp-ba-meta {
           padding: 12px 16px;
@@ -875,17 +933,26 @@ export default function SaaSLandingPage() {
               <span style={{ marginLeft: "8px", fontSize: "11px", color: "var(--text-3)" }}>Screenshot Builder</span>
             </div>
             <div className="slp-preview-body">
-              <div className="slp-mockup-tile" style={{ background: "linear-gradient(155deg, #4f46e5, #7c3aed)" }}>
-                <div className="slp-mockup-tile-label">Track Every Rep.</div>
-                <div className="slp-mockup-tile-sub">Fitness companion</div>
+              <div className="slp-mockup-tile" style={{ background: "#1DB954" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="slp-mockup-tile-img" src="https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/f3/ce/05/f3ce0547-690a-b355-b1dd-6b6e91808279/IOS_-_5.5_-_S01_-_EN_-_CA_U005bEnglish__U0028Canada_U0029_U005d.png/392x696bb.png" alt="Spotify App Store screenshot" />
+                <div className="slp-mockup-tile-overlay" />
+                <div className="slp-mockup-tile-label">Spotify</div>
+                <div className="slp-mockup-tile-sub">Music</div>
               </div>
-              <div className="slp-mockup-tile" style={{ background: "linear-gradient(155deg, #0891b2, #0ea5e9)" }}>
-                <div className="slp-mockup-tile-label">Ship Faster.</div>
-                <div className="slp-mockup-tile-sub">Task manager</div>
+              <div className="slp-mockup-tile" style={{ background: "#3b6fa0" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="slp-mockup-tile-img" src="https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/4e/87/9d/4e879dd8-bf44-69df-a4f5-092ef3688f76/748cb6a5-5588-4d86-af93-7add35562d37_iPhone_5.5_Inch_01.png/392x696bb.png" alt="Calm App Store screenshot" />
+                <div className="slp-mockup-tile-overlay" />
+                <div className="slp-mockup-tile-label">Calm</div>
+                <div className="slp-mockup-tile-sub">Meditation</div>
               </div>
-              <div className="slp-mockup-tile" style={{ background: "linear-gradient(155deg, #d97706, #f97316)" }}>
-                <div className="slp-mockup-tile-label">Grow Smarter.</div>
-                <div className="slp-mockup-tile-sub">Finance tracker</div>
+              <div className="slp-mockup-tile" style={{ background: "#ff0000" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="slp-mockup-tile-img" src="https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/e8/5d/12/e85d121e-8bcf-4f57-cf07-ed23b57f1b30/f1192f1f-430d-469a-b032-cdf77b8b04c7_iOS-5.5-in_1.jpg/392x696bb.jpg" alt="YouTube App Store screenshot" />
+                <div className="slp-mockup-tile-overlay" />
+                <div className="slp-mockup-tile-label">YouTube</div>
+                <div className="slp-mockup-tile-sub">Video</div>
               </div>
             </div>
             <div className="slp-preview-status">
@@ -996,35 +1063,36 @@ export default function SaaSLandingPage() {
         <div className="slp-ba-grid">
           {[
             {
-              before: "#1a1a2e",
-              after: "linear-gradient(135deg, #6366f1, #a855f7, #ec4899)",
-              afterTitle: "Track Every Rep.",
-              afterSub: "Your personal fitness companion.",
+              screenshotUrl: "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/f3/ce/05/f3ce0547-690a-b355-b1dd-6b6e91808279/IOS_-_5.5_-_S01_-_EN_-_CA_U005bEnglish__U0028Canada_U0029_U005d.png/392x696bb.png",
+              appName: "Spotify",
+              afterGradient: "linear-gradient(135deg, #1DB954 0%, #121212 100%)",
               tool: "App Store Screenshot",
               time: "12 sec",
             },
             {
-              before: "#0f172a",
-              after: "linear-gradient(135deg, #0ea5e9, #38bdf8)",
-              afterTitle: "Ship Faster with AI",
-              afterSub: "Deploy with confidence.",
-              tool: "Social Media Post",
+              screenshotUrl: "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/4e/87/9d/4e879dd8-bf44-69df-a4f5-092ef3688f76/748cb6a5-5588-4d86-af93-7add35562d37_iPhone_5.5_Inch_01.png/392x696bb.png",
+              appName: "Calm",
+              afterGradient: "linear-gradient(135deg, #3b6fa0 0%, #a8c5da 100%)",
+              tool: "App Store Screenshot",
               time: "8 sec",
             },
           ].map((item, idx) => (
             <div key={idx} className="slp-ba-card">
               <div className="slp-ba-visual">
-                <div className="slp-ba-before" style={{ background: item.before }}>
+                <div className="slp-ba-before">
                   <span className="slp-ba-label">Before</span>
-                  <div style={{ width: "36px", height: "64px", borderRadius: "8px", border: "1.5px dashed rgba(255,255,255,0.2)" }} />
-                  <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)", fontWeight: 600 }}>Raw screenshot</span>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={item.screenshotUrl} alt={`${item.appName} raw screenshot`} />
                 </div>
                 <div className="slp-ba-divider">→</div>
-                <div className="slp-ba-after" style={{ background: item.after }}>
+                <div className="slp-ba-after" style={{ background: item.afterGradient }}>
                   <span className="slp-ba-label right">After</span>
-                  <div style={{ fontSize: "13px", fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>{item.afterTitle}</div>
-                  <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.8)" }}>{item.afterSub}</div>
-                  <div style={{ width: "28px", height: "50px", borderRadius: "6px", border: "1.5px solid rgba(255,255,255,0.3)", background: "rgba(0,0,0,0.2)", marginTop: "6px" }} />
+                  <div className="slp-ba-after-frame">
+                    <div className="slp-ba-after-bezel" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={item.screenshotUrl} alt={`${item.appName} framed mockup`} />
+                  </div>
+                  <span className="slp-ba-after-tag">{item.appName} · BuildrStudio</span>
                 </div>
               </div>
               <div className="slp-ba-meta">
