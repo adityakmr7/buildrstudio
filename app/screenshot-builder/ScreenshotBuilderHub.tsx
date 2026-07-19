@@ -21,6 +21,7 @@ import PostExportShareModal from "./components/PostExportShareModal";
 import OnboardingTour from "../components/OnboardingTour";
 import ToolCrossLinks from "../components/ToolCrossLinks";
 import { useToast } from "../components/Toast";
+import { track } from "@/app/lib/track";
 
 // ── Multi-screen grid view ────────────────────────────────────────────────────
 
@@ -436,6 +437,7 @@ export default function ScreenshotBuilderHub() {
     const unlockedUntil = Date.now() + 24 * 60 * 60 * 1000;
     localStorage.setItem("watermark_unlocked_until", unlockedUntil.toString());
     setIsWatermarkUnlocked(true);
+    track("watermark_unlocked", { method: "tweet" });
   };
 
   const screens = deck.screens;
@@ -448,6 +450,7 @@ export default function ScreenshotBuilderHub() {
     const activeScreen = deck.screens[deck.activeScreenIndex];
     const device = getDevice(activeScreen?.deviceId || "iphone-67");
     const filename = getStoreFilename(device, deck.activeScreenIndex);
+    track("export_single", { device: device.id, watermarked: !isWatermarkUnlocked });
     canvasRef.current.exportPng(filename).then(() => {
       setShareModal({ isOpen: true, count: 1 });
     }).catch((err) => {
@@ -459,6 +462,7 @@ export default function ScreenshotBuilderHub() {
   const handleExportAll = async (smartResize = false) => {
     if (!canvasRef.current || isExporting) return;
     setIsExporting(true);
+    track("export_batch", { allSizes: smartResize, screens: deck.screens.length });
     try {
       const JSZip = (await import("jszip")).default;
       const zip = new JSZip();

@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
+import { track } from "@/app/lib/track";
 
 interface PremiumModalProps {
   isOpen: boolean;
   onClose: () => void;
   feature?: "watermark" | "4k-export" | "3d-tilt" | "brand-presets" | "batch-export";
-  defaultPlan?: "pro" | "ai_pro";
+  defaultPlan?: "pro" | "lifetime";
 }
 
 const FEATURE_HEADLINES: Record<string, string> = {
@@ -18,10 +19,17 @@ const FEATURE_HEADLINES: Record<string, string> = {
   "batch-export": "Batch multi-device export",
 };
 
-export default function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
+export default function PremiumModal({ isOpen, onClose, feature, defaultPlan = "lifetime" }: PremiumModalProps) {
   const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [plan, setPlan] = useState<"pro" | "lifetime">(defaultPlan);
+
+  useEffect(() => {
+    if (isOpen) {
+      track("premium_modal_open", { feature: feature ?? "generic" });
+    }
+  }, [isOpen, feature]);
 
   if (!isOpen) return null;
 
@@ -31,12 +39,13 @@ export default function PremiumModal({ isOpen, onClose, feature }: PremiumModalP
   const handleCheckout = async () => {
     setIsLoading(true);
     setError("");
+    track("checkout_start", { plan, feature: feature ?? "generic" });
 
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: "ai_pro" }),
+        body: JSON.stringify({ plan }),
       });
       const data = (await res.json()) as { url?: string; error?: string };
 
@@ -50,6 +59,8 @@ export default function PremiumModal({ isOpen, onClose, feature }: PremiumModalP
       setIsLoading(false);
     }
   };
+
+  const ctaLabel = plan === "lifetime" ? "Get Launch Pack — $29 once" : "Get Pro — $9/mo";
 
   return (
     <div
@@ -142,13 +153,82 @@ export default function PremiumModal({ isOpen, onClose, feature }: PremiumModalP
               <h2 className="ink-title" style={{ fontSize: "22px", letterSpacing: "-0.5px" }}>
                 {feature ? (FEATURE_HEADLINES[feature] ?? "Go Pro") : "Go Pro"}
               </h2>
-              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: "4px" }}>
-                <span style={{ fontSize: "36px", fontWeight: 800, letterSpacing: "-1px", color: "var(--text-1)" }}>$9</span>
-                <span style={{ fontSize: "14px", color: "var(--text-3)" }}>/month</span>
-              </div>
               <p style={{ fontSize: "13px", color: "var(--text-3)", margin: 0 }}>
-                Everything included. Cancel anytime.
+                Everything included. Pay once, or subscribe.
               </p>
+            </div>
+
+            {/* Plan Selector */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <button
+                type="button"
+                onClick={() => setPlan("lifetime")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "14px 16px",
+                  borderRadius: "var(--r-md)",
+                  border: plan === "lifetime" ? "2px solid var(--fill)" : "1.5px solid var(--border)",
+                  background: plan === "lifetime" ? "var(--fill-subtle)" : "transparent",
+                  cursor: "pointer",
+                  fontFamily: "var(--font)",
+                  textAlign: "left",
+                  position: "relative",
+                }}
+              >
+                <span style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                  <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-1)" }}>
+                    Launch Pack{" "}
+                    <span
+                      style={{
+                        fontSize: "10px",
+                        fontWeight: 700,
+                        color: "#fff",
+                        background: "linear-gradient(135deg, #6366f1, #a855f7)",
+                        borderRadius: "999px",
+                        padding: "2px 8px",
+                        marginLeft: "4px",
+                        verticalAlign: "middle",
+                        letterSpacing: "0.3px",
+                      }}
+                    >
+                      BEST VALUE
+                    </span>
+                  </span>
+                  <span style={{ fontSize: "12px", color: "var(--text-3)" }}>
+                    Pay once, keep Pro forever
+                  </span>
+                </span>
+                <span style={{ fontSize: "20px", fontWeight: 800, letterSpacing: "-0.5px", color: "var(--text-1)", whiteSpace: "nowrap" }}>
+                  $29
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPlan("pro")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "14px 16px",
+                  borderRadius: "var(--r-md)",
+                  border: plan === "pro" ? "2px solid var(--fill)" : "1.5px solid var(--border)",
+                  background: plan === "pro" ? "var(--fill-subtle)" : "transparent",
+                  cursor: "pointer",
+                  fontFamily: "var(--font)",
+                  textAlign: "left",
+                }}
+              >
+                <span style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                  <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-1)" }}>Monthly</span>
+                  <span style={{ fontSize: "12px", color: "var(--text-3)" }}>Cancel anytime</span>
+                </span>
+                <span style={{ fontSize: "20px", fontWeight: 800, letterSpacing: "-0.5px", color: "var(--text-1)", whiteSpace: "nowrap" }}>
+                  $9<span style={{ fontSize: "12px", fontWeight: 500, color: "var(--text-3)" }}>/mo</span>
+                </span>
+              </button>
             </div>
 
             {/* Feature List */}
@@ -208,7 +288,7 @@ export default function PremiumModal({ isOpen, onClose, feature }: PremiumModalP
                   disabled={isLoading}
                   onClick={handleCheckout}
                 >
-                  {isLoading ? "Redirecting…" : "Get Pro — $9/mo"}
+                  {isLoading ? "Redirecting…" : ctaLabel}
                 </button>
               ) : (
                 <button
@@ -223,8 +303,8 @@ export default function PremiumModal({ isOpen, onClose, feature }: PremiumModalP
 
               <span style={{ fontSize: "11px", color: "var(--text-3)", textAlign: "center" }}>
                 {isAuthenticated
-                  ? "Secure checkout via Lemon Squeezy. Cancel anytime."
-                  : "Sign in first, then subscribe to unlock all Pro features."}
+                  ? "Secure checkout via Lemon Squeezy. 7-day money-back guarantee."
+                  : "Sign in first, then unlock all Pro features."}
               </span>
             </div>
           </>

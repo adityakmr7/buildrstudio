@@ -21,18 +21,26 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   const plan = session?.user?.plan ?? "free";
 
-  if (plan !== "ai_pro") {
+  // Any paid plan (Pro subscription, Launch Pack lifetime, or AI Pro) gets unlimited generations.
+  if (plan === "free") {
     const identifier = session?.user?.id ?? req.headers.get("x-forwarded-for") ?? "anon";
     const usageTotal = await getAiUsageTotal(identifier);
     if (usageTotal >= FREE_LIFETIME_LIMIT) {
       return NextResponse.json(
-        { error: "Free AI generation used. Upgrade to AI Pro for unlimited generations.", limitReached: true },
+        { error: "Free AI generations used. Upgrade to Pro for unlimited generations.", limitReached: true },
         { status: 429 },
       );
     }
   }
 
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  // Try models in order — Google retires model versions regularly, so a
+  // single hard-coded name is a time bomb. "gemini-flash-latest" is the
+  // rolling alias; explicit versions are fallbacks.
+  const MODEL_CANDIDATES = [
+    "gemini-flash-latest",
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+  ];
 
   const langInstruction = language && language !== "en"
     ? `Write ALL output in language code "${language}". Do not include English translations.`
@@ -64,20 +72,30 @@ ${langInstruction}
 Respond ONLY with valid JSON — no markdown, no code fences:
 [{"headline":"...","subtext":"..."},...]`;
 
-  try {
-    const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
-    const cleaned = text.replace(/^```json?\s*/i, "").replace(/```\s*$/, "").trim();
-    const suggestions = JSON.parse(cleaned);
+  let lastError: unknown = null;
 
-    if (plan !== "ai_pro") {
-      const identifier = session?.user?.id ?? req.headers.get("x-forwarded-for") ?? "anon";
-      await recordAiUsage(identifier);
+  for (const modelName of MODEL_CANDIDATES) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName });
+      const result = await model.generateContent(prompt);
+      const text = result.response.text().trim();
+      const cleaned = text.replace(/^```json?\s*/i, "").replace(/```\s*$/, "").trim();
+      const suggestions = JSON.parse(cleaned);
+
+      if (plan === "free") {
+        const identifier = session?.user?.id ?? req.headers.get("x-forwarded-for") ?? "anon";
+        await recordAiUsage(identifier);
+      }
+
+      return NextResponse.json({ suggestions });
+    } catch (e) {
+      lastError = e;
+      console.error(`Gemini error (model: ${modelName}):`, e);
+      // Try the next model on 404/unsupported-model style failures;
+      // the loop simply continues for any error since a retry is cheap.
     }
-
-    return NextResponse.json({ suggestions });
-  } catch (e) {
-    console.error("Gemini error:", e);
-    return NextResponse.json({ error: "AI generation failed" }, { status: 500 });
   }
+
+  console.error("All Gemini models failed. Last error:", lastError);
+  return NextResponse.json({ error: "AI generation failed" }, { status: 500 });
 }
