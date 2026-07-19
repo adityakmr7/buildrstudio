@@ -19,11 +19,16 @@ export async function POST(req: NextRequest) {
   }
 
   const session = await auth();
-  const plan = session?.user?.plan ?? "free";
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Sign in to use AI Copywriter." }, { status: 401 });
+  }
+
+  const plan = session.user.plan ?? "free";
 
   // Any paid plan (Pro subscription, Launch Pack lifetime, or AI Pro) gets unlimited generations.
   if (plan === "free") {
-    const identifier = session?.user?.id ?? req.headers.get("x-forwarded-for") ?? "anon";
+    const identifier = session.user.id;
     const usageTotal = await getAiUsageTotal(identifier);
     if (usageTotal >= FREE_LIFETIME_LIMIT) {
       return NextResponse.json(
@@ -83,8 +88,7 @@ Respond ONLY with valid JSON — no markdown, no code fences:
       const suggestions = JSON.parse(cleaned);
 
       if (plan === "free") {
-        const identifier = session?.user?.id ?? req.headers.get("x-forwarded-for") ?? "anon";
-        await recordAiUsage(identifier);
+        await recordAiUsage(session.user.id);
       }
 
       return NextResponse.json({ suggestions });
