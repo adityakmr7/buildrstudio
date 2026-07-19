@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession, signIn } from "next-auth/react";
 
 const CATEGORIES = ["General", "Productivity", "Health & Fitness", "Finance", "Social", "Education", "Entertainment", "Travel", "Food & Drink", "Developer Tools"];
 const TONES = ["Professional", "Playful", "Bold", "Minimal", "Luxury", "Friendly"];
@@ -18,6 +19,7 @@ interface AICopywriterProps {
 }
 
 export default function AICopywriter({ onApply, onUpgrade }: AICopywriterProps) {
+  const { data: session, status } = useSession();
   const [appDesc, setAppDesc] = useState("");
   const [category, setCategory] = useState("General");
   const [tone, setTone] = useState("Professional");
@@ -31,6 +33,8 @@ export default function AICopywriter({ onApply, onUpgrade }: AICopywriterProps) 
   const [error, setError] = useState("");
   const [limitReached, setLimitReached] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
+  const isSignedIn = status === "authenticated" && !!session?.user;
 
   const generate = async () => {
     if (!appDesc.trim()) return;
@@ -82,10 +86,34 @@ export default function AICopywriter({ onApply, onUpgrade }: AICopywriterProps) 
       >
         <span style={{ fontSize: "14px" }}>✨</span>
         AI Copywriter
+        {!isSignedIn && <span style={{ marginLeft: "4px", fontSize: "10px", color: "var(--text-3)", fontWeight: 400 }}>· Sign in required</span>}
         <span style={{ marginLeft: "auto", fontSize: "10px", opacity: 0.5 }}>{isOpen ? "▲" : "▼"}</span>
       </button>
 
-      {isOpen && (
+      {isOpen && !isSignedIn && (
+        <div style={{ marginTop: "8px", padding: "16px", background: "var(--surface-2, var(--surface))", border: "1px solid var(--border)", borderRadius: "8px", textAlign: "center" }}>
+          <p style={{ fontSize: "12px", color: "var(--text-2)", margin: "0 0 10px", lineHeight: 1.5 }}>
+            Sign in to use AI Copywriter. Free accounts get 5 generations, Pro gets unlimited.
+          </p>
+          <button
+            onClick={() => signIn("google")}
+            style={{
+              padding: "8px 16px",
+              background: "var(--fill)",
+              color: "var(--fill-text)",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "12px",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            Sign in with Google
+          </button>
+        </div>
+      )}
+
+      {isOpen && isSignedIn && (
         <div style={{ marginTop: "8px", display: "flex", flexDirection: "column", gap: "8px" }}>
           <textarea
             className="input-field"
