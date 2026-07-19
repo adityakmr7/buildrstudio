@@ -6,11 +6,11 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "BuildrStudio pricing — free tools for everyone. Pro at $4/mo for watermark-free exports. AI Pro at $20/mo for unlimited AI copywriting.",
+    "BuildrStudio pricing — free tools for everyone. Launch Pack at $29 one-time or Pro at $9/mo for watermark-free exports, batch sizing, and unlimited AI headlines.",
   alternates: { canonical: "https://buildrstudio.in/pricing" },
   openGraph: {
     title: "Pricing — BuildrStudio",
-    description: "Free, Pro ($4/mo), and AI Pro ($20/mo). No watermarks, smart resize, AI headlines.",
+    description: "Free, Launch Pack ($29 one-time), and Pro ($9/mo). No watermarks, batch export, AI headlines in 15+ languages.",
     type: "website",
     url: "https://buildrstudio.in/pricing",
     locale: "en_US",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Pricing — BuildrStudio",
-    description: "Free, Pro ($4/mo), and AI Pro ($20/mo) plans for App Store screenshot generation.",
+    description: "Free, Launch Pack ($29 one-time), and Pro ($9/mo) plans for App Store screenshot generation.",
   },
 };
 
@@ -41,13 +41,13 @@ export default function PricingPage() {
         offers: {
           "@type": "AggregateOffer",
           lowPrice: "0",
-          highPrice: "20",
+          highPrice: "29",
           priceCurrency: "USD",
           offerCount: 3,
           offers: [
             { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD" },
-            { "@type": "Offer", name: "Pro", price: "4", priceCurrency: "USD", billingIncrement: "P1M" },
-            { "@type": "Offer", name: "AI Pro", price: "20", priceCurrency: "USD", billingIncrement: "P1M" },
+            { "@type": "Offer", name: "Launch Pack", price: "29", priceCurrency: "USD" },
+            { "@type": "Offer", name: "Pro", price: "9", priceCurrency: "USD", billingIncrement: "P1M" },
           ],
         },
       },
@@ -89,14 +89,15 @@ export default function PricingPage() {
         }
         .pricing-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: repeat(3, 1fr);
           gap: 24px;
-          max-width: 720px;
+          max-width: 960px;
           margin: 0 auto;
         }
-        @media (max-width: 640px) {
+        @media (max-width: 860px) {
           .pricing-grid {
             grid-template-columns: 1fr;
+            max-width: 440px;
           }
         }
         .pricing-card {
@@ -279,7 +280,7 @@ export default function PricingPage() {
         <div className="pricing-header">
           <h1>Simple, Fair Pricing</h1>
           <p>
-            All tools are free forever. Go Pro for clean exports, more devices, and advanced features.
+            All tools are free forever. Pay once for your launch, or subscribe if you ship often.
           </p>
         </div>
 
@@ -322,19 +323,18 @@ export default function PricingPage() {
             </Link>
           </div>
 
-          {/* Pro Plan */}
+          {/* Launch Pack — one-time */}
           <div className="pricing-card pro">
-            <div className="pricing-badge">MOST POPULAR</div>
-            <span className="pricing-plan-name">Pro</span>
+            <div className="pricing-badge">BEST VALUE</div>
+            <span className="pricing-plan-name">Launch Pack</span>
             <div className="pricing-price">
-              <span className="pricing-amount">$4</span>
-              <span className="pricing-period">/month</span>
-              <span className="pricing-original">$8</span>
+              <span className="pricing-amount">$29</span>
+              <span className="pricing-period">one-time</span>
             </div>
             <div className="pricing-features">
               <div className="pricing-feature">
                 <span className="pricing-check yes">✓</span>
-                <span>Everything in Free</span>
+                <span><strong>Pay once, keep Pro forever</strong> — no subscription</span>
               </div>
               <div className="pricing-feature">
                 <span className="pricing-check yes">✓</span>
@@ -342,27 +342,53 @@ export default function PricingPage() {
               </div>
               <div className="pricing-feature">
                 <span className="pricing-check yes">✓</span>
-                <span><strong>All device frames</strong> — iPhone, iPad, Android, tablets</span>
+                <span><strong>Batch export</strong> — all Apple &amp; Google sizes, canonical filenames</span>
               </div>
               <div className="pricing-feature">
                 <span className="pricing-check yes">✓</span>
-                <span><strong>3D tilt mode</strong> — perspective device mockups</span>
+                <span><strong>3D tilt mode</strong> &amp; 4K PNG export</span>
               </div>
               <div className="pricing-feature">
                 <span className="pricing-check yes">✓</span>
-                <span><strong>Mesh gradients</strong> — premium backgrounds</span>
+                <span><strong>Unlimited AI headlines</strong> — translated into 15+ languages</span>
               </div>
               <div className="pricing-feature">
                 <span className="pricing-check yes">✓</span>
-                <span><strong>Batch export</strong> — all screens at once</span>
+                <span><strong>Brand presets</strong> — custom colors &amp; swatches</span>
+              </div>
+            </div>
+            <Link href="/screenshot-builder" className="pricing-cta upgrade">
+              Get Launch Pack — $29
+            </Link>
+          </div>
+
+          {/* Pro Monthly */}
+          <div className="pricing-card">
+            <span className="pricing-plan-name">Pro Monthly</span>
+            <div className="pricing-price">
+              <span className="pricing-amount">$9</span>
+              <span className="pricing-period">/month</span>
+            </div>
+            <div className="pricing-features">
+              <div className="pricing-feature">
+                <span className="pricing-check yes">✓</span>
+                <span>Everything in Launch Pack</span>
+              </div>
+              <div className="pricing-feature">
+                <span className="pricing-check yes">✓</span>
+                <span>Ideal for agencies &amp; frequent shippers</span>
               </div>
               <div className="pricing-feature">
                 <span className="pricing-check yes">✓</span>
                 <span><strong>Priority support</strong> — direct email access</span>
               </div>
+              <div className="pricing-feature">
+                <span className="pricing-check yes">✓</span>
+                <span>Cancel anytime</span>
+              </div>
             </div>
-            <Link href="/screenshot-builder" className="pricing-cta upgrade">
-              Get Pro — $4/mo
+            <Link href="/screenshot-builder" className="pricing-cta free">
+              Get Pro — $9/mo
             </Link>
           </div>
         </div>
@@ -404,11 +430,12 @@ export default function PricingPage() {
           </div>
 
           <div className="pricing-faq-item">
-            <div className="pricing-faq-q">Will the price increase?</div>
+            <div className="pricing-faq-q">What&apos;s the difference between the Launch Pack and Pro Monthly?</div>
             <div className="pricing-faq-a">
-              The $4/mo launch price is locked for early subscribers. The regular price is $8/mo.
-              Once you subscribe at $4, your price stays the same as long as your subscription is
-              active.
+              Same features, different billing. The Launch Pack is a one-time $29 payment that keeps
+              Pro unlocked forever — most indie developers ship a release every few months, so
+              paying once usually makes more sense. Pro Monthly at $9/mo suits agencies and teams
+              shipping constantly.
             </div>
           </div>
         </div>

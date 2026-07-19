@@ -10,7 +10,10 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json().catch(() => ({}));
-  const plan = body.plan === "ai_pro" ? "ai_pro" : "pro";
+  const plan =
+    body.plan === "ai_pro" ? "ai_pro"
+    : body.plan === "lifetime" ? "lifetime"
+    : "pro";
 
   try {
     const url = await createCheckoutUrl({

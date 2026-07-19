@@ -21,8 +21,12 @@ const FAQS = [
     a: "Yes. The Pro tier includes a Brand Presets kit where you can lock in your exact hex codes, brand fonts, and custom watermark text for automatic use on any tool.",
   },
   {
-    q: "Are you planning to add AI features in the future?",
-    a: "Yes. We are currently researching AI capabilities to auto-detect your app brand colors, suggest optimized title copywriting, and automatically build visual layouts from a single raw screenshot. These features are in the research phase and will roll out as beta trials.",
+    q: "Do I have to subscribe, or can I pay once?",
+    a: "Both work. The Launch Pack is a one-time $29 purchase that unlocks every Pro feature forever — ideal if you ship a release every few months. The $9/mo subscription is there if you prefer monthly billing. Both come with a 7-day money-back guarantee.",
+  },
+  {
+    q: "Can I localize my screenshots into other languages?",
+    a: "Yes. The built-in AI copywriter generates and translates headlines in 15+ languages. Localized screenshots typically convert 20–30% better in non-English markets, and BuildrStudio makes producing every locale a few clicks instead of a design project.",
   },
 ];
 
@@ -681,9 +685,9 @@ export default function SaaSLandingPage() {
         }
         .slp-price-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: repeat(3, 1fr);
           gap: 20px;
-          max-width: 700px;
+          max-width: 1040px;
         }
         .slp-price-card {
           background: var(--surface);
@@ -892,7 +896,7 @@ export default function SaaSLandingPage() {
             That <mark>Convert</mark>
           </h1>
           <p className="slp-hero-sub">
-            Paste your App Store URL, get device-framed mockups with AI headlines ready to submit in seconds.
+            Paste your App Store URL — get device-framed mockups with AI headlines, localized into 15+ languages, ready to submit in minutes.
           </p>
           <div style={{ width: "100%", maxWidth: "520px" }}>
             <div className="slp-import-wrap">
@@ -1136,7 +1140,7 @@ export default function SaaSLandingPage() {
       <section className="slp-pricing">
         <div className="slp-pricing-heading">
           <h2 className="slp-pricing-h2">Simple, honest pricing</h2>
-          <p className="slp-pricing-sub">One plan. Everything included. No tiers to decode.</p>
+          <p className="slp-pricing-sub">Free forever. Pay once for your launch, or subscribe if you ship often.</p>
         </div>
         <div className="slp-price-grid">
           <div className="slp-price-card">
@@ -1161,15 +1165,15 @@ export default function SaaSLandingPage() {
             </Link>
           </div>
           <div className="slp-price-card pro">
-            <span className="slp-badge-pro">Everything included</span>
-            <h3 className="slp-price-name" style={{ color: "var(--fill)" }}>Pro</h3>
+            <span className="slp-badge-pro">Best value</span>
+            <h3 className="slp-price-name" style={{ color: "var(--fill)" }}>Launch Pack</h3>
             <div>
-              <span className="slp-price-val">$9</span>
-              <span className="slp-price-period"> /month</span>
+              <span className="slp-price-val">$29</span>
+              <span className="slp-price-period"> one-time</span>
             </div>
-            <p className="slp-price-desc">Clean exports, batch sizing, and unlimited AI, all in one plan.</p>
+            <p className="slp-price-desc">Pay once, keep every Pro feature forever. Built for shipping a launch.</p>
             <ul className="slp-price-feats">
-              <li className="slp-price-feat" style={{ fontWeight: 600 }}><span className="slp-price-feat-mark">✦</span> Watermark-free exports</li>
+              <li className="slp-price-feat" style={{ fontWeight: 600 }}><span className="slp-price-feat-mark">✦</span> Watermark-free exports, forever</li>
               <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> Batch export: all Apple and Google sizes</li>
               <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> Canonical store filenames, ready to upload</li>
               <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> 3D device tilts and 4K PNG</li>
@@ -1182,6 +1186,27 @@ export default function SaaSLandingPage() {
               onClick={() => setIsPremiumOpen(true)}
               className="btn-fill btn-md"
               style={{ width: "100%", justifyContent: "center", fontWeight: 700, cursor: "pointer", border: "none" }}
+            >
+              Get Launch Pack · $29
+            </button>
+          </div>
+          <div className="slp-price-card">
+            <h3 className="slp-price-name">Pro Monthly</h3>
+            <div>
+              <span className="slp-price-val">$9</span>
+              <span className="slp-price-period"> /month</span>
+            </div>
+            <p className="slp-price-desc">Same Pro features, billed monthly. Cancel anytime.</p>
+            <ul className="slp-price-feats">
+              <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> Everything in Launch Pack</li>
+              <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> Ideal for agencies and frequent shippers</li>
+              <li className="slp-price-feat"><span className="slp-price-feat-mark">✓</span> Priority support</li>
+            </ul>
+            <button
+              type="button"
+              onClick={() => setIsPremiumOpen(true)}
+              className="btn-outline btn-md"
+              style={{ width: "100%", justifyContent: "center", fontWeight: 700, cursor: "pointer" }}
             >
               Get Pro · $9/mo
             </button>
@@ -1217,6 +1242,7 @@ export default function SaaSLandingPage() {
           </div>
           <div className="slp-footer-links">
             <Link href="/screenshot-builder" className="slp-footer-link">Screenshot Builder</Link>
+            <Link href="/app-store-screenshot-sizes" className="slp-footer-link">Screenshot Sizes Guide</Link>
             <Link href="/social-optimizer" className="slp-footer-link">Launch Cards</Link>
             <Link href="/updates" className="slp-footer-link">What&apos;s New</Link>
             <Link href="/support" className="slp-footer-link">Support</Link>

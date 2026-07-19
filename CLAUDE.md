@@ -69,6 +69,9 @@ app/
     page.tsx                    # Route: /change-log
     ChangelogGenerator.tsx      # Changelog card editor
   roadmap/page.tsx              # Route: /roadmap — feature voting page
+  app-store-screenshot-sizes/
+    page.tsx                    # Route: /app-store-screenshot-sizes — SEO guide built from deviceSpecs
+  lib/track.ts                  # Umami event tracking helper (client-safe no-op)
   anchor/                       # Privacy policy & support pages for Anchor app
   flowzy/                       # Privacy, support, terms pages for Flowzy app
   sitemap.ts                    # Dynamic sitemap generation
@@ -127,8 +130,10 @@ Client-side screenshot export uses `html-to-image` / `modern-screenshot`. The ca
 - **Auth:** NextAuth.js v5 with Google OAuth, JWT session strategy. Config in root `auth.ts`.
 - **Session:** `AuthProvider` (SessionProvider) wraps the app in `layout.tsx`. Use `useSession()` in client components.
 - **Pro gating:** `session.user.isPro` boolean is set in the JWT callback by checking the `subscriptions` table.
-- **Checkout flow:** User clicks "Go Pro" → PremiumModal → if signed in, POST `/api/checkout` → redirect to Lemon Squeezy hosted checkout → webhook updates subscription status.
-- **Webhooks:** `/api/webhooks/lemonsqueezy` verifies HMAC signature and upserts subscription records.
+- **Checkout flow:** User clicks "Go Pro" → PremiumModal (plan selector: $29 one-time Launch Pack or $9/mo Pro) → if signed in, POST `/api/checkout` with `{plan}` → redirect to Lemon Squeezy hosted checkout → webhook updates subscription status.
+- **Webhooks:** `/api/webhooks/lemonsqueezy` verifies HMAC signature and upserts subscription records. Subscription events cover the $9/mo plan; `order_created` events for the lifetime variant are stored as status `lifetime` (never expires). The `order_created` event must be enabled in the Lemon Squeezy webhook config.
+- **Pricing:** Launch Pack $29 one-time (primary offer) and Pro $9/mo. Any paid plan grants unlimited AI generations; free users get 5 lifetime.
+- **Analytics:** Umami events via `app/lib/track.ts` — `export_single`, `export_batch`, `watermark_modal_open`, `watermark_unlocked`, `premium_modal_open`, `checkout_start`.
 
 ## Environment variables
 
@@ -144,8 +149,9 @@ GOOGLE_CLIENT_SECRET=<google-oauth-client-secret>
 # Required for payments
 LEMONSQUEEZY_API_KEY=<ls-api-key>
 LEMONSQUEEZY_STORE_ID=<ls-store-id>
-LEMONSQUEEZY_VARIANT_ID=<ls-variant-id>          # The $4/mo Pro plan variant
-LEMONSQUEEZY_AI_VARIANT_ID=<ls-ai-variant-id>    # The $20/mo AI Pro plan variant
+LEMONSQUEEZY_VARIANT_ID=<ls-variant-id>                  # The $9/mo Pro subscription variant
+LEMONSQUEEZY_LIFETIME_VARIANT_ID=<ls-lifetime-variant>   # The $29 one-time "Launch Pack" variant
+LEMONSQUEEZY_AI_VARIANT_ID=<ls-ai-variant-id>            # The $20/mo AI Pro plan variant (legacy)
 LEMONSQUEEZY_WEBHOOK_SECRET=<ls-webhook-signing-secret>
 
 # App URL (for checkout redirects)

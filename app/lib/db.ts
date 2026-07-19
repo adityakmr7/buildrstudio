@@ -76,7 +76,7 @@ export async function getActiveSubscription(userId: string) {
     SELECT id, ls_subscription_id, ls_variant_id, status, current_period_end, cancel_at_period_end
     FROM subscriptions
     WHERE user_id = ${userId}
-      AND status IN ('active', 'on_trial', 'paused')
+      AND status IN ('active', 'on_trial', 'paused', 'lifetime')
       AND (current_period_end IS NULL OR current_period_end > now())
     ORDER BY created_at DESC
     LIMIT 1

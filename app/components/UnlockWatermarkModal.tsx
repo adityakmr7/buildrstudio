@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { track } from "@/app/lib/track";
 
 interface UnlockWatermarkModalProps {
   isOpen: boolean;
@@ -15,6 +16,10 @@ export default function UnlockWatermarkModal({
   onUnlock,
   onOpenPremium,
 }: UnlockWatermarkModalProps) {
+  useEffect(() => {
+    if (isOpen) track("watermark_modal_open");
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleTweetUnlock = () => {

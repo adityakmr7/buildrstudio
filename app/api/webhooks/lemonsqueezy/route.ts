@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
     "subscription_resumed",
     "subscription_expired",
     "subscription_payment_success",
+    "order_created",
   ];
 
   if (!relevantEvents.includes(eventName)) {
@@ -59,6 +60,35 @@ export async function POST(request: NextRequest) {
 
   if (!userId) {
     console.error("Webhook: could not resolve user for subscription", payload.data?.id);
+    return NextResponse.json({ received: true });
+  }
+
+  // One-time purchases (Launch Pack lifetime) arrive as order_created, not
+  // subscription events. Record them as a never-expiring "lifetime" entry.
+  if (eventName === "order_created") {
+    const orderVariantId = String(attrs.first_order_item?.variant_id ?? "");
+    const lifetimeVariantId = process.env.LEMONSQUEEZY_LIFETIME_VARIANT_ID;
+
+    // Ignore orders for subscription products — those are handled by
+    // subscription_* events. Only lifetime variant orders grant access here.
+    if (!lifetimeVariantId || orderVariantId !== lifetimeVariantId) {
+      return NextResponse.json({ received: true });
+    }
+
+    if (attrs.status !== "paid") {
+      return NextResponse.json({ received: true });
+    }
+
+    await upsertSubscription({
+      userId,
+      lsSubscriptionId: `order_${payload.data.id}`,
+      lsCustomerId: String(attrs.customer_id),
+      lsVariantId: orderVariantId,
+      status: "lifetime",
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+    });
+
     return NextResponse.json({ received: true });
   }
 
