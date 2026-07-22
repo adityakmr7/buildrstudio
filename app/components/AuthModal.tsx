@@ -5,9 +5,10 @@ import { signIn } from "next-auth/react";
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  callbackUrl?: string;
 }
 
-export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose, callbackUrl }: AuthModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -68,13 +69,15 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             Sign in to BuildrStudio
           </h2>
           <p className="ink-body" style={{ fontSize: "14px", color: "var(--text-2)" }}>
-            Save your work, unlock Pro features, and sync across devices.
+            {callbackUrl
+              ? "Sign in to access the tools. Free accounts get full access."
+              : "Save your work, unlock Pro features, and sync across devices."}
           </p>
         </div>
 
         <button
           type="button"
-          onClick={() => signIn("google", { callbackUrl: window.location.href })}
+          onClick={() => signIn("google", { callbackUrl: callbackUrl ?? window.location.href })}
           style={{
             display: "flex",
             alignItems: "center",

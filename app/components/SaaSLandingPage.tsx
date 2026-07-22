@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import PremiumModal from "./PremiumModal";
+import AuthModal from "./AuthModal";
 import AppHeader from "./AppHeader";
 
 const FAQS = [
@@ -32,9 +33,20 @@ const FAQS = [
 
 export default function SaaSLandingPage() {
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authCallbackUrl, setAuthCallbackUrl] = useState<string | undefined>();
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
   const [heroUrl, setHeroUrl] = useState("");
   const [heroLoading, setHeroLoading] = useState(false);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("signin") === "1") {
+      const next = searchParams.get("next") ?? undefined;
+      setAuthCallbackUrl(next);
+      setIsAuthOpen(true);
+    }
+  }, [searchParams]);
   const heroInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
@@ -1257,6 +1269,7 @@ export default function SaaSLandingPage() {
       </footer>
 
       <PremiumModal isOpen={isPremiumOpen} onClose={() => setIsPremiumOpen(false)} />
+      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} callbackUrl={authCallbackUrl} />
     </div>
   );
 }
