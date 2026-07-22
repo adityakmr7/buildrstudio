@@ -11,7 +11,9 @@ import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
 import PremiumModal from "./PremiumModal";
 import AuthModal from "./AuthModal";
+import OnboardingModal from "./OnboardingModal";
 import UserMenu from "./UserMenu";
+import { useSession } from "next-auth/react";
 
 interface AppHeaderProps {
   activeRoute?: "social-optimizer" | "screenshot-builder" | "change-log" | "home";
@@ -19,10 +21,22 @@ interface AppHeaderProps {
 }
 
 export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps) {
+  const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [prevRoute, setPrevRoute] = useState(activeRoute);
+
+  useEffect(() => {
+    if (session?.user?.isNewUser) {
+      const seen = localStorage.getItem("buildr_onboarded");
+      if (!seen) {
+        setIsOnboardingOpen(true);
+        localStorage.setItem("buildr_onboarded", "1");
+      }
+    }
+  }, [session?.user?.isNewUser]);
 
   if (activeRoute !== prevRoute) {
     setPrevRoute(activeRoute);
@@ -651,6 +665,7 @@ export default function AppHeader({ activeRoute, onOpenPremium }: AppHeaderProps
       )}
 
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+      <OnboardingModal isOpen={isOnboardingOpen} onClose={() => setIsOnboardingOpen(false)} />
     </>
   );
 }

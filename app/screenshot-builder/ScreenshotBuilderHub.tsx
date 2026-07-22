@@ -364,6 +364,32 @@ export default function ScreenshotBuilderHub() {
     }
   }, []);
 
+  // Auto-save: debounced 3s after any deck change, only for signed-in users
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    const config = deck.screens.map(s => ({ ...s, screenshotUrl: null }));
+    const timer = setTimeout(async () => {
+      try {
+        if (currentProjectId) {
+          await fetch(`/api/projects/${currentProjectId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: projectName, config }),
+          });
+        } else {
+          const res = await fetch("/api/projects", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: projectName, tool: "screenshot-builder", config }),
+          });
+          const data = await res.json();
+          if (data.project?.id) setCurrentProjectId(data.project.id);
+        }
+      } catch { /* silent — auto-save failures shouldn't interrupt work */ }
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [deck, session?.user?.id]);
+
   const handleApplyTemplate = (screens: BuilderConfig[]) => {
     setDeck({ screens, activeScreenIndex: 0 });
   };
@@ -1174,29 +1200,67 @@ export default function ScreenshotBuilderHub() {
           </div>
 
           {/* Canvas area — single or grid view */}
-          {isGridView ? (
-            <MultiScreenGrid
-              screens={screens}
-              activeIndex={activeScreenIndex}
-              onSelectScreen={(idx) => setDeck(prev => ({ ...prev, activeScreenIndex: idx }))}
-              onUpdateConfig={(idx, key, val) => {
-                setDeck(prev => {
-                  const updated = [...prev.screens];
-                  if (updated[idx]) updated[idx] = { ...updated[idx], [key]: val };
-                  return { ...prev, screens: updated };
-                });
-              }}
-              isWatermarkUnlocked={isWatermarkUnlocked}
-            />
-          ) : (
-            <BuilderCanvas
-              ref={canvasRef}
-              config={activeScreenConfig}
-              onUpdateConfig={(key, val) => handleSetSingleConfig((prev) => ({ ...prev, [key]: val }))}
-              isWatermarkUnlocked={isWatermarkUnlocked}
-              onOpenUnlockWatermark={() => setIsUnlockModalOpen(true)}
-            />
-          )}
+          <div style={{ position: "relative", flex: 1, display: "flex", minHeight: 0 }}>
+            {!activeScreenConfig.screenshotUrl && !isGridView && (
+              <div
+                style={{
+                  position: "absolute", inset: 0, zIndex: 10,
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  gap: "16px", pointerEvents: "none",
+                }}
+              >
+                <div style={{
+                  background: "var(--surface)", border: "2px dashed var(--border-strong)",
+                  borderRadius: "16px", padding: "32px 40px", textAlign: "center",
+                  pointerEvents: "auto", maxWidth: "320px",
+                }}>
+                  <div style={{ fontSize: "32px", marginBottom: "12px" }}>📸</div>
+                  <p style={{ margin: "0 0 4px", fontSize: "15px", fontWeight: 700, color: "var(--text-1)" }}>
+                    Drop your screenshot here
+                  </p>
+                  <p style={{ margin: "0 0 16px", fontSize: "13px", color: "var(--text-3)", lineHeight: 1.5 }}>
+                    Drag & drop, paste ⌘V, or import from your App Store URL
+                  </p>
+                  <label
+                    style={{
+                      display: "inline-block", padding: "9px 20px",
+                      background: "var(--fill)", color: "var(--fill-text)",
+                      borderRadius: "var(--r-md)", fontSize: "13px", fontWeight: 600, cursor: "pointer",
+                    }}
+                  >
+                    Upload screenshot
+                    <input
+                      type="file" accept="image/*" style={{ display: "none" }}
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+                    />
+                  </label>
+                </div>
+              </div>
+            )}
+            {isGridView ? (
+              <MultiScreenGrid
+                screens={screens}
+                activeIndex={activeScreenIndex}
+                onSelectScreen={(idx) => setDeck(prev => ({ ...prev, activeScreenIndex: idx }))}
+                onUpdateConfig={(idx, key, val) => {
+                  setDeck(prev => {
+                    const updated = [...prev.screens];
+                    if (updated[idx]) updated[idx] = { ...updated[idx], [key]: val };
+                    return { ...prev, screens: updated };
+                  });
+                }}
+                isWatermarkUnlocked={isWatermarkUnlocked}
+              />
+            ) : (
+              <BuilderCanvas
+                ref={canvasRef}
+                config={activeScreenConfig}
+                onUpdateConfig={(key, val) => handleSetSingleConfig((prev) => ({ ...prev, [key]: val }))}
+                isWatermarkUnlocked={isWatermarkUnlocked}
+                onOpenUnlockWatermark={() => setIsUnlockModalOpen(true)}
+              />
+            )}
+          </div>
         </div>
       </div>
 
