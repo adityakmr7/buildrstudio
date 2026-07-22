@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { findOrCreateUser, getActiveSubscription } from "./app/lib/db";
 
-export type PlanTier = "free" | "pro" | "ai_pro";
+export type PlanTier = "free" | "pro" | "lifetime";
 
 declare module "next-auth" {
   interface Session {
@@ -47,10 +47,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           const sub = await getActiveSubscription(token.userId as string);
           if (sub) {
-            const aiVariantId = process.env.LEMONSQUEEZY_AI_VARIANT_ID;
-            const isAiPro = aiVariantId && String(sub.ls_variant_id) === aiVariantId;
             session.user.isPro = true;
-            session.user.plan = isAiPro ? "ai_pro" : "pro";
+            session.user.plan = sub.status === "lifetime" ? "lifetime" : "pro";
           } else {
             session.user.isPro = false;
             session.user.plan = "free";

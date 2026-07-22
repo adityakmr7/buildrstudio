@@ -87,9 +87,12 @@ export async function getActiveSubscription(userId: string) {
 
 export async function upsertSubscription(data: {
   userId: string;
-  lsSubscriptionId: string;
-  lsCustomerId: string;
-  lsVariantId: string;
+  lsSubscriptionId?: string;
+  lsCustomerId?: string;
+  lsVariantId?: string;
+  paddleSubscriptionId?: string;
+  paddleCustomerId?: string;
+  paddlePriceId?: string;
   status: string;
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
@@ -98,8 +101,13 @@ export async function upsertSubscription(data: {
 
   await initAuthTables();
 
+  // Normalise: support both LS and Paddle field names
+  const subId = data.paddleSubscriptionId ?? data.lsSubscriptionId ?? "";
+  const customerId = data.paddleCustomerId ?? data.lsCustomerId ?? "";
+  const variantId = data.paddlePriceId ?? data.lsVariantId ?? "";
+
   const existing = await sql`
-    SELECT id FROM subscriptions WHERE ls_subscription_id = ${data.lsSubscriptionId} LIMIT 1
+    SELECT id FROM subscriptions WHERE ls_subscription_id = ${subId} LIMIT 1
   `;
 
   if (existing.length > 0) {
@@ -109,7 +117,7 @@ export async function upsertSubscription(data: {
         current_period_end = ${data.currentPeriodEnd},
         cancel_at_period_end = ${data.cancelAtPeriodEnd},
         updated_at = now()
-      WHERE ls_subscription_id = ${data.lsSubscriptionId}
+      WHERE ls_subscription_id = ${subId}
     `;
   } else {
     await sql`
@@ -117,8 +125,8 @@ export async function upsertSubscription(data: {
         user_id, ls_subscription_id, ls_customer_id, ls_variant_id,
         status, current_period_end, cancel_at_period_end
       ) VALUES (
-        ${data.userId}, ${data.lsSubscriptionId}, ${data.lsCustomerId},
-        ${data.lsVariantId}, ${data.status}, ${data.currentPeriodEnd},
+        ${data.userId}, ${subId}, ${customerId},
+        ${variantId}, ${data.status}, ${data.currentPeriodEnd},
         ${data.cancelAtPeriodEnd}
       )
     `;
