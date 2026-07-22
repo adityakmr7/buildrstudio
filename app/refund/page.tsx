@@ -7,7 +7,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Refund Policy",
   description:
-    "Refund policy for BuildrStudio Pro and AI Pro subscriptions. Fair cancellation terms, pro-rated refunds, and transparent billing practices.",
+    "Refund policy for BuildrStudio Pro and Launch Pack subscriptions. Fair cancellation terms, pro-rated refunds, and transparent billing practices.",
   alternates: { canonical: "https://buildrstudio.in/refund" },
   openGraph: {
     title: "Refund Policy — BuildrStudio",
