@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Suspense } from "react";
 import SaaSLandingPage from "./components/SaaSLandingPage";
 
 export const metadata: Metadata = {
@@ -92,7 +93,9 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <SaaSLandingPage />
+      <Suspense>
+        <SaaSLandingPage />
+      </Suspense>
     </>
   );
 }
