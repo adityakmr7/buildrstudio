@@ -160,7 +160,7 @@ export default function RefundPage() {
         <h2>4. How to Cancel Your Subscription</h2>
         <p>You can cancel your Pro subscription at any time:</p>
         <ul>
-          <li>Through the Lemon Squeezy customer portal (link in your subscription email).</li>
+          <li>Through the Paddle customer portal (link in your subscription email).</li>
           <li>By emailing us at <a href={`mailto:${siteConfig.author.email}`}>{siteConfig.author.email}</a>.</li>
         </ul>
 

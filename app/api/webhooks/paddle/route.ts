@@ -1,134 +1,90 @@
 import { NextRequest, NextResponse } from "next/server";
-import { paddle } from "@/app/lib/paddle";
-import { upsertSubscription, findUserByEmail, initAuthTables } from "@/app/lib/db";
-import type { EventName } from "@paddle/paddle-node-sdk";
+import { verifyPaddleWebhook, PaddleWebhookVerificationError } from "@/app/lib/paddle";
+import { initPaddleTables } from "@/app/lib/paddleDb";
+import {
+  handleCustomerUpsert,
+  handleSubscriptionUpsert,
+  handleTransactionCompleted,
+} from "@/app/lib/paddleWebhookHandlers";
+import { getRequestIp, isPaddleWebhookIp } from "@/app/lib/paddleIps";
+import { EventName } from "@paddle/paddle-node-sdk";
 
 export async function POST(request: NextRequest) {
+  // 1. Verify the signature FIRST — before touching the DB, before any
+  // business logic. Read the body as raw text; paddle.webhooks.unmarshal
+  // computes the HMAC over the exact bytes Paddle sent, so JSON.parse'ing
+  // first (which normalizes whitespace/key order on re-serialization) would
+  // make verification fail even for a genuine delivery.
   const rawBody = await request.text();
   const signature = request.headers.get("paddle-signature") ?? "";
-  const secret = process.env.PADDLE_WEBHOOK_SECRET;
-
-  if (!secret) {
-    return NextResponse.json({ error: "Webhook secret not configured" }, { status: 500 });
-  }
 
   let event;
   try {
-    event = await paddle.webhooks.unmarshal(rawBody, secret, signature);
-  } catch {
+    event = await verifyPaddleWebhook(rawBody, signature);
+  } catch (err) {
+    if (err instanceof PaddleWebhookVerificationError) {
+      console.error("Paddle webhook: configuration error", err.message);
+      return NextResponse.json({ error: "Webhook not configured" }, { status: 500 });
+    }
+    console.error("Paddle webhook: signature verification failed", err);
+    // Deliberately non-2xx: a 2xx here tells Paddle the delivery succeeded
+    // and it stops retrying, which is wrong for a request we couldn't verify.
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  await initAuthTables();
-
-  const eventName = event.eventType as EventName;
-
-  // Subscription lifecycle events
-  if (
-    eventName === "subscription.created" ||
-    eventName === "subscription.activated" ||
-    eventName === "subscription.updated" ||
-    eventName === "subscription.canceled" ||
-    eventName === "subscription.paused" ||
-    eventName === "subscription.resumed" ||
-    eventName === "subscription.past_due"
-  ) {
-    const sub = event.data as {
-      id: string;
-      customerId: string;
-      items?: Array<{ price?: { id: string } }>;
-      status: string;
-      currentBillingPeriod?: { endsAt?: string } | null;
-      scheduledChange?: { action?: string } | null;
-      customData?: { user_id?: string } | null;
-      customer?: { email?: string };
-    };
-
-    let userId: string | undefined = sub.customData?.user_id;
-
-    if (!userId) {
-      const email = (sub as { customer?: { email?: string } }).customer?.email;
-      if (email) {
-        const user = await findUserByEmail(email);
-        if (user) userId = user.id as string;
-      }
+  // 2. Defense-in-depth only, and only AFTER signature verification: log
+  // (don't reject) if the source IP isn't on Paddle's published webhook
+  // allowlist. The signature check above is the authoritative gate; this is
+  // just an anomaly signal, since a stale/unfetchable allowlist should never
+  // cause us to drop an otherwise-valid, signed delivery.
+  try {
+    const clientIp = getRequestIp(request.headers);
+    const allowed = await isPaddleWebhookIp(clientIp);
+    if (!allowed) {
+      console.warn("Paddle webhook: signature valid but source IP not on Paddle's published allowlist", clientIp);
     }
-
-    if (!userId) {
-      console.error("Paddle webhook: could not resolve user for subscription", sub.id);
-      return NextResponse.json({ received: true });
-    }
-
-    const status = mapPaddleSubStatus(sub.status);
-    const priceId = sub.items?.[0]?.price?.id ?? "";
-    const periodEnd = sub.currentBillingPeriod?.endsAt ?? null;
-    const cancelAtPeriodEnd = sub.scheduledChange?.action === "cancel";
-
-    await upsertSubscription({
-      userId,
-      paddleSubscriptionId: sub.id,
-      paddleCustomerId: sub.customerId,
-      paddlePriceId: priceId,
-      status,
-      currentPeriodEnd: periodEnd,
-      cancelAtPeriodEnd,
-    });
+  } catch (err) {
+    console.error("Paddle webhook: IP allowlist check unavailable", err);
   }
 
-  // One-time purchase (Launch Pack lifetime) — transaction.completed
-  if (eventName === "transaction.completed") {
-    const txn = event.data as {
-      id: string;
-      customerId: string;
-      items?: Array<{ price?: { id: string } }>;
-      status: string;
-      customData?: { user_id?: string } | null;
-      customer?: { email?: string };
-    };
+  await initPaddleTables();
 
-    const lifetimePriceId = process.env.PADDLE_LIFETIME_PRICE_ID;
-    const txnPriceId = txn.items?.[0]?.price?.id ?? "";
+  try {
+    // Switching directly on event.eventType (rather than a copy) is what
+    // lets TypeScript narrow event.data to the right notification type in
+    // each branch below — EventEntity is a discriminated union keyed on
+    // this exact field.
+    switch (event.eventType) {
+      case EventName.CustomerCreated:
+      case EventName.CustomerUpdated:
+        await handleCustomerUpsert(event.data);
+        break;
 
-    if (!lifetimePriceId || txnPriceId !== lifetimePriceId) {
-      return NextResponse.json({ received: true });
+      case EventName.SubscriptionCreated:
+      case EventName.SubscriptionUpdated:
+      case EventName.SubscriptionCanceled:
+        await handleSubscriptionUpsert(event.data);
+        break;
+
+      case EventName.TransactionCompleted:
+        await handleTransactionCompleted(event.data);
+        break;
+
+      default:
+        // Safely ignore everything else (address.*, business.*, price.*,
+        // subscription.paused/resumed/past_due/trialing/activated, etc.) —
+        // subscription.updated already carries the current status for all
+        // of those state transitions, so there's nothing to additionally
+        // mirror from the more granular events.
+        console.log(`Paddle webhook: ignoring unhandled event type ${event.eventType}`);
     }
-
-    let userId: string | undefined = txn.customData?.user_id;
-
-    if (!userId) {
-      const email = txn.customer?.email;
-      if (email) {
-        const user = await findUserByEmail(email);
-        if (user) userId = user.id as string;
-      }
-    }
-
-    if (!userId) {
-      console.error("Paddle webhook: could not resolve user for transaction", txn.id);
-      return NextResponse.json({ received: true });
-    }
-
-    await upsertSubscription({
-      userId,
-      paddleSubscriptionId: `txn_${txn.id}`,
-      paddleCustomerId: txn.customerId,
-      paddlePriceId: txnPriceId,
-      status: "lifetime",
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-    });
+  } catch (err) {
+    // A handler failure (e.g. a transient DB error) should look like a
+    // failed delivery to Paddle so it retries — swallowing this into a 200
+    // would silently drop the event forever.
+    console.error(`Paddle webhook: handler failed for ${event.eventType}`, err);
+    return NextResponse.json({ error: "Handler failed" }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });
-}
-
-function mapPaddleSubStatus(status: string): string {
-  const map: Record<string, string> = {
-    active: "active",
-    trialing: "on_trial",
-    paused: "paused",
-    past_due: "past_due",
-    canceled: "cancelled",
-  };
-  return map[status] ?? status;
 }

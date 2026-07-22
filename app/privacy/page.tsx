@@ -156,7 +156,7 @@ export default function PrivacyPage() {
             <tr>
               <td>Payment info</td>
               <td>Pro subscription</td>
-              <td>Processed by Lemon Squeezy — we never see your card details</td>
+              <td>Processed by Paddle — we never see your card details</td>
             </tr>
             <tr>
               <td>Usage analytics</td>
@@ -180,7 +180,7 @@ export default function PrivacyPage() {
         <h2>4. How We Use Your Data</h2>
         <ul>
           <li>To create and maintain your account.</li>
-          <li>To process Pro subscription payments via Lemon Squeezy.</li>
+          <li>To process Pro subscription payments via Paddle.</li>
           <li>To send product updates if you opted in via waitlist forms.</li>
           <li>To improve the Service through anonymous usage analytics.</li>
         </ul>
@@ -189,7 +189,7 @@ export default function PrivacyPage() {
         <p>We share limited data with these trusted services:</p>
         <ul>
           <li><strong>Google OAuth</strong> — authentication (name, email, profile picture)</li>
-          <li><strong>Lemon Squeezy</strong> — payment processing (email, subscription data)</li>
+          <li><strong>Paddle</strong> — payment processing and merchant of record (email, subscription data)</li>
           <li><strong>Neon (PostgreSQL)</strong> — database hosting (account and subscription records)</li>
           <li><strong>Vercel</strong> — hosting and analytics (anonymous usage data)</li>
           <li><strong>Umami</strong> — privacy-focused analytics (no personal data, no cookies)</li>
@@ -221,7 +221,7 @@ export default function PrivacyPage() {
         <p>
           We use industry-standard security measures including encrypted connections (HTTPS), secure
           authentication (OAuth 2.0 + JWT), and HMAC-verified webhooks. Your payment data is handled
-          entirely by Lemon Squeezy and never touches our servers.
+          entirely by Paddle and never touches our servers.
         </p>
 
         <h2>10. Children&apos;s Privacy</h2>

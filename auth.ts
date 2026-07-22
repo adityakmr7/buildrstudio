@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { findOrCreateUser, getActiveSubscription } from "./app/lib/db";
+import { sendWelcomeEmail } from "./app/lib/email";
 
 export type PlanTier = "free" | "pro" | "lifetime";
 
@@ -13,6 +14,7 @@ declare module "next-auth" {
       image?: string;
       isPro: boolean;
       plan: PlanTier;
+      isNewUser?: boolean;
     };
   }
 }
@@ -31,6 +33,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ token, account, profile }) {
       if (account && profile?.email) {
+        const isNew = !(await import("./app/lib/db").then(m => m.findUserByEmail(profile.email!)));
         const user = await findOrCreateUser({
           email: profile.email,
           name: (profile.name as string) ?? profile.email.split("@")[0],
@@ -38,12 +41,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         });
         token.userId = user.id;
         token.picture = user.image;
+        token.isNewUser = isNew;
+        if (isNew) {
+          sendWelcomeEmail(user.email, user.name ?? "").catch(() => {});
+        }
       }
       return token;
     },
     async session({ session, token }) {
       if (token.userId) {
         session.user.id = token.userId as string;
+        session.user.isNewUser = (token.isNewUser as boolean) ?? false;
         try {
           const sub = await getActiveSubscription(token.userId as string);
           if (sub) {
