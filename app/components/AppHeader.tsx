@@ -14,7 +14,7 @@ import AuthModal from "./AuthModal";
 import UserMenu from "./UserMenu";
 
 interface AppHeaderProps {
-  activeRoute?: "social-optimizer" | "screenshot-builder" | "roadmap" | "change-log" | "home";
+  activeRoute?: "social-optimizer" | "screenshot-builder" | "change-log" | "home";
   onOpenPremium?: () => void;
 }
 

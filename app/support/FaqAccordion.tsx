@@ -34,7 +34,7 @@ const FAQS = [
   },
   {
     q: "Is there a team or agency plan?",
-    a: "Not yet, but it's on the roadmap. Vote for it or drop your use-case on the roadmap page — that directly influences what gets built next.",
+    a: "Not yet, but it's planned. Drop your use-case to support@buildrstudio.in — that directly influences what gets built next.",
   },
 ];
 

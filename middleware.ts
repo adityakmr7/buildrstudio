@@ -5,7 +5,6 @@ const PROTECTED_ROUTES = [
   "/screenshot-builder",
   "/social-optimizer",
   "/change-log",
-  "/roadmap",
 ];
 
 export default auth((req) => {
@@ -25,6 +24,5 @@ export const config = {
     "/screenshot-builder/:path*",
     "/social-optimizer/:path*",
     "/change-log/:path*",
-    "/roadmap/:path*",
   ],
 };
