@@ -12,6 +12,13 @@ type Interval = "month" | "year";
 interface PricingPreviewClientProps {
   initialCountryCode?: string;
   customerEmail?: string;
+  /** Paddle customer ID (ctm_...) for the signed-in user, if one exists yet — used
+   * ONLY for Paddle Retain's `pwCustomer` option below. Never pass an internal user ID
+   * or an email here; Retain needs Paddle's own customer ID. */
+  paddleCustomerId?: string;
+  /** Which billing toggle is pre-selected on load — lets /pricing deep-link straight
+   * into "year" (e.g. from a "Get Pro Annual" CTA). Defaults to "month". */
+  initialInterval?: Interval;
 }
 
 interface PriceDisplay {
@@ -22,6 +29,8 @@ interface PriceDisplay {
 export default function PricingPreviewClient({
   initialCountryCode,
   customerEmail,
+  paddleCustomerId,
+  initialInterval = "month",
 }: PricingPreviewClientProps) {
   const router = useRouter();
 
@@ -41,7 +50,7 @@ export default function PricingPreviewClient({
     }
   });
 
-  const [interval, setInterval] = useState<Interval>("month");
+  const [interval, setInterval] = useState<Interval>(initialInterval);
   const [prices, setPrices] = useState<Record<string, PriceDisplay>>({});
   const [loadingPrices, setLoadingPrices] = useState(true);
   const [previewError, setPreviewError] = useState<string | null>(null);
@@ -58,6 +67,12 @@ export default function PricingPreviewClient({
     initializePaddle({
       environment: config.environment,
       token: config.token,
+      // Paddle Retain (dunning / payment-recovery emails) needs the real Paddle
+      // customer ID here, not our internal user ID or their email — that's what
+      // paddleCustomerId (resolved server-side via getPaddleCustomerByEmail) is.
+      // Omitted entirely for a visitor who's never checked out yet (no mirrored
+      // customer to key off), rather than passing a bad/empty id.
+      ...(paddleCustomerId ? { pwCustomer: { id: paddleCustomerId } } : {}),
       eventCallback: (event) => {
         if (event.name === "checkout.completed") {
           router.push("/welcome");
@@ -73,14 +88,14 @@ export default function PricingPreviewClient({
     return () => {
       cancelled = true;
     };
-  }, [config, router]);
+  }, [config, router, paddleCustomerId]);
 
   // Fetch localized price previews whenever Paddle is ready, or the billing interval
   // changes. If initialCountryCode is undefined we omit `address` entirely so
   // PricePreview auto-detects location from the visitor's IP. The loading/error resets
   // are deferred a microtask so they don't fire synchronously within the effect body.
   useEffect(() => {
-    if (!paddle) return;
+    if (!paddle || !config) return;
 
     let cancelled = false;
     queueMicrotask(() => {
@@ -90,7 +105,7 @@ export default function PricingPreviewClient({
     });
 
     const items = PRICING_TIERS.map((tier) => ({
-      priceId: tier.priceId[interval],
+      priceId: tier.priceId[config.environment][interval],
       quantity: 1,
     }));
 
@@ -122,17 +137,17 @@ export default function PricingPreviewClient({
     return () => {
       cancelled = true;
     };
-  }, [paddle, interval, initialCountryCode]);
+  }, [paddle, config, interval, initialCountryCode]);
 
   const handleSubscribe = useCallback(
     (tier: Tier) => {
-      if (!paddle) return;
+      if (!paddle || !config) return;
       setCheckoutError(null);
       setCheckingOutTier(tier.name);
 
       try {
         paddle.Checkout.open({
-          items: [{ priceId: tier.priceId[interval], quantity: 1 }],
+          items: [{ priceId: tier.priceId[config.environment][interval], quantity: 1 }],
           ...(customerEmail ? { customer: { email: customerEmail } } : {}),
           settings: {
             displayMode: "overlay",
@@ -145,12 +160,12 @@ export default function PricingPreviewClient({
         setCheckoutError(err instanceof Error ? err.message : "Failed to open checkout");
       }
     },
-    [paddle, interval, customerEmail],
+    [paddle, config, interval, customerEmail],
   );
 
   const priceFor = useCallback(
-    (tier: Tier) => prices[tier.priceId[interval]],
-    [prices, interval],
+    (tier: Tier) => (config ? prices[tier.priceId[config.environment][interval]] : undefined),
+    [prices, config, interval],
   );
 
   // Launch Pack is a one-time purchase — Paddle has no billing_cycle for it, so the
@@ -158,8 +173,8 @@ export default function PricingPreviewClient({
   // paddlePricingTiers.ts). Detect that here rather than hardcoding tier.name, so the
   // display logic stays correct if the catalog changes shape again.
   const isOneTime = useCallback(
-    (tier: Tier) => tier.priceId.month === tier.priceId.year,
-    [],
+    (tier: Tier) => (config ? tier.priceId[config.environment].month === tier.priceId[config.environment].year : false),
+    [config],
   );
 
   const topLevelError = configError ?? previewError ?? checkoutError;
@@ -321,8 +336,8 @@ export default function PricingPreviewClient({
 
       <div className="ppv-page">
         <div className="ppv-header">
-          <h1>Pricing Preview</h1>
-          <p>Sandbox test page — Paddle overlay checkout, country-localized pricing.</p>
+          <h1>Choose your plan</h1>
+          <p>Secure checkout powered by Paddle. Pricing shown in your local currency.</p>
         </div>
 
         {topLevelError && <div className="ppv-error">{topLevelError}</div>}

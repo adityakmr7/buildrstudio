@@ -43,11 +43,12 @@ export default function PricingPage() {
           lowPrice: "0",
           highPrice: "29",
           priceCurrency: "USD",
-          offerCount: 3,
+          offerCount: 4,
           offers: [
             { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD" },
             { "@type": "Offer", name: "Launch Pack", price: "29", priceCurrency: "USD" },
-            { "@type": "Offer", name: "Pro", price: "9", priceCurrency: "USD", billingIncrement: "P1M" },
+            { "@type": "Offer", name: "Pro Monthly", price: "9", priceCurrency: "USD", billingIncrement: "P1M" },
+            { "@type": "Offer", name: "Pro Annual", price: "90", priceCurrency: "USD", billingIncrement: "P1Y" },
           ],
         },
       },
@@ -357,18 +358,21 @@ export default function PricingPage() {
                 <span><strong>Brand presets</strong> — custom colors &amp; swatches</span>
               </div>
             </div>
-            <Link href="/screenshot-builder" className="pricing-cta upgrade">
+            <Link href="/pricing-preview" className="pricing-cta upgrade">
               Get Launch Pack — $29
             </Link>
           </div>
 
           {/* Pro Monthly */}
           <div className="pricing-card">
-            <span className="pricing-plan-name">Pro Monthly</span>
+            <span className="pricing-plan-name">Pro</span>
             <div className="pricing-price">
               <span className="pricing-amount">$9</span>
               <span className="pricing-period">/month</span>
             </div>
+            <p style={{ fontSize: 13, color: "var(--text-3)", margin: "-8px 0 0" }}>
+              or $90/yr — 2 months free · includes a 7-day free trial
+            </p>
             <div className="pricing-features">
               <div className="pricing-feature">
                 <span className="pricing-check yes">✓</span>
@@ -387,8 +391,11 @@ export default function PricingPage() {
                 <span>Cancel anytime</span>
               </div>
             </div>
-            <Link href="/screenshot-builder" className="pricing-cta free">
-              Get Pro — $9/mo
+            <Link href="/pricing-preview?interval=month" className="pricing-cta free">
+              Get Pro Monthly — $9/mo
+            </Link>
+            <Link href="/pricing-preview?interval=year" className="pricing-cta free">
+              Get Pro Annual — $90/yr
             </Link>
           </div>
         </div>
@@ -430,12 +437,12 @@ export default function PricingPage() {
           </div>
 
           <div className="pricing-faq-item">
-            <div className="pricing-faq-q">What&apos;s the difference between the Launch Pack and Pro Monthly?</div>
+            <div className="pricing-faq-q">What&apos;s the difference between the Launch Pack and Pro?</div>
             <div className="pricing-faq-a">
               Same features, different billing. The Launch Pack is a one-time $29 payment that keeps
               Pro unlocked forever — most indie developers ship a release every few months, so
-              paying once usually makes more sense. Pro Monthly at $9/mo suits agencies and teams
-              shipping constantly.
+              paying once usually makes more sense. Pro at $9/mo (or $90/yr, with a 7-day free trial)
+              suits agencies and teams shipping constantly.
             </div>
           </div>
         </div>
