@@ -400,8 +400,8 @@ export default function PricingPage() {
           <div className="pricing-faq-item">
             <div className="pricing-faq-q">Can I cancel anytime?</div>
             <div className="pricing-faq-a">
-              Yes. Cancel anytime from your Lemon Squeezy dashboard or email us. Your Pro access
-              continues until the end of your current billing period.
+              Yes. Cancel anytime from your Paddle customer portal (link in your subscription email)
+              or by emailing us. Your Pro access continues until the end of your current billing period.
             </div>
           </div>
 
@@ -416,8 +416,8 @@ export default function PricingPage() {
           <div className="pricing-faq-item">
             <div className="pricing-faq-q">What payment methods do you accept?</div>
             <div className="pricing-faq-a">
-              We accept all major credit/debit cards via Lemon Squeezy. PayPal and UPI support coming
-              soon.
+              We accept all major credit/debit cards via Paddle, our payment processor. PayPal and UPI
+              support coming soon.
             </div>
           </div>
 

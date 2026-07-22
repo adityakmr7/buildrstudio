@@ -303,7 +303,7 @@ export default function PremiumModal({ isOpen, onClose, feature, defaultPlan = "
 
               <span style={{ fontSize: "11px", color: "var(--text-3)", textAlign: "center" }}>
                 {isAuthenticated
-                  ? "Secure checkout via Lemon Squeezy. 7-day money-back guarantee."
+                  ? "Secure checkout via Paddle. 7-day money-back guarantee."
                   : "Sign in first, then unlock all Pro features."}
               </span>
             </div>

@@ -125,9 +125,9 @@ export default function TermsPage() {
         <h2>4. Pro Subscription</h2>
         <ul>
           <li>Pro subscriptions are billed monthly at the price displayed at checkout.</li>
-          <li>Payment is processed securely through Lemon Squeezy, our payment processor.</li>
+          <li>Payment is processed securely through Paddle, our payment processor (Paddle acts as merchant of record).</li>
           <li>Your subscription renews automatically each month until cancelled.</li>
-          <li>You may cancel your subscription at any time from your Lemon Squeezy customer portal.</li>
+          <li>You may cancel your subscription at any time from your Paddle customer portal.</li>
         </ul>
 
         <h2>5. Free Tier</h2>
