@@ -248,7 +248,7 @@ export default function AICopywriter({ onApply, onUpgrade }: AICopywriterProps) 
                 cursor: "pointer",
               }}
             >
-              Upgrade to AI Pro — $20/mo
+              Upgrade to Pro — Unlimited generations
             </button>
           )}
           {suggestions.length > 0 && (

@@ -546,7 +546,7 @@ export default function ScreenshotBuilderHub() {
     });
 
     // AI auto-layout (fire and forget, non-blocking)
-    if (session?.user?.plan === "ai_pro") {
+    if (session?.user?.plan === "pro" || session?.user?.plan === "lifetime") {
       const formData = new FormData();
       formData.append("screenshot", file);
       fetch("/api/ai/auto-layout", { method: "POST", body: formData })
