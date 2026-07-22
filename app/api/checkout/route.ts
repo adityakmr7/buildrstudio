@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { createCheckoutUrl } from "@/app/lib/lemonsqueezy";
+import { createCheckoutUrl } from "@/app/lib/paddle";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -10,16 +10,12 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json().catch(() => ({}));
-  const plan =
-    body.plan === "ai_pro" ? "ai_pro"
-    : body.plan === "lifetime" ? "lifetime"
-    : "pro";
+  const plan = body.plan === "lifetime" ? "lifetime" : "pro";
 
   try {
     const url = await createCheckoutUrl({
       userId: session.user.id,
       userEmail: session.user.email,
-      userName: session.user.name,
       plan,
     });
 
