@@ -378,7 +378,27 @@ const BuilderCanvas = forwardRef<BuilderCanvasHandle, BuilderCanvasProps>(
       const original = el.style.transform;
       el.style.transform = "scale(1)";
       try {
-        return await toPng(el, { pixelRatio: 1, quality: 1, skipFonts: false });
+        return await toPng(el, {
+          pixelRatio: 1,
+          quality: 1,
+          skipFonts: true,
+          // html-to-image iterates document.styleSheets and reads cssRules,
+          // which throws a SecurityError on cross-origin <link> sheets.
+          // Returning false for those nodes makes the library skip them.
+          filter: (node) => {
+            if (node instanceof HTMLLinkElement && node.rel === "stylesheet") {
+              try {
+                // Same-origin sheets allow cssRules access; this will throw for cross-origin.
+                const sheets = Array.from(document.styleSheets);
+                const sheet = sheets.find(s => s.href === node.href);
+                if (sheet) { void sheet.cssRules; }
+              } catch {
+                return false;
+              }
+            }
+            return true;
+          },
+        });
       } finally {
         el.style.transform = original;
       }
