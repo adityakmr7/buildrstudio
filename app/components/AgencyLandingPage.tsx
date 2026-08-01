@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import CalBookingButton, { CalLoader } from "./CalBookingButton";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -78,8 +79,7 @@ function AgencyNav() {
           ))}
         </nav>
 
-        <a
-          href="mailto:hello@buildrstudio.in?subject=AI Audit Request"
+        <CalBookingButton
           className="cta-btn"
           style={{
             display: "inline-flex",
@@ -91,13 +91,12 @@ function AgencyNav() {
             borderRadius: 8,
             background: "#2563EB",
             color: "#fff",
-            textDecoration: "none",
             transition: "background 0.2s",
           }}
         >
           Book an AI Audit
           <ArrowRight size={13} weight="bold" />
-        </a>
+        </CalBookingButton>
       </div>
 
       <style>{`
@@ -190,19 +189,18 @@ function AgencyHero() {
 
           {/* CTAs */}
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 32 }}>
-            <a
-              href="mailto:hello@buildrstudio.in?subject=AI Audit Request"
+            <CalBookingButton
               className="hero-cta-primary"
               style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
                 padding: "13px 24px", borderRadius: 9, fontSize: 14, fontWeight: 600,
-                background: "#2563EB", color: "#fff", textDecoration: "none",
+                background: "#2563EB", color: "#fff",
                 transition: "all 0.2s",
               }}
             >
               Book an AI Audit
               <ArrowRight size={15} weight="bold" />
-            </a>
+            </CalBookingButton>
             <a
               href="#services"
               className="hero-cta-secondary"
@@ -661,19 +659,18 @@ function ProcessSection() {
             <p style={{ fontSize: 15, color: "rgba(245,245,245,0.45)", maxWidth: "40ch", margin: "0 0 28px" }}>
               A repeatable, low-friction engagement model built for teams that can&apos;t afford a 6-month integration project.
             </p>
-            <a
-              href="mailto:hello@buildrstudio.in?subject=AI Audit Request"
+            <CalBookingButton
               className="process-cta"
               style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
                 padding: "12px 22px", borderRadius: 9, fontSize: 14, fontWeight: 600,
-                background: "#2563EB", color: "#fff", textDecoration: "none",
+                background: "#2563EB", color: "#fff",
                 transition: "background 0.2s",
               }}
             >
               Book an AI Audit
               <ArrowRight size={14} weight="bold" />
-            </a>
+            </CalBookingButton>
           </div>
 
           {/* Right: steps */}
@@ -801,19 +798,18 @@ function CTABanner() {
         <p style={{ fontSize: 15, color: "rgba(245,245,245,0.45)", maxWidth: "40ch", margin: "0 auto 36px" }}>
           Book a free 60-minute AI Audit and we&apos;ll identify your top automation opportunities — no commitment.
         </p>
-        <a
-          href="mailto:hello@buildrstudio.in?subject=AI Audit Request"
+        <CalBookingButton
           className="cta-banner-btn"
           style={{
             display: "inline-flex", alignItems: "center", gap: 9,
             padding: "15px 32px", borderRadius: 10, fontSize: 15, fontWeight: 600,
-            background: "#2563EB", color: "#fff", textDecoration: "none",
+            background: "#2563EB", color: "#fff",
             transition: "all 0.2s",
           }}
         >
           Book an AI Audit
           <ArrowRight size={16} weight="bold" />
-        </a>
+        </CalBookingButton>
       </div>
       <style>{`.cta-banner-btn:hover { background: #1D4ED8 !important; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(37,99,235,0.30); }`}</style>
     </section>
@@ -864,6 +860,8 @@ function AgencyFooter() {
 export default function AgencyLandingPage() {
   return (
     <div style={{ background: "#080B0F", minHeight: "100svh" }}>
+      {/* Pre-loads Cal.com embed script so the modal opens instantly */}
+      <CalLoader />
       <AgencyNav />
       <AgencyHero />
       <ProofStrip />
