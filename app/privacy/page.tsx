@@ -1,21 +1,21 @@
-import { siteConfig } from "@/app/lib/siteConfig";
 import type { Metadata } from "next";
 import Script from "next/script";
-import AppHeader from "../components/AppHeader";
 import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "Privacy policy for BuildrStudio, the free App Store screenshot generator. Learn how we collect, use, and protect your data. GDPR compliant.",
+    "Privacy policy for Buildr Studio, the AI automation & custom software agency. Learn how we collect, use, and protect your data.",
   alternates: { canonical: "https://buildrstudio.in/privacy" },
   openGraph: {
-    title: "Privacy Policy — BuildrStudio",
-    description: "How BuildrStudio collects, uses, and protects your data.",
+    title: "Privacy Policy — Buildr Studio",
+    description: "How Buildr Studio collects, uses, and protects your data.",
     type: "website",
     url: "https://buildrstudio.in/privacy",
   },
 };
+
+const CONTACT_EMAIL = "hello@buildrstudio.in";
 
 export default function PrivacyPage() {
   const jsonLd = {
@@ -36,52 +36,58 @@ export default function PrivacyPage() {
       />
 
       <style>{`
-        .legal-page {
+        .legal-wrap {
           max-width: 720px;
           margin: 0 auto;
-          padding: 48px 24px 80px;
-          font-family: var(--font);
-          color: var(--text-1);
+          padding: 80px 24px 80px;
+          font-family: var(--font-dm-sans, sans-serif);
+          color: rgba(245,245,245,0.85);
         }
-        .legal-page h1 {
+        .legal-back {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 13px;
+          color: rgba(245,245,245,0.40);
+          text-decoration: none;
+          margin-bottom: 40px;
+          transition: color .2s;
+        }
+        .legal-back:hover { color: #F5F5F5; }
+        .legal-wrap h1 {
           font-size: 32px;
-          font-weight: 800;
-          letter-spacing: -1px;
+          font-weight: 700;
+          letter-spacing: -0.03em;
+          color: #F5F5F5;
           margin-bottom: 8px;
         }
         .legal-date {
           font-size: 13px;
-          color: var(--text-3);
-          margin-bottom: 40px;
+          color: rgba(245,245,245,0.35);
+          margin-bottom: 44px;
         }
-        .legal-page h2 {
-          font-size: 20px;
-          font-weight: 700;
-          margin-top: 36px;
-          margin-bottom: 12px;
-          letter-spacing: -0.3px;
-        }
-        .legal-page h3 {
-          font-size: 16px;
+        .legal-wrap h2 {
+          font-size: 18px;
           font-weight: 600;
-          margin-top: 20px;
-          margin-bottom: 8px;
+          color: #F5F5F5;
+          margin-top: 36px;
+          margin-bottom: 10px;
+          letter-spacing: -0.02em;
         }
-        .legal-page p, .legal-page li {
+        .legal-wrap p, .legal-wrap li {
           font-size: 15px;
-          line-height: 1.7;
-          color: var(--text-2);
+          line-height: 1.75;
+          color: rgba(245,245,245,0.55);
         }
-        .legal-page ul {
+        .legal-wrap ul {
           padding-left: 20px;
-          margin: 12px 0;
+          margin: 10px 0;
         }
-        .legal-page li {
-          margin-bottom: 6px;
-        }
-        .legal-page a {
-          color: var(--fill);
+        .legal-wrap li { margin-bottom: 5px; }
+        .legal-wrap a {
+          color: #3B82F6;
           text-decoration: underline;
+          text-underline-offset: 3px;
         }
         .legal-table {
           width: 100%;
@@ -92,48 +98,45 @@ export default function PrivacyPage() {
         .legal-table th, .legal-table td {
           text-align: left;
           padding: 10px 14px;
-          border: 1px solid var(--border);
+          border: 1px solid rgba(255,255,255,0.09);
         }
         .legal-table th {
-          background: var(--fill-subtle);
+          background: rgba(255,255,255,0.04);
           font-weight: 600;
-          color: var(--text-1);
+          color: rgba(245,245,245,0.75);
         }
-        .legal-table td {
-          color: var(--text-2);
-        }
+        .legal-table td { color: rgba(245,245,245,0.50); }
         .legal-footer {
           margin-top: 60px;
           padding-top: 24px;
-          border-top: 1px solid var(--border);
+          border-top: 1px solid rgba(255,255,255,0.07);
           display: flex;
-          gap: 24px;
+          flex-wrap: wrap;
+          gap: 20px;
           font-size: 13px;
         }
         .legal-footer a {
-          color: var(--text-3);
+          color: rgba(245,245,245,0.35);
           text-decoration: none;
+          transition: color .2s;
         }
-        .legal-footer a:hover {
-          color: var(--text-1);
-        }
+        .legal-footer a:hover { color: #F5F5F5; }
       `}</style>
 
-      <AppHeader activeRoute="home" />
+      <div className="legal-wrap">
+        <Link href="/" className="legal-back">← Back to Buildr Studio</Link>
 
-      <div className="legal-page">
         <h1>Privacy Policy</h1>
-        <p className="legal-date">Last updated: June 23, 2026</p>
+        <p className="legal-date">Last updated: August 1, 2026</p>
 
         <h2>1. Introduction</h2>
         <p>
-          BuildrStudio (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) respects your privacy. This
-          policy explains what data we collect, why, and how we protect it. BuildrStudio is operated
-          by Aditya Kumar from India.
+          Buildr Studio (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) respects your privacy. This
+          policy explains what data we collect when you interact with our website at buildrstudio.in,
+          why we collect it, and how we protect it. Buildr Studio is operated by Aditya Kumar from India.
         </p>
 
         <h2>2. Data We Collect</h2>
-
         <table className="legal-table">
           <thead>
             <tr>
@@ -144,108 +147,64 @@ export default function PrivacyPage() {
           </thead>
           <tbody>
             <tr>
-              <td>Name, email, profile picture</td>
-              <td>Google Sign-In</td>
-              <td>Account creation, subscription management</td>
-            </tr>
-            <tr>
-              <td>Email address</td>
-              <td>Waitlist / interest forms</td>
-              <td>Product updates, launch notifications</td>
-            </tr>
-            <tr>
-              <td>Payment info</td>
-              <td>Pro subscription</td>
-              <td>Processed by Paddle — we never see your card details</td>
+              <td>Name &amp; email address</td>
+              <td>Contact / audit booking form</td>
+              <td>To respond to enquiries and schedule AI Audits</td>
             </tr>
             <tr>
               <td>Usage analytics</td>
               <td>Page visits</td>
-              <td>Improving the product (via Vercel Analytics &amp; Umami)</td>
+              <td>Improving the site (via Vercel Analytics &amp; Umami — no personal data)</td>
             </tr>
           </tbody>
         </table>
 
         <h2>3. Data We Do NOT Collect</h2>
         <ul>
-          <li>
-            <strong>Your screenshots and images</strong> — all image processing happens entirely in
-            your browser. We never upload, store, or access your screenshots on our servers.
-          </li>
-          <li>
-            <strong>Your designs and exports</strong> — everything you create stays on your device.
-          </li>
+          <li>Payment card details — we have no payment system on this site.</li>
+          <li>Tracking cookies or advertising pixels.</li>
+          <li>Any data from third-party account logins.</li>
         </ul>
 
         <h2>4. How We Use Your Data</h2>
         <ul>
-          <li>To create and maintain your account.</li>
-          <li>To process Pro subscription payments via Paddle.</li>
-          <li>To send product updates if you opted in via waitlist forms.</li>
-          <li>To improve the Service through anonymous usage analytics.</li>
+          <li>To respond to enquiries and book AI Audit sessions.</li>
+          <li>To improve the website through anonymous usage analytics.</li>
         </ul>
 
         <h2>5. Third-Party Services</h2>
-        <p>We share limited data with these trusted services:</p>
         <ul>
-          <li><strong>Google OAuth</strong> — authentication (name, email, profile picture)</li>
-          <li><strong>Paddle</strong> — payment processing and merchant of record (email, subscription data)</li>
-          <li><strong>Neon (PostgreSQL)</strong> — database hosting (account and subscription records)</li>
           <li><strong>Vercel</strong> — hosting and analytics (anonymous usage data)</li>
           <li><strong>Umami</strong> — privacy-focused analytics (no personal data, no cookies)</li>
         </ul>
 
         <h2>6. Cookies</h2>
         <p>
-          We use minimal cookies for authentication (session token) and theme preference. We do not
-          use advertising cookies or third-party tracking cookies. Umami analytics is cookie-free.
+          We do not use advertising cookies or third-party tracking cookies. Umami analytics is
+          fully cookie-free.
         </p>
 
         <h2>7. Data Retention</h2>
-        <ul>
-          <li>Account data is retained as long as your account is active.</li>
-          <li>Waitlist emails are retained until the feature launches or you request removal.</li>
-          <li>You can request deletion of all your data by emailing us.</li>
-        </ul>
+        <p>
+          Enquiry emails are retained as long as necessary to complete the engagement or until you
+          request removal.
+        </p>
 
         <h2>8. Your Rights</h2>
-        <p>You have the right to:</p>
         <ul>
           <li>Access the personal data we hold about you.</li>
           <li>Request correction of inaccurate data.</li>
-          <li>Request deletion of your data.</li>
-          <li>Withdraw consent for marketing emails at any time.</li>
+          <li>Request deletion of your data at any time.</li>
         </ul>
 
-        <h2>9. Data Security</h2>
-        <p>
-          We use industry-standard security measures including encrypted connections (HTTPS), secure
-          authentication (OAuth 2.0 + JWT), and HMAC-verified webhooks. Your payment data is handled
-          entirely by Paddle and never touches our servers.
-        </p>
-
-        <h2>10. Children&apos;s Privacy</h2>
-        <p>
-          BuildrStudio is not intended for users under 13 years of age. We do not knowingly collect
-          data from children.
-        </p>
-
-        <h2>11. Changes to This Policy</h2>
-        <p>
-          We may update this privacy policy from time to time. We will notify registered users of
-          material changes via email.
-        </p>
-
-        <h2>12. Contact</h2>
+        <h2>9. Contact</h2>
         <p>
           For privacy-related questions or data requests, contact us at{" "}
-          <a href={`mailto:${siteConfig.author.email}`}>{siteConfig.author.email}</a>.
+          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
         </p>
 
         <div className="legal-footer">
           <Link href="/terms">Terms &amp; Conditions</Link>
-          <Link href="/refund">Refund Policy</Link>
-          <Link href="/pricing">Pricing</Link>
           <Link href="/">Home</Link>
         </div>
       </div>

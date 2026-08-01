@@ -4,12 +4,11 @@ import Script from "next/script";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { ToastProvider } from "./components/Toast";
-import AuthProvider from "./components/AuthProvider";
 import "./globals.css";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-dm-sans",
   display: "swap",
   preload: true,
@@ -18,26 +17,27 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL("https://buildrstudio.in"),
   title: {
-    default: "BuildrStudio — Free App Store Screenshot Generator",
-    template: "%s — BuildrStudio",
+    default: "Buildr Studio — AI Automation & Custom Software Agency",
+    template: "%s — Buildr Studio",
   },
   description:
-    "Free App Store screenshot generator — paste your app URL and get polished mockups with AI-generated marketing copy in seconds. No design skills needed.",
-  authors: [{ name: "Aditya Kumar", url: "https://buildrstudio.in" }],
+    "We design, build, and deploy custom AI agents, n8n workflow automation, multi-agent systems, and RAG knowledge base pipelines that save businesses hundreds of manual hours.",
+  authors: [{ name: "Buildr Studio", url: "https://buildrstudio.in" }],
   keywords: [
-    "app store screenshot generator",
-    "app store mockup",
-    "screenshot builder",
-    "play store screenshot maker",
-    "social media graphics",
-    "developer tools",
-    "app store optimization",
-    "ASO screenshots",
-    "BuildrStudio",
+    "AI automation agency",
+    "custom AI agents",
+    "n8n automation",
+    "Make workflow automation",
+    "RAG pipeline",
+    "multi-agent systems",
+    "AI consulting",
+    "workflow automation",
+    "LLM integration",
+    "Buildr Studio",
   ],
   openGraph: {
     type: "website",
-    siteName: "BuildrStudio",
+    siteName: "Buildr Studio",
   },
   twitter: {
     card: "summary_large_image",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -62,17 +62,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="light" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
-        style={{ fontFamily: "var(--font)" }}
+        style={{ fontFamily: "var(--font-dm-sans, sans-serif)", background: "#080B0F" }}
         className={dmSans.variable}
         suppressHydrationWarning
       >
-        <AuthProvider>
-          <ToastProvider>
-            {children}
-          </ToastProvider>
-        </AuthProvider>
+        <ToastProvider>
+          {children}
+        </ToastProvider>
         <SpeedInsights />
         <Analytics />
         <Script
@@ -84,5 +82,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-

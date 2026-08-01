@@ -1,29 +1,41 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Suspense } from "react";
-import SaaSLandingPage from "./components/SaaSLandingPage";
+import AgencyLandingPage from "./components/AgencyLandingPage";
 
 export const metadata: Metadata = {
-  title: "BuildrStudio — Free App Store Screenshot Generator",
+  title: "Buildr Studio — AI Automation & Custom Software Agency",
   description:
-    "Create App Store & Play Store screenshots in seconds. Paste your app URL, get polished mockups with AI headlines and device frames. Free.",
+    "We design, build, and deploy custom AI agents, n8n workflow automation, multi-agent systems, and RAG knowledge base pipelines that save businesses hundreds of manual hours.",
   alternates: {
     canonical: "https://buildrstudio.in",
   },
   openGraph: {
-    title: "BuildrStudio — App Store Screenshots That Convert",
+    title: "Buildr Studio — AI Automation & Custom Software Agency",
     description:
-      "Paste your App Store URL and get polished, submission-ready screenshots in seconds. Free, no design skills needed.",
+      "Custom AI agents, automated workflows, and context-aware RAG pipelines. Deployed in weeks, not months.",
     type: "website",
     url: "https://buildrstudio.in",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "BuildrStudio — App Store Screenshots That Convert",
+    title: "Buildr Studio — AI Automation & Custom Software Agency",
     description:
-      "Paste your App Store URL and get polished, submission-ready screenshots in seconds.",
+      "Custom AI agents, n8n automation, and RAG pipelines that eliminate manual ops — deployed in 6 weeks.",
   },
+  keywords: [
+    "AI automation agency",
+    "custom AI agents",
+    "n8n automation",
+    "Make workflow automation",
+    "RAG pipeline",
+    "multi-agent systems",
+    "AI consulting",
+    "workflow automation",
+    "LLM integration",
+    "Buildr Studio",
+  ],
 };
 
 const jsonLd = {
@@ -32,53 +44,62 @@ const jsonLd = {
     {
       "@type": "WebSite",
       "@id": "https://buildrstudio.in/#website",
-      "url": "https://buildrstudio.in",
-      "name": "BuildrStudio",
-      "description":
-        "Free App Store & Google Play screenshot generator. Paste your app URL or upload a screenshot, get submission-ready mockups in seconds.",
-      "publisher": {
-        "@type": "Person",
-        "name": "Aditya Kumar",
+      url: "https://buildrstudio.in",
+      name: "Buildr Studio",
+      description:
+        "AI Automation & Custom Software Agency — building custom AI agents, workflow automation, and RAG pipelines.",
+      publisher: {
+        "@type": "Organization",
+        name: "Buildr Studio",
+        url: "https://buildrstudio.in",
       },
     },
     {
-      "@type": "WebApplication",
-      "@id": "https://buildrstudio.in/#webapp",
-      "url": "https://buildrstudio.in/screenshot-builder",
-      "name": "BuildrStudio App Store Screenshot Builder",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "All",
-      "browserRequirements": "Requires CSS3/HTML5",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD",
+      "@type": "ProfessionalService",
+      "@id": "https://buildrstudio.in/#agency",
+      name: "Buildr Studio",
+      url: "https://buildrstudio.in",
+      description:
+        "We design, build, and deploy custom AI agents, automated n8n/Make workflows, context-aware RAG pipelines, and full-stack software integrations.",
+      serviceType: [
+        "AI Automation",
+        "Custom Software Development",
+        "Workflow Automation",
+        "AI Agent Development",
+      ],
+      areaServed: "Worldwide",
+      contactPoint: {
+        "@type": "ContactPoint",
+        email: "hello@buildrstudio.in",
+        contactType: "customer service",
       },
-      "description":
-        "Create submission-ready App Store and Google Play screenshots in seconds. Auto-import from your App Store URL, AI headlines, smart device-size resize.",
     },
     {
       "@type": "FAQPage",
-      "mainEntity": [
+      mainEntity: [
         {
           "@type": "Question",
-          "name": "Do I need a credit card to get started?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No! You can use all core features of BuildrStudio completely free without entering any billing details." },
+          name: "What does Buildr Studio build?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Buildr Studio builds custom AI agents, n8n and Make workflow automations, multi-agent systems, and RAG knowledge base integrations tailored to your business operations.",
+          },
         },
         {
           "@type": "Question",
-          "name": "How does the Batch Store Exporter work?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Under the Pro plan, you can upload a single screenshot, and our system automatically renders and packs it in all canonical resolutions required by Apple and Google. You get a clean ZIP file instantly." },
+          name: "How long does a typical engagement take?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Most projects go from initial AI Audit to production deployment in 6 weeks. The audit takes one week, build and integration takes 4 weeks, and deployment/handoff is week 6.",
+          },
         },
         {
           "@type": "Question",
-          "name": "Can I save my custom brand colors and gradients?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes! The Pro tier includes a Brand Presets kit where you can lock in your exact hex codes, brand fonts, and custom watermark text for automatic use on any tool." },
-        },
-        {
-          "@type": "Question",
-          "name": "Does BuildrStudio have AI features?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes! BuildrStudio includes an AI-powered copywriter that generates marketing headlines in 15+ languages, and AI auto-layout that suggests gradients and text positioning when you upload a screenshot." },
+          name: "What industries does Buildr Studio serve?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "We primarily serve mid-market B2B SaaS companies, E-commerce brands, Real Estate firms, and high-growth agencies looking to automate operational workflows with AI.",
+          },
         },
       ],
     },
@@ -89,12 +110,12 @@ export default function Home() {
   return (
     <>
       <Script
-        id="json-ld-website"
+        id="json-ld-agency"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Suspense>
-        <SaaSLandingPage />
+        <AgencyLandingPage />
       </Suspense>
     </>
   );
