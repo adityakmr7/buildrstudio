@@ -1,20 +1,23 @@
 export const siteConfig = {
-  name: "BuildrStudio",
+  name: "Buildr Studio",
   url: "https://buildrstudio.in",
-  tagline: "Free browser-based tools for launch-ready visuals",
+  tagline: "AI Automation & Custom Software Agency",
+  description:
+    "We design, build, and deploy custom AI agents, n8n workflow automation, multi-agent systems, and RAG pipelines that save businesses hundreds of manual hours.",
+
+  contact: {
+    email: "hello@buildrstudio.in",
+    auditEmail: "hello@buildrstudio.in?subject=AI Audit Request",
+  },
 
   author: {
     name: "Aditya Kumar",
-    email: "adityakmr9672@gmail.com",
-    support: "support@buildrstudio.in",
-    twitter: "@dev_adityakmr",
-    twitterUrl: "https://x.com/dev_adityakmr",
+    twitter: "@buildrstudio",
+    twitterUrl: "https://x.com/buildrstudio",
     github: "adityakmr7",
     githubUrl: "https://github.com/adityakmr7",
     linkedin: "adityakmr7",
     linkedinUrl: "https://linkedin.com/in/adityakmr7",
-    substack: "adityakmr7",
-    substackUrl: "https://substack.com/@adityakmr7",
     cal: "adityakmr7",
     calUrl: "https://cal.com/adityakmr7",
   },
