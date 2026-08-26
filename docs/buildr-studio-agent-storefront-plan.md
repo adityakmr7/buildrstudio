@@ -17,6 +17,9 @@ Positioning is settled: a **small, indie/small-business-scale version of Kore.ai
 2026-08-26 "positioning settled" entry in Section 10 for the full comparison).
 
 **What's actually working right now, verified end-to-end (not just build/lint):**
+- **Live in production at buildrstudio.in** (deployed 2026-08-26 via `vercel --prod`) — homepage,
+  catalog, product pages with real pricing, and the on-site demo (real Gemini reply) all verified
+  directly against the live URL, not just locally.
 - Browse catalog → product page → on-site live demo, calling real Gemini
 - Sign-in via a dev-only bypass (`DEV_BYPASS_AUTH=true` in `.env.local`) — real Google OAuth
   credentials exist too but haven't been re-verified after the redirect-URI fix propagated
@@ -43,21 +46,19 @@ Positioning is settled: a **small, indie/small-business-scale version of Kore.ai
    placeholders) are what you're actually charging. **Explicitly deferred, 2026-08-26 — site owner
    said stay sandbox-only for now.** Don't push toward `paddle-live` authentication or production
    Paddle as an urgent task on your own initiative; wait for the site owner to say they're ready.
-2. **Actual deployment** — everything built this whole conversation is uncommitted locally. Nothing
-   is live on buildrstudio.in yet. Needs: commit/push/merge, real production env vars on Vercel
-   (separate from local `.env.local`), `prisma migrate deploy` against production.
-3. **A real end-to-end purchase test** — checkout → Paddle webhook → auto-provisioned API key has
+2. **A real end-to-end purchase test** — checkout → Paddle webhook → auto-provisioned API key has
    never actually run; only simulated by hand-creating an `ApiKey` row for testing. No longer blocked
-   on pricing or the API key — both exist now, at least in sandbox.
-4. **Decide dev/prod database separation** — right now local dev points at the same Neon project
-   that would become production if deployed as-is. Neon branching is the easy fix; nobody's decided
+   on anything — pricing, the API key, and now a live production URL for the webhook to actually
+   reach all exist.
+3. **Decide dev/prod database separation** — local dev and production currently point at the *same*
+   Neon project (deployed as-is, not separated). Neon branching is the easy fix; nobody's decided
    to do it yet.
-5. Product depth gaps: no conversation/transcript viewing in the dashboard (just a usage count), no
+4. Product depth gaps: no conversation/transcript viewing in the dashboard (just a usage count), no
    PDF/URL support in the knowledge base (text/`.txt`/`.md` only), the two "coming-soon" catalog
    products have zero real implementation, no email notifications (`resend` is installed, unused).
-6. Turn off `DEV_BYPASS_AUTH` before any real testing/launch — hard-gated against production builds,
+5. Turn off `DEV_BYPASS_AUTH` before any real testing/launch — hard-gated against production builds,
    but shouldn't be left on even locally past the point it's needed.
-7. A security review hasn't been done — worth doing before real payments/user data are involved.
+6. A security review hasn't been done — worth doing before real payments/user data are involved.
 
 Full blow-by-blow of how we got here is in Section 10 below, in date order.
 
@@ -423,3 +424,40 @@ the dashboard accepted it.
 The webhook route and customer-portal route can now genuinely authenticate to Paddle server-side.
 Still open: nobody has actually clicked through a live checkout yet, and everything remains sandbox
 until `paddle-live` is authenticated and the pricing is deliberately made final.
+
+**2026-08-26 (same session, continued) — Deployed to production for real.**
+
+Asked directly to deploy — prompted by wanting to test embedding Support Agent Starter on a real
+external site (captioncraft.co) rather than faking it with a localhost-pointed embed snippet.
+
+Found the Vercel project (`buildrstudio`) already existed from the pre-pivot agency site, last
+deployed 25 days earlier — linked to it rather than creating a new one. Its Production env vars
+turned out to be a mix of leftovers from *three* earlier product iterations (LemonSqueezy-era vars,
+an old Paddle setup with different price-ID-based products, `NEON_DATABASE_URL` from the original
+tools product) — none matching what this app's code actually reads, and some (`PADDLE_API_KEY`,
+`NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`) potentially real/live Paddle credentials from that old setup,
+which would have been actively dangerous to leave in place given the explicit "sandbox only for
+now" decision. Overwrote every var this app actually uses (`DATABASE_URL`, `AUTH_SECRET`,
+`AUTH_URL`, `GOOGLE_CLIENT_ID`/`SECRET`, `GEMINI_API_KEY`, `PADDLE_API_KEY`,
+`PADDLE_WEBHOOK_SECRET`, `PADDLE_ENV`, `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`,
+`NEXT_PUBLIC_PADDLE_ENV`) with our confirmed sandbox/real values on both Production and Preview via
+`vercel env add --force --sensitive`, verified each override actually took (the CLI's own "✓
+Overrode" confirmation — the `vercel env ls` "created" column is misleading, it doesn't update on
+overwrite) rather than trusting exit codes alone. Left the old unused vars in place — deleting them
+wasn't necessary for correctness and wasn't asked for.
+
+Committed the entire session's work (55 files) to a new branch (`feat/agent-marketplace`, following
+the "branch first off main" convention) with a full summary commit message, pushed it to GitHub for
+review/merge tracking, then deployed straight to production via `vercel --prod` rather than waiting
+on a PR merge — the fastest path to an actually-live site, decoupled from when the branch gets
+reviewed and merged.
+
+**Verified against the live production URL, not just locally:** homepage copy, catalog listing both
+live agents, product page showing real $19/$49 pricing with a working "Get this agent" button
+(proving DATABASE_URL + the Paddle price IDs work in production), the on-site demo returning a real
+Gemini-generated reply, and next-auth's Google provider + dashboard auth-gating (redirects
+unauthenticated visitors instead of erroring) all responding correctly.
+
+The database is the same Neon project used for local dev this whole session — no separate
+prod/dev split (see the still-open item above). `prisma migrate deploy` wasn't needed since this
+exact database was already migrated and seeded from earlier local work.
