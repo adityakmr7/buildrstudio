@@ -1,22 +1,32 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════
-   Buildr Studio — Agency Global Styles
-   Clean slate for AI automation agency.
-   Dark-tech base. DM Sans. Electric blue accent.
+   Buildr Studio — Marketplace Global Styles
+   Light SaaS theme. DM Sans. Electric blue accent.
+   No dark mode — this is a deliberate single-theme site.
 ═══════════════════════════════════════════════ */
 
 /* ─── TOKENS ─── */
 
 :root {
-  /* Agency palette */
-  --agency-bg:         #080B0F;
-  --agency-surface:    #0C1015;
-  --agency-border:     rgba(255, 255, 255, 0.07);
-  --agency-accent:     #2563EB;
-  --agency-accent-mid: #3B82F6;
-  --agency-text:       #F5F5F5;
-  --agency-muted:      rgba(245, 245, 245, 0.50);
+  /* Palette */
+  --bg:           #F5F8FC;
+  --surface:      #FFFFFF;
+  --surface-alt:  #EEF3FA;
+  --border:       rgba(15, 23, 42, 0.08);
+  --border-strong:rgba(15, 23, 42, 0.16);
+  --accent:       #2563EB;
+  --accent-mid:   #3B82F6;
+  --accent-soft:  rgba(37, 99, 235, 0.08);
+  --text:         #0F172A;
+  --text-1:       #0F172A; /* alias kept for Toast.tsx */
+  --muted:        rgba(15, 23, 42, 0.58);
+  --muted-2:      rgba(15, 23, 42, 0.36);
+  --success:      #16A34A;
+
+  /* Toast aliases */
+  --fill:         var(--accent);
+  --fill-text:    #FFFFFF;
 
   /* Typography */
   --font: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -40,13 +50,13 @@
 
 html {
   scroll-behavior: smooth;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
-  background: var(--agency-bg);
+  background: var(--bg);
   font-family: var(--font);
-  color: var(--agency-text);
+  color: var(--text);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -74,31 +84,28 @@ img, video {
   border-width: 0;
 }
 
-/* ─── AGENCY REUSABLE UTILITIES ─── */
+/* ─── REUSABLE UTILITIES ─── */
 
-/* Focus ring for interactive elements */
 :focus-visible {
-  outline: 2px solid var(--agency-accent-mid);
+  outline: 2px solid var(--accent-mid);
   outline-offset: 3px;
   border-radius: var(--r-sm);
 }
 
-/* Selection highlight */
 ::selection {
-  background: rgba(37, 99, 235, 0.30);
-  color: #fff;
+  background: rgba(37, 99, 235, 0.16);
+  color: var(--text);
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar       { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.10); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.18); }
-* { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.10) transparent; }
+::-webkit-scrollbar-thumb { background: rgba(15,23,42,0.14); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(15,23,42,0.22); }
+* { scrollbar-width: thin; scrollbar-color: rgba(15,23,42,0.14) transparent; }
 
 /* ─── ANIMATIONS ─── */
 
-@keyframes agency-marquee {
+@keyframes site-marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }

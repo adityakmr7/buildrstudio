@@ -4,6 +4,7 @@ import Script from "next/script";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { ToastProvider } from "./components/Toast";
+import { AuthProvider } from "./components/AuthProvider";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -17,22 +18,20 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL("https://buildrstudio.in"),
   title: {
-    default: "Buildr Studio — AI Automation & Custom Software Agency",
+    default: "Buildr Studio — The AI Agent Marketplace",
     template: "%s — Buildr Studio",
   },
   description:
-    "We design, build, and deploy custom AI agents, n8n workflow automation, multi-agent systems, and RAG knowledge base pipelines that save businesses hundreds of manual hours.",
+    "Browse, buy, and embed AI agents on any website — support agents, knowledge assistants, workflow automation, and multi-agent systems. Install in minutes, no code required.",
   authors: [{ name: "Buildr Studio", url: "https://buildrstudio.in" }],
   keywords: [
-    "AI automation agency",
-    "custom AI agents",
-    "n8n automation",
-    "Make workflow automation",
-    "RAG pipeline",
-    "multi-agent systems",
-    "AI consulting",
+    "AI agent marketplace",
+    "embeddable AI chat widget",
+    "AI support agent",
+    "RAG knowledge assistant",
+    "AI chatbot for website",
+    "no-code AI agent",
     "workflow automation",
-    "LLM integration",
     "Buildr Studio",
   ],
   openGraph: {
@@ -64,13 +63,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        style={{ fontFamily: "var(--font-dm-sans, sans-serif)", background: "#080B0F" }}
+        style={{ fontFamily: "var(--font-dm-sans, sans-serif)", background: "#F5F8FC" }}
         className={dmSans.variable}
         suppressHydrationWarning
       >
-        <ToastProvider>
-          {children}
-        </ToastProvider>
+        <AuthProvider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </AuthProvider>
         <SpeedInsights />
         <Analytics />
         <Script

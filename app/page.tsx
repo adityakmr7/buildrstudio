@@ -1,39 +1,34 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Suspense } from "react";
-import AgencyLandingPage from "./components/AgencyLandingPage";
+import MarketplaceLandingPage from "./components/MarketplaceLandingPage";
 
 export const metadata: Metadata = {
-  title: "Buildr Studio — AI Automation & Custom Software Agency",
+  title: "Buildr Studio — The AI Agent Marketplace",
   description:
-    "We design, build, and deploy custom AI agents, n8n workflow automation, multi-agent systems, and RAG knowledge base pipelines that save businesses hundreds of manual hours.",
+    "Browse, buy, and embed AI agents on any website — support agents, knowledge assistants, workflow automation, and multi-agent systems. Install in minutes, no code required.",
   alternates: {
     canonical: "https://buildrstudio.in",
   },
   openGraph: {
-    title: "Buildr Studio — AI Automation & Custom Software Agency",
-    description:
-      "Custom AI agents, automated workflows, and context-aware RAG pipelines. Deployed in weeks, not months.",
+    title: "Buildr Studio — The AI Agent Marketplace",
+    description: "Browse, buy, and embed AI agents on any website. Install in minutes, no code required.",
     type: "website",
     url: "https://buildrstudio.in",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Buildr Studio — AI Automation & Custom Software Agency",
-    description:
-      "Custom AI agents, n8n automation, and RAG pipelines that eliminate manual ops — deployed in 6 weeks.",
+    title: "Buildr Studio — The AI Agent Marketplace",
+    description: "Browse, buy, and embed AI agents on any website. Install in minutes, no code required.",
   },
   keywords: [
-    "AI automation agency",
-    "custom AI agents",
-    "n8n automation",
-    "Make workflow automation",
-    "RAG pipeline",
-    "multi-agent systems",
-    "AI consulting",
-    "workflow automation",
-    "LLM integration",
+    "AI agent marketplace",
+    "embeddable AI chat widget",
+    "AI support agent",
+    "RAG knowledge assistant",
+    "AI chatbot for website",
+    "no-code AI agent",
     "Buildr Studio",
   ],
 };
@@ -46,8 +41,7 @@ const jsonLd = {
       "@id": "https://buildrstudio.in/#website",
       url: "https://buildrstudio.in",
       name: "Buildr Studio",
-      description:
-        "AI Automation & Custom Software Agency — building custom AI agents, workflow automation, and RAG pipelines.",
+      description: "The AI Agent Marketplace — browse, buy, and embed AI agents on any website.",
       publisher: {
         "@type": "Organization",
         name: "Buildr Studio",
@@ -55,50 +49,22 @@ const jsonLd = {
       },
     },
     {
-      "@type": "ProfessionalService",
-      "@id": "https://buildrstudio.in/#agency",
-      name: "Buildr Studio",
-      url: "https://buildrstudio.in",
-      description:
-        "We design, build, and deploy custom AI agents, automated n8n/Make workflows, context-aware RAG pipelines, and full-stack software integrations.",
-      serviceType: [
-        "AI Automation",
-        "Custom Software Development",
-        "Workflow Automation",
-        "AI Agent Development",
-      ],
-      areaServed: "Worldwide",
-      contactPoint: {
-        "@type": "ContactPoint",
-        email: "hello@buildrstudio.in",
-        contactType: "customer service",
-      },
-    },
-    {
       "@type": "FAQPage",
       mainEntity: [
         {
           "@type": "Question",
-          name: "What does Buildr Studio build?",
+          name: "Do I need a developer to install an agent?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Buildr Studio builds custom AI agents, n8n and Make workflow automations, multi-agent systems, and RAG knowledge base integrations tailored to your business operations.",
+            text: "No. After subscribing, your dashboard gives you a single script tag to paste into any website — no code required.",
           },
         },
         {
           "@type": "Question",
-          name: "How long does a typical engagement take?",
+          name: "Can I try an agent before paying?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Most projects go from initial AI Audit to production deployment in 6 weeks. The audit takes one week, build and integration takes 4 weeks, and deployment/handoff is week 6.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "What industries does Buildr Studio serve?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "We primarily serve mid-market B2B SaaS companies, E-commerce brands, Real Estate firms, and high-growth agencies looking to automate operational workflows with AI.",
+            text: "Yes — every agent works on a small trial message quota as soon as you generate an API key.",
           },
         },
       ],
@@ -110,12 +76,12 @@ export default function Home() {
   return (
     <>
       <Script
-        id="json-ld-agency"
+        id="json-ld-marketplace"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Suspense>
-        <AgencyLandingPage />
+        <MarketplaceLandingPage />
       </Suspense>
     </>
   );
