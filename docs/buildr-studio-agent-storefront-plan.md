@@ -9,7 +9,7 @@ Section 10 is what actually happened.)
 
 ---
 
-## 0. Current status (read this first — updated 2026-08-26)
+## 0. Current status (read this first — updated 2026-08-27)
 
 Positioning is settled: a **small, indie/small-business-scale version of Kore.ai's core loop**
 (browse → subscribe → deploy a working agent), explicitly *not* matching Kore.ai's enterprise depth
@@ -21,8 +21,9 @@ Positioning is settled: a **small, indie/small-business-scale version of Kore.ai
   catalog, product pages with real pricing, and the on-site demo (real Gemini reply) all verified
   directly against the live URL, not just locally.
 - Browse catalog → product page → on-site live demo, calling real Gemini
-- Sign-in via a dev-only bypass (`DEV_BYPASS_AUTH=true` in `.env.local`) — real Google OAuth
-  credentials exist too but haven't been re-verified after the redirect-URI fix propagated
+- **Real Google sign-in works in production**, verified end-to-end (2026-08-27) — this surfaced and
+  fixed a genuine bug (`auth.config.ts` sending `client_id=undefined`, see the 2026-08-27 entry in
+  Section 10) that every prior local test missed because it always used `DEV_BYPASS_AUTH` instead.
 - A real, dedicated Neon database (`buildrstudio` project) with real migration history
 - **Retrieval-augmented knowledge base** — a customer can upload text, and their agent answers from
   it instead of a generic script. Proven with a real test API key: uploaded content, got precise
@@ -38,6 +39,12 @@ Positioning is settled: a **small, indie/small-business-scale version of Kore.ai
   via browser automation (Paddle's API genuinely has no endpoint to create this one), then verified
   by calling Paddle's API directly through the app's own SDK setup. The webhook route and
   customer-portal route can now actually authenticate to Paddle server-side.
+- **A real end-to-end purchase now works, verified for real** (2026-08-27) — sign in with a real
+  Google account, buy Support Agent Starter through Paddle sandbox checkout, land on the dashboard
+  with a working embed code. Getting here surfaced and fixed a real webhook-delivery bug (the
+  destination URL 307-redirected on POST — see the 2026-08-27 entry in Section 10) and required
+  manually fulfilling the one purchase that got stuck before the fix; the fix itself means future
+  purchases are handled automatically.
 
 **What's NOT done — in rough priority order:**
 1. **Authenticate `paddle-live` and decide the sandbox pricing is final** — right now $19/$49 only
@@ -46,19 +53,15 @@ Positioning is settled: a **small, indie/small-business-scale version of Kore.ai
    placeholders) are what you're actually charging. **Explicitly deferred, 2026-08-26 — site owner
    said stay sandbox-only for now.** Don't push toward `paddle-live` authentication or production
    Paddle as an urgent task on your own initiative; wait for the site owner to say they're ready.
-2. **A real end-to-end purchase test** — checkout → Paddle webhook → auto-provisioned API key has
-   never actually run; only simulated by hand-creating an `ApiKey` row for testing. No longer blocked
-   on anything — pricing, the API key, and now a live production URL for the webhook to actually
-   reach all exist.
-3. **Decide dev/prod database separation** — local dev and production currently point at the *same*
+2. **Decide dev/prod database separation** — local dev and production currently point at the *same*
    Neon project (deployed as-is, not separated). Neon branching is the easy fix; nobody's decided
    to do it yet.
-4. Product depth gaps: no conversation/transcript viewing in the dashboard (just a usage count), no
+3. Product depth gaps: no conversation/transcript viewing in the dashboard (just a usage count), no
    PDF/URL support in the knowledge base (text/`.txt`/`.md` only), the two "coming-soon" catalog
    products have zero real implementation, no email notifications (`resend` is installed, unused).
-5. Turn off `DEV_BYPASS_AUTH` before any real testing/launch — hard-gated against production builds,
+4. Turn off `DEV_BYPASS_AUTH` before any real testing/launch — hard-gated against production builds,
    but shouldn't be left on even locally past the point it's needed.
-6. A security review hasn't been done — worth doing before real payments/user data are involved.
+5. A security review hasn't been done — worth doing before real payments/user data are involved.
 
 Full blow-by-blow of how we got here is in Section 10 below, in date order.
 
@@ -461,3 +464,73 @@ unauthenticated visitors instead of erroring) all responding correctly.
 The database is the same Neon project used for local dev this whole session — no separate
 prod/dev split (see the still-open item above). `prisma migrate deploy` wasn't needed since this
 exact database was already migrated and seeded from earlier local work.
+
+**2026-08-27 — Real Google sign-in broke production; found and fixed a `client_id=undefined` bug.**
+
+Attempted the real end-to-end purchase test (item #2 on the still-open list): sign in with a real
+Google account on the live site, then buy Support Agent Starter through Paddle sandbox checkout.
+Sign-in failed in production. Root cause: `auth.config.ts`'s bare `Google` provider relies on
+next-auth's env-var auto-inference, which looks for `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET` — but this
+project's vars (matching `.env.example` everywhere else) are named `GOOGLE_CLIENT_ID`/
+`GOOGLE_CLIENT_SECRET`. The provider silently sent `client_id=undefined` to Google's OAuth endpoint
+instead of erroring loudly. This had been wrong since the client was set up (2026-08-25) but never
+surfaced, because every local test all session used `DEV_BYPASS_AUTH`, which never touches the real
+Google flow at all — this is the first genuine end-to-end auth test of the whole project.
+
+Fixed by passing `clientId`/`clientSecret` explicitly in `auth.config.ts` rather than relying on
+inference, committed, redeployed to production, and reverified — real Google sign-in then worked,
+and the site owner completed a real sandbox purchase (Support Agent Starter, Standard tier) through
+to Paddle's checkout success screen.
+
+**2026-08-27 (same day, continued) — Purchase succeeded in Paddle but never reached the dashboard;
+found and fixed a webhook delivery failure, then manually fulfilled the stuck purchase.**
+
+Reported by the site owner: after a successful checkout, `/dashboard/integrations` still showed "You
+haven't subscribed to any agents yet." Checked Paddle sandbox directly (`paddle-sandbox` MCP) rather
+than guessing from app logs:
+
+- The Paddle subscription itself was real and correct — `sub_01m10ycatwbye7fm5s4axfsh0k`, status
+  `active`, correct `custom_data` (`userId`/`agentId`/`tierId` all present and correct), confirming
+  `PaddleCheckoutButton.tsx`'s customData wiring works.
+- But `client.notifications.list()` showed every `subscription.created`/`.activated` delivery
+  attempt for it as `status: "failed"`, `times_attempted: 3`, `delivered_at: null`.
+- Root cause: `curl -X POST https://buildrstudio.in/api/webhooks/paddle` (the destination URL
+  configured this session, 2026-08-26) returns a 307 redirect to the `www` host on POST — Paddle
+  (like most webhook senders) doesn't follow redirects on delivery, so all 3 attempts failed before
+  ever reaching the handler. `https://www.buildrstudio.in/api/webhooks/paddle` directly returns 401
+  for an unsigned test request, confirming the handler itself was never the problem.
+
+**Bigger finding while fixing it:** this Paddle sandbox account already had a second, older
+notification destination — `ntfset_01ky5cpb9tn850cc1gcvga80ms`, "BuildrStudio - fulfillment webhook
+(sandbox)" — correctly pointed at the `www` URL from some earlier setup, predating this session
+entirely (its own delivered events go back to 2026-07-31). This session's Paddle provisioning work
+(2026-08-26) created a brand-new, differently-misconfigured destination
+(`ntfset_01m0zhjsbd4jb2aj88y2y7k6n2`) without noticing the existing one, and wired
+`PADDLE_WEBHOOK_SECRET` to match the new (broken) one instead. (The sandbox account also turned out
+to hold a notification destination for an entirely unrelated project, "BrandinAI" — confirming this
+Paddle account isn't dedicated to Buildr Studio; left untouched.)
+
+Resolved by consolidating onto the older, correctly-addressed destination rather than fixing the new
+one's URL (which was blocked anyway — Paddle won't allow two destinations with the same URL):
+updated `ntfset_01ky5cpb9tn850cc1gcvga80ms`'s `subscribed_events` to the exact list
+`app/api/webhooks/paddle/route.ts` acts on (`subscription.created/.activated/.resumed/.updated/
+.canceled/.paused/.past_due`), deactivated (not deleted — kept for audit history) the broken
+duplicate, and rotated `PADDLE_WEBHOOK_SECRET` to the correct destination's `endpoint_secret_key` in
+both `.env.local` and Vercel (production + preview), then redeployed. Future purchases now reach the
+handler correctly.
+
+The site owner's specific stuck purchase still needed fixing directly — Paddle's `notifications.replay`
+only redelivers to a notification's *original* destination, and its original destination was the
+broken one. Rather than relying on replay, wrote a one-off script
+(`scripts/fulfill-stuck-subscription.ts`, deleted after running) that did exactly what the webhook
+handler's `subscription.created`/`.activated` case does — `agentSubscription.upsert` +
+auto-provision an `ApiKey` if none exists — using the real, confirmed values read back from Paddle's
+own subscription object. Verified every ID against the live database first (`user`, `agent`, `tier`
+all resolved to real rows, `existingSub` was `null`) before writing anything, then ran it: created
+one real `AgentSubscription` (status `active`, correct `currentPeriodEnd`) and one real `ApiKey` for
+the site owner's own account.
+
+**Lesson for future Paddle provisioning work:** always run `notificationSettings.list()` (not just
+`.create()`) before wiring a new webhook destination — this account already carries destinations
+from other projects and earlier BuildrStudio setups, and duplicate/near-duplicate destinations are
+easy to create by accident without checking first.
