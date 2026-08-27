@@ -5,7 +5,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Terms and Conditions",
   description:
-    "Terms and conditions for Buildr Studio, the AI agent marketplace. Subscription terms, acceptable use, and liability.",
+    "Terms and conditions for Buildr Studio's AI agents. Subscription terms, acceptable use, and liability.",
   alternates: { canonical: "https://buildrstudio.in/terms" },
   openGraph: {
     title: "Terms and Conditions — Buildr Studio",

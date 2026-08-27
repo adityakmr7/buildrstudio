@@ -2,30 +2,30 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Suspense } from "react";
 import MarketplaceLandingPage from "./components/MarketplaceLandingPage";
+import { siteConfig } from "./lib/siteConfig";
 
 export const metadata: Metadata = {
-  title: "Buildr Studio — The AI Agent Marketplace",
-  description:
-    "Browse, buy, and embed AI agents on any website — support agents, knowledge assistants, workflow automation, and multi-agent systems. Install in minutes, no code required.",
+  title: `Buildr Studio — ${siteConfig.tagline}`,
+  description: siteConfig.description,
   alternates: {
-    canonical: "https://buildrstudio.in",
+    canonical: siteConfig.url,
   },
   openGraph: {
-    title: "Buildr Studio — The AI Agent Marketplace",
-    description: "Browse, buy, and embed AI agents on any website. Install in minutes, no code required.",
+    title: `Buildr Studio — ${siteConfig.tagline}`,
+    description: siteConfig.description,
     type: "website",
-    url: "https://buildrstudio.in",
+    url: siteConfig.url,
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Buildr Studio — The AI Agent Marketplace",
-    description: "Browse, buy, and embed AI agents on any website. Install in minutes, no code required.",
+    title: `Buildr Studio — ${siteConfig.tagline}`,
+    description: siteConfig.description,
   },
   keywords: [
-    "AI agent marketplace",
+    "AI employees for small business",
+    "AI customer support agent",
     "embeddable AI chat widget",
-    "AI support agent",
     "RAG knowledge assistant",
     "AI chatbot for website",
     "no-code AI agent",
@@ -39,13 +39,13 @@ const jsonLd = {
     {
       "@type": "WebSite",
       "@id": "https://buildrstudio.in/#website",
-      url: "https://buildrstudio.in",
+      url: siteConfig.url,
       name: "Buildr Studio",
-      description: "The AI Agent Marketplace — browse, buy, and embed AI agents on any website.",
+      description: siteConfig.description,
       publisher: {
         "@type": "Organization",
         name: "Buildr Studio",
-        url: "https://buildrstudio.in",
+        url: siteConfig.url,
       },
     },
     {

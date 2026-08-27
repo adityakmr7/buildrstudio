@@ -5,7 +5,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "Privacy policy for Buildr Studio, the AI agent marketplace. Learn how we collect, use, and protect your data.",
+    "Privacy policy for Buildr Studio's AI agents. Learn how we collect, use, and protect your data.",
   alternates: { canonical: "https://buildrstudio.in/privacy" },
   openGraph: {
     title: "Privacy Policy — Buildr Studio",
@@ -131,11 +131,11 @@ export default function PrivacyPage() {
 
         <h2>1. Introduction</h2>
         <p>
-          Buildr Studio (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) operates an AI agent
-          marketplace at buildrstudio.in, where you can subscribe to and embed AI agents on your
-          own website. This policy explains what data we collect — both from you as a subscriber
-          and, where applicable, from visitors to sites where you&apos;ve embedded an agent — and
-          how we protect it. Buildr Studio is operated by Aditya Kumar from India.
+          Buildr Studio (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) provides pre-built AI
+          agents at buildrstudio.in that you can subscribe to and embed on your own website. This
+          policy explains what data we collect — both from you as a subscriber and, where
+          applicable, from visitors to sites where you&apos;ve embedded an agent — and how we
+          protect it. Buildr Studio is operated by Aditya Kumar from India.
         </p>
 
         <h2>2. Data We Collect</h2>
@@ -161,7 +161,7 @@ export default function PrivacyPage() {
             <tr>
               <td>Chat messages</td>
               <td>A visitor uses an embedded agent</td>
-              <td>Sent to OpenAI to generate a reply, and stored so the agent has conversation context</td>
+              <td>Sent to Google Gemini to generate a reply, and stored so the agent has conversation context</td>
             </tr>
             <tr>
               <td>Usage analytics</td>
@@ -174,9 +174,10 @@ export default function PrivacyPage() {
         <h2>3. Chat Data From Embedded Agents</h2>
         <p>
           When a visitor uses an agent embedded on your website, their messages are sent to our
-          API, forwarded to OpenAI to generate a response, and stored so the agent can maintain
-          conversation context. If you embed an agent, you&apos;re responsible for disclosing this
-          to your own visitors (e.g. in your own privacy policy) where required by law.
+          API, forwarded to Google Gemini to generate a response, and stored so the agent can
+          maintain conversation context. If you embed an agent, you&apos;re responsible for
+          disclosing this to your own visitors (e.g. in your own privacy policy) where required by
+          law.
         </p>
 
         <h2>4. Data We Do NOT Collect</h2>
@@ -188,7 +189,7 @@ export default function PrivacyPage() {
 
         <h2>5. Third-Party Services</h2>
         <ul>
-          <li><strong>OpenAI</strong> — processes chat messages to generate agent replies</li>
+          <li><strong>Google Gemini</strong> — processes chat messages to generate agent replies</li>
           <li><strong>Paddle</strong> — payment processing and billing (acts as merchant of record)</li>
           <li><strong>Google</strong> — authentication (sign-in)</li>
           <li><strong>Neon</strong> — database hosting for account, subscription, and chat data</li>

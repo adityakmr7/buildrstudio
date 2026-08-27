@@ -20,8 +20,8 @@ export default function LiveDemoChat({ product }: { product: AgentProduct }) {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
   }, [messages, busy]);
 
-  const send = async () => {
-    const text = input.trim();
+  const send = async (overrideText?: string) => {
+    const text = (overrideText ?? input).trim();
     if (!text || busy) return;
     setInput("");
     setError(null);
@@ -125,6 +125,30 @@ export default function LiveDemoChat({ product }: { product: AgentProduct }) {
         )}
       </div>
 
+      {messages.length === 1 && product.suggestedQuestions.length > 0 && (
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: "0 10px 10px", background: "var(--surface)" }}>
+          {product.suggestedQuestions.map((question) => (
+            <button
+              key={question}
+              onClick={() => send(question)}
+              disabled={busy}
+              style={{
+                padding: "6px 12px",
+                borderRadius: 999,
+                fontSize: 12,
+                fontWeight: 500,
+                cursor: busy ? "default" : "pointer",
+                border: "1px solid var(--border)",
+                background: "var(--bg)",
+                color: "var(--muted)",
+              }}
+            >
+              {question}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div style={{ display: "flex", gap: 8, padding: 10, borderTop: "1px solid var(--border)", background: "var(--surface)" }}>
         <input
           value={input}
@@ -136,7 +160,7 @@ export default function LiveDemoChat({ product }: { product: AgentProduct }) {
           style={{ flex: 1, border: "1px solid var(--border)", borderRadius: 10, padding: "9px 12px", fontSize: 13.5, outline: "none", fontFamily: "var(--font)", color: "var(--text)", background: "var(--bg)" }}
         />
         <button
-          onClick={send}
+          onClick={() => send()}
           disabled={busy || !input.trim()}
           style={{
             width: 38,

@@ -5,23 +5,23 @@ import AgentsCatalogHub from "./AgentsCatalogHub";
 import { AGENT_CATALOG } from "../lib/agentCatalog";
 
 export const metadata: Metadata = {
-  title: "Agent Catalog — Buildr Studio",
+  title: "AI Agents — Buildr Studio",
   description:
-    "Browse Buildr Studio's marketplace of embeddable AI agents — support agents, RAG knowledge assistants, workflow automation, and multi-agent systems. Install with one script tag, no code required.",
+    "Find an AI employee for your business — customer support, knowledge, and automation agents you can try live and install with one script tag. No code required.",
   alternates: {
     canonical: "https://buildrstudio.in/agents",
   },
   openGraph: {
-    title: "Agent Catalog — Buildr Studio",
-    description: "Embeddable AI agents — subscribe and install with one script tag.",
+    title: "AI Agents — Buildr Studio",
+    description: "Find an AI employee for your business — try one live, then install it in minutes.",
     type: "website",
     url: "https://buildrstudio.in/agents",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Agent Catalog — Buildr Studio",
-    description: "Embeddable AI agents — subscribe and install with one script tag.",
+    title: "AI Agents — Buildr Studio",
+    description: "Find an AI employee for your business — try one live, then install it in minutes.",
   },
 };
 

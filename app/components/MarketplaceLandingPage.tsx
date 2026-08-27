@@ -19,6 +19,7 @@ import {
 } from "@phosphor-icons/react";
 import SiteNav from "./SiteNav";
 import SiteFooter from "./SiteFooter";
+import OutcomeDiscovery from "./OutcomeDiscovery";
 import { AGENT_CATALOG } from "../lib/agentCatalog";
 
 const CATEGORY_ICONS = { Robot, FlowArrow, Brain, Database };
@@ -56,27 +57,6 @@ function Hero() {
         }}
       />
       <div style={{ maxWidth: 780, margin: "0 auto", textAlign: "center", position: "relative" }}>
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            fontSize: 11,
-            fontFamily: "monospace",
-            textTransform: "uppercase",
-            letterSpacing: "0.14em",
-            padding: "6px 12px",
-            borderRadius: 999,
-            color: "var(--accent)",
-            background: "var(--accent-soft)",
-            border: "1px solid rgba(37,99,235,0.22)",
-            marginBottom: 24,
-          }}
-        >
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent)" }} />
-          The AI Agent Marketplace
-        </div>
-
         <h1
           style={{
             fontSize: "clamp(34px, 5.5vw, 58px)",
@@ -87,14 +67,53 @@ function Hero() {
             margin: "0 0 18px",
           }}
         >
-          Browse, buy, and embed <br />
-          <em style={{ color: "var(--accent)", fontStyle: "italic" }}>AI agents</em> on your site
+          AI employees for <br />
+          <em style={{ color: "var(--accent)", fontStyle: "italic" }}>your business</em>
         </h1>
 
-        <p style={{ fontSize: 17, lineHeight: 1.65, color: "var(--muted)", maxWidth: "50ch", margin: "0 auto 36px" }}>
-          Support agents, knowledge assistants, and workflow automation — pick one, paste a script
-          tag, and it&apos;s live. No engineering, no procurement process.
+        <p style={{ fontSize: 17, lineHeight: 1.65, color: "var(--muted)", maxWidth: "52ch", margin: "0 auto 28px" }}>
+          Deploy pre-built AI agents for customer support, knowledge, and automation in minutes.
+          No AI expertise required.
         </p>
+
+        <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap", marginBottom: 32 }}>
+          <a
+            href="#solutions"
+            className="hero-cta-primary"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "13px 26px",
+              borderRadius: 10,
+              fontSize: 14.5,
+              fontWeight: 600,
+              background: "var(--accent)",
+              color: "#fff",
+            }}
+          >
+            Find my AI agent
+            <ArrowRight size={14} weight="bold" />
+          </a>
+          <Link
+            href="/agents"
+            className="hero-cta-secondary"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "13px 26px",
+              borderRadius: 10,
+              fontSize: 14.5,
+              fontWeight: 600,
+              background: "var(--surface)",
+              color: "var(--text)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            Browse agents
+          </Link>
+        </div>
 
         <form onSubmit={submit} style={{ display: "flex", justifyContent: "center", marginBottom: 40 }}>
           <div
@@ -160,6 +179,8 @@ function Hero() {
 
       <style>{`
         .hero-search-btn:hover { background: #1D4ED8 !important; }
+        .hero-cta-primary:hover { background: #1D4ED8 !important; }
+        .hero-cta-secondary:hover { border-color: var(--border-strong) !important; }
         @media (max-width: 560px) {
           .hero-stats { grid-template-columns: repeat(2, 1fr) !important; }
         }
@@ -271,9 +292,8 @@ function CatalogPreview() {
           {AGENT_CATALOG.map((product) => {
             const Icon = CATEGORY_ICONS[product.icon];
             return (
-              <Link
+              <div
                 key={product.slug}
-                href={`/agents/${product.slug}`}
                 className="catalog-preview-card"
                 style={{
                   display: "flex",
@@ -285,37 +305,50 @@ function CatalogPreview() {
                   border: "1px solid var(--border)",
                 }}
               >
-                <div
-                  style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: 9,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: `${product.accent}1A`,
-                    color: product.accent,
-                  }}
-                >
-                  <Icon size={19} weight="duotone" />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: 14.5, fontWeight: 600, color: "var(--text)", margin: "0 0 6px" }}>{product.name}</h3>
-                  <p style={{ fontSize: 12.5, lineHeight: 1.55, color: "var(--muted)", margin: 0 }}>{product.tagline}</p>
-                </div>
-                <span
-                  style={{
-                    marginTop: "auto",
-                    fontSize: 10,
-                    fontFamily: "monospace",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                    color: product.status === "live" ? "#16A34A" : "var(--muted-2)",
-                  }}
-                >
-                  {product.status === "live" ? "● Live" : "○ Coming soon"}
-                </span>
-              </Link>
+                <Link href={`/agents/${product.slug}`} style={{ display: "flex", flexDirection: "column", gap: 14, flex: 1 }}>
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: 9,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: `${product.accent}1A`,
+                      color: product.accent,
+                    }}
+                  >
+                    <Icon size={19} weight="duotone" />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: 14.5, fontWeight: 600, color: "var(--text)", margin: "0 0 6px" }}>{product.name}</h3>
+                    <p style={{ fontSize: 12.5, lineHeight: 1.55, color: "var(--muted)", margin: 0 }}>{product.tagline}</p>
+                  </div>
+                </Link>
+                {product.status === "live" ? (
+                  <div style={{ display: "flex", gap: 12, marginTop: "auto" }}>
+                    <Link href={`/agents/${product.slug}#demo`} style={{ fontSize: 11.5, fontWeight: 600, color: product.accent }}>
+                      Try live →
+                    </Link>
+                    <Link href={`/agents/${product.slug}#pricing`} style={{ fontSize: 11.5, fontWeight: 600, color: "var(--muted-2)" }}>
+                      View pricing
+                    </Link>
+                  </div>
+                ) : (
+                  <span
+                    style={{
+                      marginTop: "auto",
+                      fontSize: 10,
+                      fontFamily: "monospace",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.08em",
+                      color: "var(--muted-2)",
+                    }}
+                  >
+                    ○ Coming soon
+                  </span>
+                )}
+              </div>
             );
           })}
         </div>
@@ -574,6 +607,7 @@ export default function MarketplaceLandingPage() {
     <div style={{ background: "var(--bg)", minHeight: "100svh" }}>
       <SiteNav />
       <Hero />
+      <OutcomeDiscovery />
       <ValueProps />
       <CatalogPreview />
       <ComparisonSection />

@@ -81,7 +81,7 @@ function DetailHero({ product }: { product: AgentProduct }) {
 
 function LiveDemoSection({ product }: { product: AgentProduct }) {
   return (
-    <section style={{ padding: "0 24px 56px" }}>
+    <section id="demo" style={{ padding: "0 24px 56px" }}>
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
         {product.status === "live" ? (
           <LiveDemoChat product={product} />
@@ -149,6 +149,38 @@ function WhatsIncluded({ product }: { product: AgentProduct }) {
           ))}
         </ul>
       </div>
+    </section>
+  );
+}
+
+function TrustInfo({ product }: { product: AgentProduct }) {
+  const rows = [
+    { label: "Setup time", value: product.installTime },
+    { label: "Knowledge sources", value: product.connectsTo.length > 0 ? product.connectsTo.join(", ") : "Not yet available" },
+    { label: "Deployment", value: "Website widget (one script tag)" },
+  ];
+  return (
+    <section style={{ padding: "0 24px 64px" }}>
+      <div style={{ maxWidth: 780, margin: "0 auto" }}>
+        <h3 style={{ fontSize: 12, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--muted-2)", margin: "0 0 14px" }}>
+          Connects to
+        </h3>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }} className="trust-info-grid">
+          {rows.map((row) => (
+            <div key={row.label} style={{ padding: 18, borderRadius: 12, background: "var(--bg)", border: "1px solid var(--border)" }}>
+              <div style={{ fontSize: 11, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--muted-2)", marginBottom: 6 }}>
+                {row.label}
+              </div>
+              <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{row.value}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <style>{`
+        @media (max-width: 700px) {
+          .trust-info-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </section>
   );
 }
@@ -235,7 +267,7 @@ function TierCard({
 
 function PricingSection({ product, dbAgent }: { product: AgentProduct; dbAgent: OperationalAgent | null }) {
   return (
-    <section style={{ padding: "64px 24px", background: "var(--surface)", borderTop: "1px solid var(--border)" }}>
+    <section id="pricing" style={{ padding: "64px 24px", background: "var(--surface)", borderTop: "1px solid var(--border)" }}>
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
         <h2 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text)", margin: "0 0 8px" }}>
           Pricing
@@ -292,6 +324,7 @@ export default function AgentDetailHub({ product, dbAgent }: { product: AgentPro
       <LiveDemoSection product={product} />
       <InfoGrid product={product} />
       <WhatsIncluded product={product} />
+      {product.status === "live" && <TrustInfo product={product} />}
       <PricingSection product={product} dbAgent={dbAgent} />
       <FAQSection product={product} />
       <SiteFooter />

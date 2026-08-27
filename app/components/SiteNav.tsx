@@ -8,8 +8,8 @@ import { isDevAuthBypassEnabled, DEV_BYPASS_PROVIDER_ID } from "../lib/devAuth";
 
 const NAV_LINKS = [
   { label: "Agents", href: "/agents" },
+  { label: "Solutions", href: "/#solutions" },
   { label: "Pricing", href: "/#pricing" },
-  { label: "FAQ", href: "/#faq" },
 ];
 
 export default function SiteNav() {
@@ -147,7 +147,7 @@ export default function SiteNav() {
               color: "#fff",
             }}
           >
-            Browse agents
+            Find an agent
             <ArrowRight size={13} weight="bold" />
           </Link>
         </div>

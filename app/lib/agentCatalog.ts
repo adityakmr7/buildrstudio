@@ -26,6 +26,34 @@
 export type CatalogStatus = "live" | "coming-soon";
 export type CatalogCategory = "Support" | "Knowledge" | "Automation" | "Multi-Agent";
 
+// The 6 "what do you need AI to do?" outcomes shown on the homepage discovery
+// section (see app/components/OutcomeDiscovery.tsx). Not every outcome has a
+// real product behind it yet — "sales" and "marketing" currently match zero
+// catalog entries, and that's shown honestly (a "not built yet" state, not a
+// fake product) rather than inventing agents that don't exist.
+export type Outcome =
+  | "customer-support"
+  | "sales"
+  | "website-assistant"
+  | "knowledge"
+  | "operations"
+  | "marketing";
+
+// The 9 business types shown as filter chips on /agents (see
+// app/components/BusinessTypeSelector.tsx). With only 4 general-purpose
+// products in the catalog, this re-sorts rather than hard-filters — see
+// AgentsCatalogHub.tsx.
+export type BusinessType =
+  | "SaaS"
+  | "E-commerce"
+  | "Agency"
+  | "Freelancer"
+  | "Local business"
+  | "Startup"
+  | "Creator"
+  | "Developer tool"
+  | "Other";
+
 export interface PricingTier {
   name: string;
   price: string; // "Pricing TBD" until plan Section 9 decision #2 is resolved
@@ -51,6 +79,19 @@ export interface AgentProduct {
   installTime: string;
   tiers: PricingTier[];
   faq: { question: string; answer: string }[];
+  // Which "what do you need AI to do?" outcomes this product genuinely
+  // serves — used by OutcomeDiscovery + the /agents ?outcome= filter.
+  outcomes: Outcome[];
+  // Which business types this suits — used by BusinessTypeSelector to
+  // re-rank (not filter out) the catalog. Tagged honestly: these are
+  // general-purpose agents, not vertical-specific builds.
+  businessTypes: BusinessType[];
+  // Real, currently-supported knowledge sources only — see
+  // app/lib/knowledge.ts. Do not list PDF/Notion/website-crawl; none of
+  // those exist yet.
+  connectsTo: string[];
+  // Realistic prompts shown as clickable chips in the live demo.
+  suggestedQuestions: string[];
 }
 
 export const AGENT_CATALOG: AgentProduct[] = [
@@ -103,6 +144,15 @@ export const AGENT_CATALOG: AgentProduct[] = [
           "For deeper integrations or bespoke requirements, we also offer custom-built agent engagements — reach out and we'll scope it.",
       },
     ],
+    outcomes: ["customer-support", "website-assistant"],
+    businessTypes: ["SaaS", "E-commerce", "Agency", "Startup", "Local business"],
+    connectsTo: ["Pasted text", ".txt files", ".md files"],
+    suggestedQuestions: [
+      "What does this product do?",
+      "How much does it cost?",
+      "Can I cancel my subscription?",
+      "How do I get started?",
+    ],
   },
   {
     slug: "rag-knowledge-assistant",
@@ -152,6 +202,15 @@ export const AGENT_CATALOG: AgentProduct[] = [
           "For deeper integrations or bespoke requirements, we also offer custom-built agent engagements — reach out and we'll scope it.",
       },
     ],
+    outcomes: ["knowledge"],
+    businessTypes: ["SaaS", "Startup", "Agency", "Developer tool"],
+    connectsTo: ["Pasted text", ".txt files", ".md files"],
+    suggestedQuestions: [
+      "What documentation do you have access to?",
+      "Summarize the key points from our docs",
+      "Where can I find our onboarding guide?",
+      "How do I get started?",
+    ],
   },
   {
     slug: "workflow-automation-pack",
@@ -195,6 +254,10 @@ export const AGENT_CATALOG: AgentProduct[] = [
         answer: "Not yet — join the waitlist by reaching out and we'll notify you.",
       },
     ],
+    outcomes: ["operations"],
+    businessTypes: ["SaaS", "Agency", "Startup", "E-commerce"],
+    connectsTo: [],
+    suggestedQuestions: [],
   },
   {
     slug: "multi-agent-system-lite",
@@ -238,9 +301,25 @@ export const AGENT_CATALOG: AgentProduct[] = [
         answer: "Not yet — join the waitlist by reaching out and we'll notify you.",
       },
     ],
+    outcomes: ["operations"],
+    businessTypes: ["SaaS", "Agency", "Startup"],
+    connectsTo: [],
+    suggestedQuestions: [],
   },
 ];
 
 export function getAgentProduct(slug: string): AgentProduct | undefined {
   return AGENT_CATALOG.find((p) => p.slug === slug);
 }
+
+export const BUSINESS_TYPES: BusinessType[] = [
+  "SaaS",
+  "E-commerce",
+  "Agency",
+  "Freelancer",
+  "Local business",
+  "Startup",
+  "Creator",
+  "Developer tool",
+  "Other",
+];

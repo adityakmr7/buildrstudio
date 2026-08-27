@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { ToastProvider } from "./components/Toast";
 import { AuthProvider } from "./components/AuthProvider";
+import { siteConfig } from "./lib/siteConfig";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -16,22 +17,21 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://buildrstudio.in"),
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: "Buildr Studio — The AI Agent Marketplace",
+    default: `Buildr Studio — ${siteConfig.tagline}`,
     template: "%s — Buildr Studio",
   },
-  description:
-    "Browse, buy, and embed AI agents on any website — support agents, knowledge assistants, workflow automation, and multi-agent systems. Install in minutes, no code required.",
-  authors: [{ name: "Buildr Studio", url: "https://buildrstudio.in" }],
+  description: siteConfig.description,
+  authors: [{ name: "Buildr Studio", url: siteConfig.url }],
   keywords: [
-    "AI agent marketplace",
+    "AI employees for small business",
+    "AI customer support agent",
     "embeddable AI chat widget",
-    "AI support agent",
     "RAG knowledge assistant",
     "AI chatbot for website",
     "no-code AI agent",
-    "workflow automation",
+    "business automation",
     "Buildr Studio",
   ],
   openGraph: {
