@@ -764,6 +764,14 @@ function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: In
         </pre>
       </div>
 
+      <p style={{ fontSize: 12.5, color: "var(--muted)", margin: "-4px 0 14px" }}>
+        On WordPress?{" "}
+        <a href="/downloads/buildrstudio-wordpress.zip" download style={{ color: "var(--accent)", textDecoration: "underline", textUnderlineOffset: 3 }}>
+          Download the plugin
+        </a>
+        , then paste agent ID <code>{row.agentSlug}</code> and your API key in Settings → BuildrStudio.
+      </p>
+
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
         <button onClick={copyEmbed} className="dash-btn" style={btnStyle("solid")}>
           <Copy size={14} weight="bold" /> Copy embed code

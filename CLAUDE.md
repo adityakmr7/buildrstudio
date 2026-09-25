@@ -297,6 +297,14 @@ email via Resend only when `RESEND_API_KEY` + `LEADS_FROM_EMAIL` are set, and a 
 click-to-chat link returned to the visitor when the owner set `ApiKey.whatsappNumber`. Dashboard:
 `/dashboard/leads` + CSV export (`/api/leads/export`), settings modal "Lead handoff".
 
+### WordPress plugin
+
+`integrations/wordpress/buildrstudio/` is a standalone GPL WordPress plugin: a settings page and a
+footer enqueue of `widget.js`, with `data-*` attributes added via `script_loader_tag`. It isn't
+part of the Next build. `npm run zip:wordpress` builds `public/downloads/buildrstudio-wordpress.zip`
+(committed, deterministic). Re-run it after any plugin edit. `npm run check:wordpress-zip` detects
+drift. See `integrations/wordpress/README.md`.
+
 ### Conversation log + unanswered questions
 
 The chat route stores every exchange (`ChatSession` with `pageUrl`, `messageCount`,

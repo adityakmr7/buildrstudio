@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "test:crawler": "tsx scripts/test-crawler.ts",
-    "test:leads": "tsx scripts/test-leads.ts"
+    "test:leads": "tsx scripts/test-leads.ts",
+    "zip:wordpress": "node scripts/zip-wordpress-plugin.mjs",
+    "check:wordpress-zip": "node scripts/zip-wordpress-plugin.mjs --check"
   },
   "dependencies": {
     "@auth/core": "^0.34.3",
