@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
@@ -8,21 +8,28 @@ import { AuthProvider } from "./components/AuthProvider";
 import { siteConfig } from "./lib/siteConfig";
 import "./globals.css";
 
-const dmSans = DM_Sans({
+const geistSans = Geist({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-dm-sans",
+  variable: "--font-geist-sans",
   display: "swap",
   preload: true,
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `Buildr Studio — ${siteConfig.tagline}`,
-    template: "%s — Buildr Studio",
+    default: "BuildrStudio — AI employees for your business",
+    template: "%s — BuildrStudio",
   },
-  description: siteConfig.description,
+  description:
+    "Skip the build. Keep the control. Deploy a pre-built AI agent for customer support or internal knowledge in minutes. One script tag, no AI team required.",
   authors: [{ name: "Buildr Studio", url: siteConfig.url }],
   keywords: [
     "AI employees for small business",
@@ -61,12 +68,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        style={{ fontFamily: "var(--font-dm-sans, sans-serif)", background: "#F5F8FC" }}
-        className={dmSans.variable}
-        suppressHydrationWarning
-      >
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+      <body className="bg-ink font-sans text-cream" suppressHydrationWarning>
         <AuthProvider>
           <ToastProvider>
             {children}
