@@ -8,7 +8,7 @@ import { config as loadEnv } from "dotenv";
 // but the standalone Prisma CLI process doesn't.
 loadEnv({ path: ".env.local" });
 
-import { defineConfig, env } from "prisma/config";
+import { defineConfig } from "prisma/config";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -21,6 +21,9 @@ export default defineConfig({
     // provider. Set DATABASE_URL in .env.local to your Neon connection
     // string (the "BuildrStudio" project, reused rather than creating a
     // new one — see .env.local's own comment for details).
-    url: env("DATABASE_URL"),
+    // process.env (not env()) so `prisma generate` also works where
+    // DATABASE_URL isn't set, e.g. a fresh install or CI. migrate/db
+    // commands still need a real DATABASE_URL.
+    url: process.env.DATABASE_URL ?? "",
   },
 });
