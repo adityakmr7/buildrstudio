@@ -9,7 +9,7 @@ export const maxDuration = 60;
 
 async function getOwnedSource(keyId: string, sourceId: string, userId: string) {
   const source = await db.knowledgeSource.findUnique({ where: { id: sourceId }, include: { apiKey: true } });
-  if (!source || source.apiKeyId !== keyId || source.apiKey.userId !== userId) return null;
+  if (!source || source.kind !== "website" || source.apiKeyId !== keyId || source.apiKey.userId !== userId) return null;
   return source;
 }
 

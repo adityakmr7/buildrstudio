@@ -65,3 +65,18 @@ export function normalizeWhatsappNumber(input: string): string | null {
   if (digits.length < 8 || digits.length > 15) throw new Error("Enter the full WhatsApp number with country code, e.g. 919876543210.");
   return digits;
 }
+
+/**
+ * Was this a question the agent couldn't answer well? Drives the dashboard's
+ * "Unanswered questions" list. Asking for a person isn't "unanswered" by
+ * itself — only the model's own flag or a weak knowledge match count.
+ */
+export function unansweredReason(opts: {
+  modelFlagged: boolean;
+  hasKnowledge: boolean;
+  topScore: number | null;
+}): "model_unsure" | "low_score" | null {
+  if (opts.modelFlagged) return "model_unsure";
+  if (opts.hasKnowledge && opts.topScore !== null && opts.topScore < LOW_CONFIDENCE_SCORE) return "low_score";
+  return null;
+}

@@ -1,9 +1,15 @@
 import { EMBED_SNIPPET } from "./homeData";
 import SectionHeading from "./SectionHeading";
 
-const STACKS = [
+export const WORDPRESS_PLUGIN_ZIP = "/downloads/buildrstudio-wordpress.zip";
+
+const STACKS: { name: string; how: string; link?: { href: string; label: string } }[] = [
   { name: "Plain HTML", how: "Paste it before the closing </body> tag." },
-  { name: "WordPress", how: "Add it to your theme footer, or any header/footer snippet plugin." },
+  {
+    name: "WordPress",
+    how: "Install our free plugin and paste your agent ID and key in Settings. Or put the tag in your theme footer.",
+    link: { href: WORDPRESS_PLUGIN_ZIP, label: "Download plugin (.zip)" },
+  },
   { name: "React", how: "Drop it into index.html or your root layout. No package to install." },
   { name: "Vue", how: "Same as React: one line in index.html." },
 ];
@@ -37,6 +43,15 @@ export default function EmbedSection() {
               <li key={stack.name} className="bg-raised p-4">
                 <p className="text-[15px] font-semibold tracking-[-0.01em] text-cream">{stack.name}</p>
                 <p className="mt-1 text-sm text-muted">{stack.how}</p>
+                {stack.link && (
+                  <a
+                    href={stack.link.href}
+                    download
+                    className="mt-2 inline-block text-sm font-medium text-brass underline underline-offset-4 hover:text-cream"
+                  >
+                    {stack.link.label}
+                  </a>
+                )}
               </li>
             ))}
           </ul>

@@ -117,7 +117,7 @@ app/
   sitemap.ts, robots.ts
 
 public/
-  widget.js                     # The embeddable chat widget — vanilla JS IIFE, Shadow DOM (no iframe), <15KB. This is what site owners paste as a <script> tag.
+  widget.js                     # The embeddable chat widget — vanilla JS IIFE, Shadow DOM (no iframe), ~18KB unminified. This is what site owners paste as a <script> tag.
 
 prisma/
   schema.prisma                 # Operational data model — see "Database" below
@@ -242,6 +242,13 @@ iframe) so host-page CSS can't leak in or out, persists a session id in `localSt
 `/api/v1/chat`. Keep it dependency-free and small — there's no bundler step for this file, it ships
 as-is from `public/`.
 
+Appearance (greeting / brand color / position) resolves as `window.BuildrAgentConfig` (per-page
+override) > the install's saved dashboard config from `GET /api/v1/config?key=&agent=` (public,
+CORS-open, CDN-cached 5 min + stale-while-revalidate) > built-in defaults. The last fetched config is
+cached in `localStorage` (`buildr_agent_config_<agent>`) so repeat views render instantly; on a
+first view the widget waits up to 1.5s for the config before rendering with defaults. It sends the
+host `page_url` on a session's first message.
+
 `app/api/v1/chat/route.ts` is what it talks to: validates the `Authorization: Bearer pk_live_...`
 key against `ApiKey`, rate-limits per key (in-memory — see `app/lib/rateLimit.ts`, acceptable for
 MVP per the plan's constraints), checks the caller's monthly quota (falls back to a small
@@ -289,6 +296,51 @@ email via Resend only when `RESEND_API_KEY` + `LEADS_FROM_EMAIL` are set, and a 
 `X-BuildrStudio-Signature: sha256=HMAC(secret, "<timestamp>.<body>")`). WhatsApp is a wa.me
 click-to-chat link returned to the visitor when the owner set `ApiKey.whatsappNumber`. Dashboard:
 `/dashboard/leads` + CSV export (`/api/leads/export`), settings modal "Lead handoff".
+
+### INR payments (Razorpay), alongside Paddle
+
+Feature-flagged. Everything is off (Paddle only) unless `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`
+and `RAZORPAY_WEBHOOK_SECRET` are set. Each tier also needs `RAZORPAY_PLAN_<AGENT_SLUG>_<TIER>`,
+e.g. `RAZORPAY_PLAN_SUPPORT_AGENT_STARTER_STANDARD`. INR prices are never in code: they're read
+from the Razorpay plan (`GET /v1/plans/:id`, cached 10 min), and non-INR plans are ignored.
+
+- `app/lib/razorpay.ts`: fetch-based API client, signature checks, status mapping.
+- `app/lib/razorpayServer.ts`: `applyRazorpaySubscription` (upserts AgentSubscription with
+  `provider = "razorpay"`) and `getInrTierOptions`.
+- Flow:
+  - `/api/razorpay/plans?agent=` (public; enabled flag, INR labels, `suggestInr` from
+    `x-vercel-ip-country` / Accept-Language)
+  - `POST /api/razorpay/subscribe` (creates the subscription and a `status: "created"` row)
+  - checkout.js (`RazorpayCheckoutButton`)
+  - `POST /api/razorpay/verify` (HMAC of `payment_id|subscription_id`, then re-reads the status
+    from Razorpay)
+  - `POST /api/webhooks/razorpay` (HMAC of the raw body; idempotent via `ProcessedWebhookEvent`
+    keyed on `x-razorpay-event-id`; the entity's status is the source of truth)
+  - `POST /api/razorpay/cancel` (cancel at cycle end; Razorpay has no customer portal)
+- Access is granted by `app/lib/subscriptionAccess.ts#grantAgentAccess`, which is shared with the
+  Paddle webhook: create a key if the user has none for the agent (trial keys are kept), then mark
+  the trial converted.
+- Only `status: "active"` grants access anywhere.
+- `bun run test:razorpay` checks signatures with fake secrets.
+
+### WordPress plugin
+
+`integrations/wordpress/buildrstudio/` is a standalone GPL WordPress plugin: a settings page and a
+footer enqueue of `widget.js`, with `data-*` attributes added via `script_loader_tag`. It isn't
+part of the Next build. `npm run zip:wordpress` builds `public/downloads/buildrstudio-wordpress.zip`
+(committed, deterministic). Re-run it after any plugin edit. `npm run check:wordpress-zip` detects
+drift. See `integrations/wordpress/README.md`.
+
+### Conversation log + unanswered questions
+
+The chat route stores every exchange (`ChatSession` with `pageUrl`, `messageCount`,
+`lastMessageAt`; `Message` rows). When an answer is flagged by `app/lib/handoff.ts#unansweredReason`
+(model emitted the handoff token, or best RAG score under `LOW_CONFIDENCE_SCORE`) it also writes an
+`UnansweredQuestion`. Dashboard: `/dashboard/conversations` (7d/30d counts, list, detail at
+`/dashboard/conversations/[id]`) and `/dashboard/unanswered`, where "Add answer to knowledge"
+(`POST /api/unanswered/[id]`) embeds a Q&A chunk into a per-install `KnowledgeSource` of kind `qa`
+(`app/lib/qaKnowledge.ts`). Pasted-text saves only replace `sourceId = null` chunks, so Q&A and
+website chunks survive.
 
 ### Knowledge base / retrieval-augmented generation
 
