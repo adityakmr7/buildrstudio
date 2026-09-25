@@ -1,0 +1,181 @@
+// Buildr Studio — Agent Marketplace data model
+// See docs/buildr-studio-agent-storefront-plan.md (Section 10, decisions log)
+// for why this looks the way it does:
+//   - Runs against the existing Neon Postgres instance (DATABASE_URL), not a
+//     new Supabase project — Neon is plain Postgres, Prisma just points at it.
+//   - Billing fields are Paddle-shaped (paddleCustomerId / paddleSubscriptionId),
+//     not Stripe.
+//   - `Agent` is a fixed catalog entry (4 products, matching the slugs in
+//     app/lib/agentCatalog.ts), not a user-created/owned resource — there is
+//     no open marketplace where anyone can list an agent.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Prisma 7: the connection URL is no longer set here — it's passed to
+  // PrismaClient via a driver adapter at runtime (see app/lib/db.ts) and to
+  // the CLI via prisma.config.ts (for `migrate`/`db push`/`studio`).
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  apiKeys       ApiKey[]
+  subscriptions AgentSubscription[]
+  usage         Usage[]
+}
+
+/// One row per catalog product (see app/lib/agentCatalog.ts). Not user-owned —
+/// this is our fixed marketplace, not an open one where anyone lists an agent.
+model Agent {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  category     String
+  systemPrompt String   @db.Text
+  model        String   @default("gemini-2.5-flash")
+  maxTokens    Int      @default(500)
+  temperature  Float    @default(0.7)
+  isPublic     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tiers         AgentTier[]
+  apiKeys       ApiKey[]
+  subscriptions AgentSubscription[]
+  chatSessions  ChatSession[]
+  messages      Message[]
+  usage         Usage[]
+}
+
+/// Standard / Pro packaging per agent. `paddlePriceId` is null until real
+/// pricing exists in the Paddle dashboard (plan Section 9, open decision #2)
+/// — checkout refuses to open for a tier with no price attached rather than
+/// guessing a dollar figure.
+model AgentTier {
+  id            String  @id @default(cuid())
+  agentId       String
+  agent         Agent   @relation(fields: [agentId], references: [id])
+  name          String // "standard" | "pro"
+  monthlyLimit  Int     @default(500)
+  paddlePriceId String?
+
+  subscriptions AgentSubscription[]
+
+  @@unique([agentId, name])
+}
+
+/// The credential the embedded widget authenticates with. Also carries the
+/// widget's per-install customization (greeting/color/position) shown in the
+/// dashboard's "Edit config" modal, rather than a separate config table.
+model ApiKey {
+  id         String    @id @default(cuid())
+  key        String    @unique
+  name       String    @default("Default")
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  agentId    String
+  agent      Agent     @relation(fields: [agentId], references: [id])
+  isActive   Boolean   @default(true)
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  greeting String @default("Hi! How can I help you today?")
+  color    String @default("#2563EB")
+  position String @default("bottom-right") // "bottom-right" | "bottom-left"
+
+  chatSessions   ChatSession[]
+  documentChunks DocumentChunk[]
+
+  @@index([userId, agentId])
+}
+
+/// One customer's knowledge base, scoped to their ApiKey (one install = one
+/// knowledge base — not a multi-document CMS). Embeddings are plain
+/// `Float[]`, not pgvector: at indie/small-business scale (a few hundred
+/// chunks per customer, not millions), computing cosine similarity in
+/// application code is simpler than managing a Postgres extension and is
+/// nowhere near a performance concern at this scale. See
+/// app/lib/knowledge.ts for the retrieval logic.
+model DocumentChunk {
+  id        String   @id @default(cuid())
+  apiKeyId  String
+  apiKey    ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  source    String // filename, or "Pasted text"
+  content   String   @db.Text
+  embedding Float[]
+  createdAt DateTime @default(now())
+
+  @@index([apiKeyId])
+}
+
+/// A conversation the widget is holding with one site visitor. Deliberately
+/// separate from next-auth's own session concept (there isn't one in this
+/// codebase — auth uses JWT sessions, no Prisma adapter, no DB-backed auth
+/// session table).
+model ChatSession {
+  id        String    @id @default(cuid())
+  agentId   String
+  agent     Agent     @relation(fields: [agentId], references: [id])
+  apiKeyId  String
+  apiKey    ApiKey    @relation(fields: [apiKeyId], references: [id])
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Message {
+  id            String      @id @default(cuid())
+  chatSessionId String
+  chatSession   ChatSession @relation(fields: [chatSessionId], references: [id])
+  agentId       String
+  agent         Agent       @relation(fields: [agentId], references: [id])
+  role          String // "user" | "assistant"
+  content       String      @db.Text
+  tokens        Int?
+  createdAt     DateTime    @default(now())
+
+  @@index([chatSessionId])
+}
+
+model Usage {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  agentId      String
+  agent        Agent    @relation(fields: [agentId], references: [id])
+  month        String // "2026-08"
+  messageCount Int      @default(0)
+  tokenCount   Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, agentId, month])
+}
+
+model AgentSubscription {
+  id                   String    @id @default(cuid())
+  userId               String
+  user                 User      @relation(fields: [userId], references: [id])
+  agentId              String
+  agent                Agent     @relation(fields: [agentId], references: [id])
+  tierId               String
+  tier                 AgentTier @relation(fields: [tierId], references: [id])
+  paddleCustomerId     String?
+  paddleSubscriptionId String?   @unique
+  status               String    @default("active") // active | canceled | past_due | paused
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([userId, agentId])
+}

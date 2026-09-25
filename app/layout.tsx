@@ -1,38 +1,44 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { ToastProvider } from "./components/Toast";
+import { AuthProvider } from "./components/AuthProvider";
+import { siteConfig } from "./lib/siteConfig";
 import "./globals.css";
 
-const dmSans = DM_Sans({
+const geistSans = Geist({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-dm-sans",
+  variable: "--font-geist-sans",
   display: "swap",
   preload: true,
 });
 
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+  display: "swap",
+  preload: false,
+});
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://buildrstudio.in"),
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: "Buildr Studio — AI Automation & Custom Software Agency",
-    template: "%s — Buildr Studio",
+    default: "BuildrStudio — AI employees for your business",
+    template: "%s — BuildrStudio",
   },
   description:
-    "We design, build, and deploy custom AI agents, n8n workflow automation, multi-agent systems, and RAG knowledge base pipelines that save businesses hundreds of manual hours.",
-  authors: [{ name: "Buildr Studio", url: "https://buildrstudio.in" }],
+    "Skip the build. Keep the control. Deploy a pre-built AI agent for customer support or internal knowledge in minutes. One script tag, no AI team required.",
+  authors: [{ name: "Buildr Studio", url: siteConfig.url }],
   keywords: [
-    "AI automation agency",
-    "custom AI agents",
-    "n8n automation",
-    "Make workflow automation",
-    "RAG pipeline",
-    "multi-agent systems",
-    "AI consulting",
-    "workflow automation",
-    "LLM integration",
+    "AI employees for small business",
+    "AI customer support agent",
+    "embeddable AI chat widget",
+    "RAG knowledge assistant",
+    "AI chatbot for website",
+    "no-code AI agent",
+    "business automation",
     "Buildr Studio",
   ],
   openGraph: {
@@ -62,15 +68,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        style={{ fontFamily: "var(--font-dm-sans, sans-serif)", background: "#080B0F" }}
-        className={dmSans.variable}
-        suppressHydrationWarning
-      >
-        <ToastProvider>
-          {children}
-        </ToastProvider>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+      <body className="bg-ink font-sans text-cream" suppressHydrationWarning>
+        <AuthProvider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </AuthProvider>
         <SpeedInsights />
         <Analytics />
         <Script

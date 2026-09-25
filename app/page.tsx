@@ -1,39 +1,46 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Suspense } from "react";
-import AgencyLandingPage from "./components/AgencyLandingPage";
+import SiteNav from "./components/SiteNav";
+import SiteFooter from "./components/SiteFooter";
+import Hero from "./components/home/Hero";
+import JobsMarquee from "./components/home/JobsMarquee";
+import JobsSection from "./components/home/JobsSection";
+import EmbedSection from "./components/home/EmbedSection";
+import BuyVsBuild from "./components/home/BuyVsBuild";
+import PricingStrip from "./components/home/PricingStrip";
+import FaqSection, { FAQS } from "./components/home/FaqSection";
+import CloseSection from "./components/home/CloseSection";
+import { siteConfig } from "./lib/siteConfig";
+
+const TITLE = "BuildrStudio — AI employees for your business";
+const DESCRIPTION =
+  "Skip the build. Keep the control. Deploy a pre-built AI agent for customer support or internal knowledge in minutes. One script tag, no AI team required.";
 
 export const metadata: Metadata = {
-  title: "Buildr Studio — AI Automation & Custom Software Agency",
-  description:
-    "We design, build, and deploy custom AI agents, n8n workflow automation, multi-agent systems, and RAG knowledge base pipelines that save businesses hundreds of manual hours.",
+  title: { absolute: TITLE },
+  description: DESCRIPTION,
   alternates: {
-    canonical: "https://buildrstudio.in",
+    canonical: siteConfig.url,
   },
   openGraph: {
-    title: "Buildr Studio — AI Automation & Custom Software Agency",
-    description:
-      "Custom AI agents, automated workflows, and context-aware RAG pipelines. Deployed in weeks, not months.",
+    title: TITLE,
+    description: DESCRIPTION,
     type: "website",
-    url: "https://buildrstudio.in",
+    url: siteConfig.url,
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Buildr Studio — AI Automation & Custom Software Agency",
-    description:
-      "Custom AI agents, n8n automation, and RAG pipelines that eliminate manual ops — deployed in 6 weeks.",
+    title: TITLE,
+    description: DESCRIPTION,
   },
   keywords: [
-    "AI automation agency",
-    "custom AI agents",
-    "n8n automation",
-    "Make workflow automation",
-    "RAG pipeline",
-    "multi-agent systems",
-    "AI consulting",
-    "workflow automation",
-    "LLM integration",
+    "AI employees for small business",
+    "AI customer support agent",
+    "embeddable AI chat widget",
+    "RAG knowledge assistant",
+    "AI chatbot for website",
+    "no-code AI agent",
     "Buildr Studio",
   ],
 };
@@ -44,64 +51,23 @@ const jsonLd = {
     {
       "@type": "WebSite",
       "@id": "https://buildrstudio.in/#website",
-      url: "https://buildrstudio.in",
-      name: "Buildr Studio",
-      description:
-        "AI Automation & Custom Software Agency — building custom AI agents, workflow automation, and RAG pipelines.",
+      url: siteConfig.url,
+      name: "BuildrStudio",
+      description: DESCRIPTION,
       publisher: {
         "@type": "Organization",
-        name: "Buildr Studio",
-        url: "https://buildrstudio.in",
-      },
-    },
-    {
-      "@type": "ProfessionalService",
-      "@id": "https://buildrstudio.in/#agency",
-      name: "Buildr Studio",
-      url: "https://buildrstudio.in",
-      description:
-        "We design, build, and deploy custom AI agents, automated n8n/Make workflows, context-aware RAG pipelines, and full-stack software integrations.",
-      serviceType: [
-        "AI Automation",
-        "Custom Software Development",
-        "Workflow Automation",
-        "AI Agent Development",
-      ],
-      areaServed: "Worldwide",
-      contactPoint: {
-        "@type": "ContactPoint",
-        email: "hello@buildrstudio.in",
-        contactType: "customer service",
+        name: "BuildrStudio",
+        url: siteConfig.url,
+        email: siteConfig.contact.email,
       },
     },
     {
       "@type": "FAQPage",
-      mainEntity: [
-        {
-          "@type": "Question",
-          name: "What does Buildr Studio build?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "Buildr Studio builds custom AI agents, n8n and Make workflow automations, multi-agent systems, and RAG knowledge base integrations tailored to your business operations.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "How long does a typical engagement take?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "Most projects go from initial AI Audit to production deployment in 6 weeks. The audit takes one week, build and integration takes 4 weeks, and deployment/handoff is week 6.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "What industries does Buildr Studio serve?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "We primarily serve mid-market B2B SaaS companies, E-commerce brands, Real Estate firms, and high-growth agencies looking to automate operational workflows with AI.",
-          },
-        },
-      ],
+      mainEntity: FAQS.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
     },
   ],
 };
@@ -110,13 +76,22 @@ export default function Home() {
   return (
     <>
       <Script
-        id="json-ld-agency"
+        id="json-ld-marketplace"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Suspense>
-        <AgencyLandingPage />
-      </Suspense>
+      <SiteNav />
+      <main>
+        <Hero />
+        <JobsMarquee />
+        <JobsSection />
+        <EmbedSection />
+        <BuyVsBuild />
+        <PricingStrip />
+        <FaqSection />
+        <CloseSection />
+      </main>
+      <SiteFooter />
     </>
   );
 }

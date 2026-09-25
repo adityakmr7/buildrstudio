@@ -1,13 +1,13 @@
 export const siteConfig = {
   name: "Buildr Studio",
   url: "https://buildrstudio.in",
-  tagline: "AI Automation & Custom Software Agency",
+  tagline: "AI employees for your small business",
   description:
-    "We design, build, and deploy custom AI agents, n8n workflow automation, multi-agent systems, and RAG pipelines that save businesses hundreds of manual hours.",
+    "Deploy pre-built AI agents for customer support, knowledge, and business automation in minutes — no AI expertise required. Pick one, connect your business info, and it's live on your site.",
 
   contact: {
     email: "hello@buildrstudio.in",
-    auditEmail: "hello@buildrstudio.in?subject=AI Audit Request",
+    salesEmail: "hello@buildrstudio.in?subject=Enterprise%20Plan%20Enquiry",
   },
 
   author: {

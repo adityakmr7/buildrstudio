@@ -1,119 +1,254 @@
 @import "tailwindcss";
 
-/* ═══════════════════════════════════════════════
-   Buildr Studio — Agency Global Styles
-   Clean slate for AI automation agency.
-   Dark-tech base. DM Sans. Electric blue accent.
-═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   BuildrStudio — design tokens
+   Dark workshop palette. Geist. One accent (brass), one signal (green).
+   Brass is reserved for: the wordmark mark, the nav rule, one underline,
+   and primary buttons. Green is reserved for "live" / "available".
+═══════════════════════════════════════════════════════════════════ */
 
-/* ─── TOKENS ─── */
+@theme {
+  /* Palette */
+  --color-ink: #0c0b09;
+  --color-raised: #16140f;
+  --color-raised-2: #1d1a14;
+  --color-line: rgba(255, 244, 214, 0.12);
+  --color-line-strong: rgba(255, 244, 214, 0.24);
+  --color-cream: #f4efe4;
+  --color-muted: #a39a88; /* 7.0:1 on ink */
+  --color-faint: #8c8474; /* 5.3:1 on ink */
+  --color-brass: #e4b15a;
+  --color-brass-hover: #edc47e;
+  --color-live: #7dcea0;
 
+  /* Type */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --tracking-display: -0.04em;
+  --text-hero: clamp(48px, 6.4vw + 12px, 92px);
+  --text-hero--line-height: 0.96;
+
+  /* Shape */
+  --radius-card: 2px;
+  --radius-btn: 8px;
+
+  /* Motion */
+  --animate-marquee: marquee 60s linear infinite;
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+}
+
+/* Legacy variable names — inner pages (catalog, agent detail, dashboard,
+   legal, Toast) style themselves with these via inline styles. They are
+   aliased to the tokens above so every page shares one palette. */
 :root {
-  /* Agency palette */
-  --agency-bg:         #080B0F;
-  --agency-surface:    #0C1015;
-  --agency-border:     rgba(255, 255, 255, 0.07);
-  --agency-accent:     #2563EB;
-  --agency-accent-mid: #3B82F6;
-  --agency-text:       #F5F5F5;
-  --agency-muted:      rgba(245, 245, 245, 0.50);
+  --bg: var(--color-ink);
+  --surface: var(--color-raised);
+  --surface-alt: var(--color-raised-2);
+  --border: var(--color-line);
+  --border-strong: var(--color-line-strong);
+  --accent: var(--color-brass);
+  --accent-mid: var(--color-brass-hover);
+  --accent-soft: rgba(228, 177, 90, 0.1);
+  --accent-ink: var(--color-ink); /* text on brass */
+  --text: var(--color-cream);
+  --text-1: var(--color-cream);
+  --muted: var(--color-muted);
+  --muted-2: var(--color-faint);
+  --success: var(--color-live);
+  --fill: var(--color-brass);
+  --fill-text: var(--color-ink);
+  --font: var(--font-sans);
 
-  /* Typography */
-  --font: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-
-  /* Spacing scale */
-  --space-1: 4px;  --space-2: 8px;   --space-3: 12px;
-  --space-4: 16px; --space-5: 20px;  --space-6: 24px;
-  --space-8: 32px; --space-10: 40px; --space-12: 48px;
-
-  /* Border radii */
-  --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 18px; --r-full: 9999px;
+  --r-sm: 2px;
+  --r-md: 2px;
+  --r-lg: 2px;
+  --r-xl: 2px;
+  --r-full: 9999px;
 }
 
-/* ─── RESET ─── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+    background: var(--color-ink);
+  }
 
-*, *::before, *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  body {
+    background: var(--color-ink);
+    color: var(--color-cream);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-cream);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: rgba(228, 177, 90, 0.28);
+    color: var(--color-cream);
+  }
+
+  /* Anchor targets clear the sticky nav */
+  [id] {
+    scroll-margin-top: 96px;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 244, 214, 0.14) transparent;
+  }
 }
 
-html {
-  scroll-behavior: smooth;
-  color-scheme: dark;
-}
+/* ─── Components ─────────────────────────────────────────────────── */
 
-body {
-  background: var(--agency-bg);
-  font-family: var(--font);
-  color: var(--agency-text);
-  line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+@layer components {
+  .btn-primary,
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 24px;
+    border-radius: var(--radius-btn);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+  }
+  .btn-primary {
+    background: var(--color-brass);
+    color: var(--color-ink);
+    border: 1px solid var(--color-brass);
+  }
+  .btn-primary:hover {
+    background: var(--color-brass-hover);
+    border-color: var(--color-brass-hover);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--color-cream);
+    border: 1px solid var(--color-line-strong);
+  }
+  .btn-secondary:hover {
+    background: var(--color-raised);
+    border-color: rgba(255, 244, 214, 0.4);
+  }
+  .btn-primary:active,
+  .btn-secondary:active {
+    transform: translateY(1px);
+  }
+  .btn-sm {
+    min-height: 40px;
+    padding: 0 16px;
+    font-size: 14px;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  .link-quiet {
+    color: var(--color-muted);
+    transition: color 160ms ease;
+  }
+  .link-quiet:hover {
+    color: var(--color-cream);
+  }
 
-img, video {
-  display: block;
-  max-width: 100%;
-}
+  .link-underline {
+    color: var(--color-cream);
+    text-decoration: underline;
+    text-decoration-color: var(--color-line-strong);
+    text-underline-offset: 4px;
+    transition: text-decoration-color 160ms ease;
+  }
+  .link-underline:hover {
+    text-decoration-color: var(--color-cream);
+  }
 
-/* ─── ACCESSIBILITY ─── */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .display {
+    font-weight: 600;
+    letter-spacing: var(--tracking-display);
+    color: var(--color-cream);
+    text-wrap: balance;
+  }
+
+  .body-copy {
+    max-width: 62ch;
+    color: var(--color-muted);
+    text-wrap: pretty;
+  }
+
+  .card {
+    background: var(--color-raised);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-card);
+  }
+
+  .brass-underline {
+    background-image: linear-gradient(var(--color-brass), var(--color-brass));
+    background-repeat: no-repeat;
+    background-size: 100% 0.07em;
+    background-position: 0 92%;
+    padding-bottom: 0.04em;
+  }
+
+  .status-live {
+    color: var(--color-live);
+  }
+}
 
 .sr-only {
   position: absolute;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
 }
 
-/* ─── AGENCY REUSABLE UTILITIES ─── */
-
-/* Focus ring for interactive elements */
-:focus-visible {
-  outline: 2px solid var(--agency-accent-mid);
-  outline-offset: 3px;
-  border-radius: var(--r-sm);
+/* Inner pages set outline:none inline on inputs; keep a visible keyboard ring. */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-cream) !important;
+  outline-offset: 2px;
 }
 
-/* Selection highlight */
-::selection {
-  background: rgba(37, 99, 235, 0.30);
-  color: #fff;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar       { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.10); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.18); }
-* { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.10) transparent; }
-
-/* ─── ANIMATIONS ─── */
-
-@keyframes agency-marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
+/* ─── Motion ─────────────────────────────────────────────────────── */
 
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
-}
-
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
+  50% { opacity: 0.4; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-marquee {
+    animation: none !important;
+  }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

@@ -2,24 +2,42 @@
 
 ## What is this project?
 
-BuildrStudio is a suite of free browser-based developer tools for creating polished visual assets — App Store screenshot mockups, social media graphics, and changelog cards. It targets indie hackers, solo developers, and small teams who need launch-ready visuals without Figma or Photoshop.
+BuildrStudio is **the AI Agent Marketplace** — buy, and embed AI agents on any website. A visitor
+picks a product (a support agent, a knowledge assistant, etc.), subscribes, and gets an API key +
+a single `<script>` embed snippet that drops a working chat widget onto their own site. There is no
+"book a call" step in the primary flow and no agency framing anywhere on the site — it reads as a
+self-serve SaaS product, not a services business.
+
+This is a pivot from an earlier "AI automation agency" positioning (dark-tech theme, Cal.com
+booking, 6-week custom engagements) — all of that was removed 2026-08-21. Positioning is now
+settled as a **small, indie/small-business-scale version of Kore.ai's core loop** (browse →
+subscribe → deploy a working agent) — explicitly not matching Kore.ai's enterprise depth.
+
+**Before doing any storefront/marketplace work, read
+[`docs/buildr-studio-agent-storefront-plan.md`](docs/buildr-studio-agent-storefront-plan.md),
+Section 0 first** — it's a short "what's actually working / what's not done yet" snapshot kept
+current, meant to be read before the long chronological decisions log in Section 10. Don't rely on
+this CLAUDE.md file alone to know current state — it documents architecture and *why* things are
+built the way they are, which doesn't change often; Section 0 of the plan doc is where fast-moving
+status (what's real vs. dummy in `.env.local`, what's blocking launch) actually lives.
 
 **Live site:** https://buildrstudio.in
 **Author:** Aditya Kumar (@adityakmr7)
 
 ## Tech stack
 
-- **Framework:** Next.js 16 (App Router) with React 19
+- **Framework:** Next.js 16 (App Router, Turbopack) with React 19
 - **Language:** TypeScript (strict mode)
-- **Styling:** Tailwind CSS v4 + custom "Ink Design System" (CSS custom properties, no component library)
+- **Styling:** Tailwind CSS v4 is imported, but components don't use Tailwind utility classes — see "Styling approach" below. **Light theme only** — no dark mode, no toggle.
 - **Package manager:** Bun (bun.lock)
-- **Database:** Neon Postgres (serverless driver `@neondatabase/serverless`) — users, subscriptions, waitlist
-- **Auth:** NextAuth.js v5 (Auth.js) with Google OAuth, JWT sessions
-- **Payments:** Lemon Squeezy (subscription billing, webhook-driven)
-- **Screenshot capture:** `html-to-image` and `modern-screenshot` for client-side PNG export
+- **Database:** Neon Postgres via **Prisma 7** — `@prisma/adapter-neon` driver adapter (not a bare connection string; Prisma 7 requires an adapter). See "Database" below — this is *not* a new Supabase project, it's the same Neon instance.
+- **Auth:** NextAuth.js v5 (Auth.js), Google OAuth only, JWT sessions, no Prisma adapter (we upsert our own `User` row manually — see `auth.ts`).
+- **Payments:** **Paddle** (`@paddle/paddle-js` client-side, `@paddle/paddle-node-sdk` server-side) — merchant of record. Not Stripe, despite older docs/templates assuming Stripe.
+- **AI:** Gemini (`@google/generative-ai`), `gemini-2.5-flash` by default per agent (see `app/lib/agentRuntime.ts`). Not OpenAI — swapped 2026-08-22. Gemini model names get retired/replaced over time; run `bun scripts/check-gemini-models.mjs` before changing the default rather than guessing one.
+- **Icons:** `@phosphor-icons/react`
 - **Analytics:** Vercel Analytics, Vercel Speed Insights, Umami
 - **Deployment:** Vercel
-- **Linting:** ESLint 9 with `eslint-config-next` (core-web-vitals + typescript)
+- **Linting:** ESLint 9 with `eslint-config-next`
 - **Font:** DM Sans via `next/font/google`
 
 ## Commands
@@ -29,157 +47,331 @@ bun run dev          # Start dev server on port 3005
 bun run build        # Production build
 bun run start        # Start production server
 bun run lint         # Run ESLint
+
+bunx prisma generate # Regenerate the Prisma client after schema changes
+bunx prisma migrate dev --name <name>   # Apply schema changes to the DB (needs DATABASE_URL)
+bunx prisma db seed  # Seed operational agent config (prisma/seed.ts)
 ```
 
 There are no tests configured. Type checking uses `tsc --noEmit` implicitly via the Next.js build.
+
+**The app builds and runs with zero environment variables configured** — every integration
+(database, Gemini, Paddle) is constructed lazily and fails at the point of use, not at module load,
+specifically so an unconfigured integration never crashes the build or an unrelated page. Keep new
+integrations following that pattern (see `app/lib/db.ts`, `app/lib/gemini.ts`, `app/lib/paddle.ts`
+for the shape) rather than constructing a client eagerly at module scope.
+
+For local dev, `.env.local` is checked out with dummy values for everything (gitignored, never
+committed) — the app runs and every page renders, but sign-in/checkout/the paid embed widget won't
+functionally work against fake credentials. The one thing worth pasting a *real* key in for is
+`GEMINI_API_KEY` (free tier at https://aistudio.google.com/apikey) — that alone makes the on-site
+live demo on `/agents/[slug]` produce real generated replies instead of a labeled mock response.
 
 ## Project structure
 
 ```
 app/
-  layout.tsx                    # Root layout — DM Sans font, Vercel analytics, Umami script
-  page.tsx                      # Landing page (SaaSLandingPage component)
-  globals.css                   # Ink Design System (all-in-one, flattened from ink-design-system/)
-  api/interest/route.ts         # POST endpoint — saves waitlist/interest emails to Neon
-  lib/
-    interest.ts                 # Neon DB helper for waitlist_requests table
+  layout.tsx                    # Root layout — DM Sans font, AuthProvider, ToastProvider, analytics
+  page.tsx                      # Homepage (server) — renders MarketplaceLandingPage
+  globals.css                   # Light theme tokens (--bg, --surface, --accent, --text, --muted, …), reset, a11y, animations
   components/
-    AppHeader.tsx               # Shared sticky header with nav dropdown, mobile drawer, theme toggle
-    SaaSLandingPage.tsx         # Marketing landing page (hero, tools grid, pricing, FAQs)
-    WorkspaceHub.tsx            # Social Optimizer workspace — sidebar + canvas
-    TabbedSidebar.tsx           # Sidebar with tabbed controls for the social optimizer
-    LivePreviewCanvas.tsx       # Live canvas renderer for social optimizer
-    ControlSidebar.tsx          # Legacy sidebar (superseded by TabbedSidebar)
-    QuickPresets.tsx             # Preset gradient/style quick-apply buttons
-    ThemeToggle.tsx             # Light/dark theme toggle (localStorage-backed)
-    PremiumModal.tsx            # "Go Pro" waitlist modal — posts to /api/interest
-    UnlockWatermarkModal.tsx    # Tweet-to-unlock watermark removal (24h localStorage)
-    ChangeLogCard.tsx           # Changelog card renderer
-    RoadmapRequestForm.tsx      # Roadmap vote form — posts to /api/interest
-  social-optimizer/page.tsx     # Route: /social-optimizer — wraps WorkspaceHub
-  screenshot-builder/
-    page.tsx                    # Route: /screenshot-builder
-    ScreenshotBuilderHub.tsx    # Multi-screen deck manager with canvas + sidebar
-    components/
-      BuilderSidebar.tsx        # Config sidebar for screenshot builder
-      BuilderCanvas.tsx         # Canvas renderer with device frames
-      DeviceFrame.tsx           # SVG/CSS device frame overlays
-    lib/deviceSpecs.ts          # Device dimensions (Apple/Google canonical sizes), BuilderConfig type
-  change-log/
-    page.tsx                    # Route: /change-log
-    ChangelogGenerator.tsx      # Changelog card editor
-  roadmap/page.tsx              # Route: /roadmap — feature voting page
-  app-store-screenshot-sizes/
-    page.tsx                    # Route: /app-store-screenshot-sizes — SEO guide built from deviceSpecs
-  lib/track.ts                  # Umami event tracking helper (client-safe no-op)
-  anchor/                       # Privacy policy & support pages for Anchor app
-  flowzy/                       # Privacy, support, terms pages for Flowzy app
-  sitemap.ts                    # Dynamic sitemap generation
-  robots.ts                     # Robots.txt generation
+    MarketplaceLandingPage.tsx  # Homepage content — hero/search, value props, catalog preview, comparison, testimonials, FAQ, CTA
+    SiteNav.tsx                 # Shared nav — session-aware (Sign in / Dashboard link), used on every page
+    SiteFooter.tsx              # Shared footer
+    AuthProvider.tsx            # next-auth SessionProvider wrapper (client)
+    PaddleCheckoutButton.tsx    # Opens Paddle's overlay checkout for a given agent+tier
+    Toast.tsx                   # ToastProvider/toast primitives (uses --fill/--fill-text/--text-1 token aliases)
+  lib/
+    siteConfig.ts                # Site name, tagline, contact/author info
+    track.ts                     # Umami event tracking helper
+    agentCatalog.ts               # Marketing/display data for the 4 catalog products (static TS, no DB) — see below
+    db.ts                         # Prisma client (lazy singleton behind a Proxy)
+    gemini.ts                     # Gemini client (lazy singleton) + generateReply() shared by the paid chat route and the demo route
+    agentRuntime.ts               # Static system-prompt/model config for "live" products — shared by prisma/seed.ts and the DB-free demo route
+    paddle.ts                     # Paddle Node SDK client (lazy singleton)
+    rateLimit.ts                  # In-memory fixed-window rate limiter, used for both the paid chat API (per API key) and the public demo (per IP)
+    devAuth.ts                     # Client-safe check for the dev-only auth bypass (mirrors the server-side gate in auth.ts)
+    knowledge.ts                    # Retrieval-augmented generation: chunking, Gemini embeddings, in-app cosine similarity
+  agents/
+    page.tsx                     # /agents — catalog grid, search, category filter tabs
+    AgentsCatalogHub.tsx
+    [slug]/
+      page.tsx                   # /agents/[slug] — fetches operational DB data (agent id, tier ids, Paddle price ids) alongside static marketing data; tolerates DB being unreachable
+      AgentDetailHub.tsx          # Product detail — live demo, info grid, what's included, pricing/checkout, FAQ
+      LiveDemoChat.tsx             # On-site "try it live" chat, calls /api/v1/demo — no login/API key/DB needed
+  dashboard/
+    page.tsx                     # Redirects to /dashboard/integrations
+    integrations/
+      page.tsx                   # Server component — auth-gated (middleware), fetches user's API keys/usage/subscriptions
+      IntegrationsHub.tsx         # Client — embed code, copy button, regenerate key, edit-config modal
+  api/
+    v1/chat/route.ts             # THE endpoint the embedded widget calls — validates API key, rate-limits, checks quota, calls Gemini, persists messages, CORS-open (embeds on arbitrary origins)
+    v1/demo/route.ts              # Public, unauthenticated, DB-free — powers the on-site live demo. Rate-limited by IP, falls back to a labeled mock reply if GEMINI_API_KEY isn't set
+    webhooks/paddle/route.ts     # Verifies Paddle webhook signature, upserts AgentSubscription, auto-provisions an ApiKey on first activation
+    keys/[id]/regenerate/route.ts # POST — rotates an API key (ownership-checked)
+    keys/[id]/config/route.ts     # PATCH — updates widget greeting/color/position (ownership-checked)
+    keys/[id]/knowledge/route.ts  # GET/POST/DELETE — a customer's knowledge base for one install (ownership-checked)
+    portal/route.ts               # GET — creates a Paddle customer portal session for one subscription (cancel/update payment method), ownership-checked
+    auth/[...nextauth]/route.ts   # next-auth route handlers
+  privacy/page.tsx, terms/page.tsx  # Legal pages — marketplace-specific (billing via Paddle, chat data sent to Gemini, etc.)
+  sitemap.ts, robots.ts
 
-ink-design-system/              # Modular CSS source files for the Ink Design System
-  index.css                     # Entry point (imports all modules)
-  tokens.css, base.css, typography.css, buttons.css, cards.css,
-  inputs.css, chips.css, list.css, selection.css, progress.css,
-  navigation.css, feedback.css
+public/
+  widget.js                     # The embeddable chat widget — vanilla JS IIFE, Shadow DOM (no iframe), <15KB. This is what site owners paste as a <script> tag.
 
-docs/                           # Internal specs and documentation
-public/                         # Static assets (SVGs, OG image)
+prisma/
+  schema.prisma                 # Operational data model — see "Database" below
+  seed.ts                       # Seeds Agent/AgentTier rows to match app/lib/agentCatalog.ts slugs
+
+auth.config.ts                  # Edge-safe auth config (providers only, no DB) — used by proxy.ts
+auth.ts                         # Full auth config (DB callbacks) — used everywhere else
+proxy.ts                        # Next.js 16 middleware (renamed from middleware.ts) — protects /dashboard/*
+prisma.config.ts                # Prisma 7 CLI config (schema path, migrations, DATABASE_URL for the CLI)
+types/next-auth.d.ts            # Module augmentation for session.user.id
+
+docs/
+  buildr-studio-agent-storefront-plan.md   # The plan — read before storefront/marketplace work
 ```
 
 ## Architecture patterns
 
 ### Routing
 
-Next.js App Router with file-based routing. Each route page is a **server component** that exports `metadata` and structured data (`JSON-LD`), then renders a `"use client"` hub component.
+Next.js App Router. Each route's `page.tsx` is a **server component** exporting `metadata` (and
+JSON-LD via a `<Script>` tag), rendering a `"use client"` hub/view component that holds the actual
+UI and interactivity.
 
 ### Styling approach
 
-**No Tailwind utility classes in components.** The project uses a custom CSS design system called "Ink" via CSS custom properties (`--bg`, `--surface`, `--text-1`, `--fill`, etc.). Components use a mix of:
+**No Tailwind utility classes in components.** Inline `style` props are the default; a trailing
+scoped `<style>{`...`}`}</style>` tag handles `:hover`/`:media`/`@keyframes` that inline styles
+can't express. CSS custom properties from `globals.css` are used directly in inline styles
+(`background: "var(--accent)"`, not a hardcoded hex) — this is a change from the pre-pivot agency
+code, which hardcoded hex values. Prefer the token.
 
-1. **Ink Design System classes** defined in `globals.css` (e.g., `.btn-fill`, `.card-default`, `.chip-subtle`, `.ink-body`)
-2. **Inline `<style>` tags** inside client components for component-scoped styles
-3. **Inline `style` props** for one-off layout adjustments
+**Palette:** `--bg: #F5F8FC`, `--surface: #FFFFFF`, `--accent: #2563EB`, `--text: #0F172A`,
+`--muted: rgba(15,23,42,0.58)`. Full token list in `globals.css`.
 
-When adding new UI, follow the existing pattern: use Ink classes where available, add scoped `<style>` blocks for component-specific styles.
+### Database
 
-### Theme system
+Prisma 7 against the existing Neon Postgres instance — **not** a new Supabase project (see the
+plan's decisions log for why). Prisma 7 changed how connections work:
 
-Light/dark theming via `data-theme` attribute on `<html>`. CSS custom properties switch values between themes. `ThemeToggle` component manages the toggle and persists to `localStorage` under key `ink-theme`.
+- `prisma/schema.prisma`'s `datasource` block has **no `url`** — Prisma 7 removed inline connection
+  strings entirely. The CLI gets its connection from `prisma.config.ts` (`datasource.url`); the
+  app gets it via a **driver adapter** passed to `new PrismaClient({ adapter })` — see `app/lib/db.ts`.
+- The adapter is `@prisma/adapter-neon` (Neon's serverless/websocket driver), which needs the `ws`
+  package and `neonConfig.webSocketConstructor = ws` in Node runtimes (edge/browser don't need it).
+- The generated client lives at `generated/prisma/` (gitignored, regenerate with `prisma generate`)
+  and is imported from `generated/prisma/client` — **not** `generated/prisma` (there's no index
+  file at that path in Prisma 7's new output shape; `client.ts` is the documented entry point).
+- `db` in `app/lib/db.ts` is a **lazy Proxy**, not an eagerly-constructed singleton. This is
+  deliberate: Next.js evaluates route/page modules during build-time "collect page data" even for
+  code that never runs in a given request, so an eager `new PrismaClient()` throws and crashes the
+  *entire build* the moment `DATABASE_URL` is unset. The Proxy defers construction until the first
+  real property access, which only happens inside a request/render — where callers already handle
+  the failure (see `getOperationalData` in `app/agents/[slug]/page.tsx` for the pattern: try/catch,
+  return null, page still renders with checkout disabled).
 
-### State management
+**`Agent` is a fixed catalog entry, not user-owned** — there are exactly 4 rows, matching the slugs
+in `app/lib/agentCatalog.ts`. This is not an open marketplace where anyone can list an agent.
 
-No global state library. Each workspace hub component (`WorkspaceHub`, `ScreenshotBuilderHub`) manages its own state with `useState`. Configuration objects (e.g., `BuilderConfig`, `OptimizationConfig`) are passed down as props.
+**Two layers of "agent" data, kept in sync by `slug`:**
+1. `app/lib/agentCatalog.ts` — static marketing copy (name, tagline, tiers, FAQ) for the `/agents` pages. No DB access, renders instantly.
+2. `prisma/schema.prisma`'s `Agent`/`AgentTier` models — operational config (system prompt, model, token limits, Paddle price IDs) that the chat API and checkout actually use.
 
-### Export/capture
+When adding a product: add it to `agentCatalog.ts`, add its operational config to `prisma/seed.ts`, re-run `bunx prisma db seed`.
 
-Client-side screenshot export uses `html-to-image` / `modern-screenshot`. The canvas wrapper uses `ref` + `useImperativeHandle` to expose `exportPng()` and `copyToClipboard()` methods.
+**Dedicated Neon project.** `DATABASE_URL` points at a Neon project named `buildrstudio`
+(`wispy-butterfly-59371469`, created 2026-08-26), used exclusively by this app — plain `public`
+schema, real migration history (`prisma/migrations/`), no isolation tricks needed. This replaced an
+earlier setup that reused a pre-existing "BuildrStudio" project shared with an unrelated older
+product; that project's real data (old users/subscriptions/waitlist/paddle-billing tables) was
+**permanently deleted** at the site owner's explicit, informed request (see the plan's decisions
+log, 2026-08-26) rather than migrated — don't go looking for it, it's gone.
+
+**A lesson from that episode, worth keeping in mind on any future database work:** both
+`prisma migrate dev` and `prisma db push` compare the *entire* target schema against what's
+declared in `schema.prisma` and will offer to **drop anything not declared as a model** — they
+don't just additively sync what's missing. If either command ever reports it wants to drop tables
+you don't recognize from `schema.prisma`'s models, **stop and ask before proceeding** — never pass
+`--accept-data-loss` or run `prisma migrate reset` to make the warning go away without confirming
+first what's actually in those tables.
+
+`prisma.config.ts` explicitly loads `.env.local` (not the `dotenv/config` default of bare `.env`,
+which doesn't exist in this project) — needed for `prisma migrate`/`db push`/`db seed` run via the
+CLI directly (outside `bun run dev`) to see the right `DATABASE_URL` at all.
+
+### Auth
+
+next-auth v5, Google OAuth only, JWT sessions (no Prisma adapter, no next-auth-managed
+Account/Session tables). Split into two files for Edge compatibility:
+- `auth.config.ts` — providers only, **must stay free of any DB import**. Used by `proxy.ts`.
+- `auth.ts` — full config including the `jwt`/`session` callbacks that upsert our own `User` row via Prisma. Used by API routes, server components, `app/api/auth/[...nextauth]/route.ts`.
+
+`proxy.ts` (Next.js 16's renamed `middleware.ts`) builds its own lightweight `NextAuth(authConfig)`
+instance rather than importing `auth` from `auth.ts` — importing the full config into Edge
+middleware would pull in Prisma/Neon/`ws`, none of which run on the Edge runtime. Don't collapse
+these two files back into one without re-checking that constraint.
+
+`session.user.id` is populated via `types/next-auth.d.ts` module augmentation — it's not on
+next-auth's default `Session` type.
+
+The `jwt` callback's `db.user.upsert()` is wrapped in try/catch — if the DB is unreachable (dummy
+`DATABASE_URL` during local dev), sign-in falls back to using the email as `token.userId` rather
+than failing outright. Auth itself and a broken database are deliberately decoupled failure modes.
+
+**Dev-only auth bypass** (`auth.ts`, gated by `DEV_BYPASS_AUTH` + `NEXT_PUBLIC_DEV_BYPASS_AUTH` in
+`.env.local`, hard-disabled whenever `NODE_ENV === "production"` regardless of the env var): adds a
+`Credentials` provider (`id: "dev-bypass"`) that signs you in as a fixed `dev@buildrstudio.local`
+user with zero fields, no Google round-trip. `SiteNav.tsx` and `PaddleCheckoutButton.tsx` both check
+`isDevAuthBypassEnabled()` (`app/lib/devAuth.ts`) and call `signIn("dev-bypass")` instead of
+`signIn("google")` when it's on. `SiteNav` also renders a persistent amber "DEV AUTH BYPASS ACTIVE"
+banner site-wide whenever it's enabled, specifically so it's never silently forgotten. Turn it off
+in `.env.local` (both vars) once testing the real Google flow again — it exists to unblock building
+the rest of the app while Google OAuth setup was still in progress, not as a permanent feature.
+
+### The embed/delivery layer
+
+`public/widget.js` is what a customer pastes onto their own site:
+```html
+<script src="https://buildrstudio.in/widget.js" data-agent-id="support-agent-starter" data-key="pk_live_..."></script>
+```
+It's a vanilla-JS IIFE (no build step, no framework) that renders into a **Shadow DOM** (not an
+iframe) so host-page CSS can't leak in or out, persists a session id in `localStorage`, and POSTs to
+`/api/v1/chat`. Keep it dependency-free and small — there's no bundler step for this file, it ships
+as-is from `public/`.
+
+`app/api/v1/chat/route.ts` is what it talks to: validates the `Authorization: Bearer pk_live_...`
+key against `ApiKey`, rate-limits per key (in-memory — see `app/lib/rateLimit.ts`, acceptable for
+MVP per the plan's constraints), checks the caller's monthly quota (falls back to a small
+`TRIAL_MONTHLY_LIMIT` if there's no active subscription, so the widget is testable pre-purchase),
+retrieves relevant knowledge-base chunks (see below) if the customer has any, calls Gemini (via
+`generateReply()` in `app/lib/gemini.ts`) with the agent's DB-configured system prompt + retrieved
+context + last 10 messages, and persists the exchange. It's deliberately CORS-open
+(`Access-Control-Allow-Origin: *`) — the widget embeds on arbitrary third-party origins, so auth is
+the API key, not same-origin cookies.
+
+### Knowledge base / retrieval-augmented generation
+
+**This is what makes an agent actually useful, not just a demo** — without it, every subscriber to
+an agent got the identical generic system prompt with zero knowledge of their actual business (that
+was true of every "live" agent until 2026-08-26). `app/lib/knowledge.ts` + the dashboard's
+"Knowledge base" section in `IntegrationsHub.tsx` + `app/api/keys/[id]/knowledge/route.ts` close
+that gap, deliberately kept simple for indie/small-business scale rather than enterprise-grade:
+
+- **One knowledge base per `ApiKey`** (one install = one knowledge base), not a multi-document CMS.
+  Uploading replaces the previous one entirely (`DocumentChunk.deleteMany` then re-create in a
+  `$transaction`) — there's no per-document add/remove.
+- **Plain text only.** Paste text directly, or pick a `.txt`/`.md` file — the browser reads it with
+  `file.text()` client-side and appends it into the same textarea; there's no server-side file
+  upload endpoint, no PDF parsing, no URL scraping. Deliberately deferred, not forgotten — see the
+  plan doc if reviving this decision.
+- **Chunking is naive**: fixed-size character windows (800 chars, 100 overlap) in `chunkText()` —
+  no sentence-aware or semantic chunking. Fine at this scale; revisit only if quality actually
+  suffers for real customers.
+- **Embeddings are `gemini-embedding-001`** (3072-dim, verified against a real key — see
+  `scripts/check-gemini-models.mjs` for how to re-check if it's ever retired like `gemini-1.5-flash`
+  was), stored as plain `Float[]` columns on `DocumentChunk`, **not pgvector.** Retrieval
+  (`retrieveRelevantChunks()`) fetches all of one customer's chunks and computes cosine similarity
+  in application code. This is a deliberate simplicity trade-off: at a few hundred chunks per
+  customer (indie/small-business scale, capped at `MAX_CHUNKS_PER_KEY = 300`), an in-app scan is
+  fast enough and avoids managing a Postgres extension entirely. Don't reach for pgvector unless a
+  real customer's usage actually demands it.
+- **The on-site demo does NOT use this** — `/api/v1/demo` is deliberately DB-free (see below) and
+  has no per-customer identity to scope a knowledge base to. Retrieval only happens on the paid,
+  API-key-authenticated `/api/v1/chat` path.
+- Embedding calls in the upload route run **sequentially, not in parallel** (`for` loop, not
+  `Promise.all`) — deliberately avoids bursting dozens of concurrent requests at Gemini for one
+  upload.
+
+### The on-site live demo
+
+`/agents/[slug]` (for `status: "live"` products) also embeds `LiveDemoChat.tsx`, a first-party chat
+UI (plain React, not Shadow DOM — no host-page isolation needed since it's not embedding on a
+third-party site) that calls `app/api/v1/demo/route.ts`. This is a deliberately separate, simpler
+path from the paid widget: **no API key, no login, no database at all** — it reads system
+prompt/model straight from the static `app/lib/agentRuntime.ts` (the same config `prisma/seed.ts`
+uses to seed the DB), rate-limits by IP instead of by key, and never persists anything. The point is
+that the marketplace's core claim ("this agent actually works") is demonstrable with nothing
+configured except `GEMINI_API_KEY`. Without that key set, it returns a reply clearly prefixed
+`"(Demo mode — ...)"` rather than erroring — don't remove that label or make the mock reply
+indistinguishable from a real one.
+
+### Payments (Paddle)
+
+`app/components/PaddleCheckoutButton.tsx` opens Paddle's client-side overlay checkout
+(`@paddle/paddle-js`) with `customData: { userId, agentId, tierId }` — that gets echoed back on
+webhook events, which is how `app/api/webhooks/paddle/route.ts` correlates a
+`subscription.created`/`.updated`/`.canceled` event back to our own `AgentSubscription` row without
+needing to guess from Paddle's own IDs. The webhook also auto-provisions an `ApiKey` on first
+activation so the dashboard has something to show immediately after purchase.
+
+Checkout also sets `settings.successUrl` to `/dashboard/integrations?welcome=1` — the dashboard
+(`IntegrationsHub.tsx`) reads that query param to show a one-time "you're all set" banner, then
+strips it via `router.replace`. There's a small unhandled race here: if the buyer lands on the
+dashboard before Paddle's webhook has finished processing, their new subscription/API key won't be
+there yet on first paint. No retry/polling was added for this — acceptable for now, revisit if it
+turns out to matter in practice.
+
+**Managing/canceling a subscription** happens through Paddle's own hosted customer portal, not a
+page we built — `app/api/portal/route.ts` calls `paddle.customerPortalSessions.create()` for one
+`AgentSubscription` at a time (ownership-checked) and returns the portal URL; the dashboard's
+"Manage subscription" button (only shown when `IntegrationRow.subscriptionId` is set — i.e. not for
+trial-only users) opens it in a new tab. Don't build custom cancel/payment-method UI — Paddle's
+portal already does this correctly and is the merchant of record's responsibility, not ours.
+
+**Pricing exists now, but only in Paddle *sandbox*** (set 2026-08-26: $19/mo Standard, $49/mo Pro on
+both live agents — see the plan's decisions log for the reasoning and the actual product/price IDs).
+`AgentTier.paddlePriceId` is set for both live agents' tiers, so checkout shows a real "Get this
+agent" button — but this is sandbox money, not a production commitment. `AgentTier.paddlePriceId`
+stays nullable by design: checkout refuses to open (shows "Notify me when priced" instead) for any
+tier with no price ID, which is still true for the two `coming-soon` products. Going live for real
+needs authenticating the `paddle-live` MCP tool and a deliberate decision that these numbers are
+final, not just sandbox-tested — don't treat the sandbox IDs as production-ready without that step.
+
+**`PADDLE_API_KEY` is real (sandbox).** Paddle has no API to create one — it was created by hand in
+the Paddle dashboard via browser automation, then verified by calling Paddle directly through
+`@paddle/paddle-node-sdk`. If it's ever lost or revoked, it has to be recreated the same way
+(dashboard → Developer Tools → Authentication), not through the Paddle MCP — that gap is confirmed,
+not just unexplored.
 
 ## Key conventions
 
-- **All pages include SEO metadata** — `export const metadata`, Open Graph tags, Twitter cards, and JSON-LD structured data. Maintain this when adding new routes.
-- **`"use client"` is explicit** — hub/interactive components are client components; route pages are server components.
-- **Path alias:** `@/*` maps to the project root.
-- **No test files exist.** Validate changes by running `bun run build` and checking the dev server.
-- **CSS classes use the Ink naming convention** — lowercase with hyphens (`.btn-fill`, `.card-default`, `.ctrl-label`).
-- **Component file naming:** PascalCase for `.tsx` files, camelCase for `.ts` utility files.
-- **The `AppHeader` component is shared across all routes** — it accepts `activeRoute` and `onOpenPremium` props.
-
-### Authentication & payments
-
-- **Auth:** NextAuth.js v5 with Google OAuth, JWT session strategy. Config in root `auth.ts`.
-- **Session:** `AuthProvider` (SessionProvider) wraps the app in `layout.tsx`. Use `useSession()` in client components.
-- **Pro gating:** `session.user.isPro` boolean is set in the JWT callback by checking the `subscriptions` table.
-- **Checkout flow:** User clicks "Go Pro" → PremiumModal (plan selector: $29 one-time Launch Pack or $9/mo Pro) → if signed in, POST `/api/checkout` with `{plan}` → redirect to Lemon Squeezy hosted checkout → webhook updates subscription status.
-- **Webhooks:** `/api/webhooks/lemonsqueezy` verifies HMAC signature and upserts subscription records. Subscription events cover the $9/mo plan; `order_created` events for the lifetime variant are stored as status `lifetime` (never expires). The `order_created` event must be enabled in the Lemon Squeezy webhook config.
-- **Pricing:** Launch Pack $29 one-time (primary offer) and Pro $9/mo. Any paid plan grants unlimited AI generations; free users get 5 lifetime.
-- **Analytics:** Umami events via `app/lib/track.ts` — `export_single`, `export_batch`, `watermark_modal_open`, `watermark_unlocked`, `premium_modal_open`, `checkout_start`.
+- **All pages include SEO metadata** — `export const metadata` (or `generateMetadata` for dynamic routes), Open Graph, Twitter cards, JSON-LD. Maintain this when adding routes.
+- **`"use client"` is explicit** — hub/interactive components are client components; route `page.tsx` files are server components.
+- **Path alias:** `@/*` maps to the project root (mostly unused in favor of relative imports so far — follow whichever a file already uses).
+- **No test files exist.** Validate changes with `bun run build` (catches TS errors across the whole app) and `bun run lint`.
+- **`/dashboard/*` is auth-gated** by `proxy.ts` and carries `robots: { index: false }` — don't add it to `sitemap.ts`.
+- **Never build a real checkout price into code** while plan Section 9's pricing decision is open — see "Payments" above.
 
 ## Environment variables
 
-```bash
-# Required for database
-NEON_DATABASE_URL=postgresql://...   # or DATABASE_URL
-
-# Required for auth
-AUTH_SECRET=<random-32-char-string>       # NextAuth.js secret (run: openssl rand -base64 32)
-GOOGLE_CLIENT_ID=<google-oauth-client-id>
-GOOGLE_CLIENT_SECRET=<google-oauth-client-secret>
-
-# Required for payments
-LEMONSQUEEZY_API_KEY=<ls-api-key>
-LEMONSQUEEZY_STORE_ID=<ls-store-id>
-LEMONSQUEEZY_VARIANT_ID=<ls-variant-id>                  # The $9/mo Pro subscription variant
-LEMONSQUEEZY_LIFETIME_VARIANT_ID=<ls-lifetime-variant>   # The $29 one-time "Launch Pack" variant
-LEMONSQUEEZY_AI_VARIANT_ID=<ls-ai-variant-id>            # The $20/mo AI Pro plan variant (legacy)
-LEMONSQUEEZY_WEBHOOK_SECRET=<ls-webhook-signing-secret>
-
-# App URL (for checkout redirects)
-NEXT_PUBLIC_APP_URL=https://buildrstudio.in
-
-# AI copywriting (Gemini free tier)
-GEMINI_API_KEY=<google-ai-studio-api-key>
-```
-
-## Database
-
-Tables in Neon Postgres, auto-created on first write:
-
-- **`users`** — id, email, name, image, email_verified, created_at
-- **`subscriptions`** — user_id, ls_subscription_id, status, current_period_end, cancel_at_period_end
-- **`waitlist_requests`** — email collection for interest/roadmap forms
+See `.env.example` for the full list with comments. Summary: `DATABASE_URL` (Neon), `AUTH_SECRET` +
+`GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` (auth), `GEMINI_API_KEY`, `PADDLE_API_KEY` +
+`PADDLE_WEBHOOK_SECRET` + `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` (billing). All are optional at build
+time (see "The app builds and runs with zero environment variables configured" above) but required
+for the corresponding feature to actually work at runtime. `.env.local` (gitignored) currently holds
+dummy values for local dev — see that file's header comment for exactly what does/doesn't work with
+dummy values.
 
 ## Common tasks
 
-### Adding a new tool/route
+### Adding a new marketplace product
 
-1. Create `app/<tool-name>/page.tsx` as a server component with metadata + JSON-LD
-2. Create the client hub component (e.g., `<ToolNameHub />`)
-3. Add the route to `AppHeader.tsx` dropdown and mobile drawer
-4. Add to `sitemap.ts`
-5. Add a tool card to `SaaSLandingPage.tsx` tools grid
-6. Add footer link in `SaaSLandingPage.tsx`
+1. Add an entry to `app/lib/agentCatalog.ts` (marketing copy) with `status: "coming-soon"` until it's ready.
+2. Add its operational config (system prompt, model) to `prisma/seed.ts`, run `bunx prisma db seed`.
+3. It automatically appears on `/agents` and gets a `/agents/[slug]` page.
+4. Add the slug to `sitemap.ts`.
+5. Flip `status` to `"live"` once pricing exists and a real Paddle price ID is set on its `AgentTier` rows.
+
+### Changing the Prisma schema
+
+1. Edit `prisma/schema.prisma`.
+2. `bunx prisma generate` (regenerates `generated/prisma/`, needed for TS types — doesn't need a live DB connection).
+3. `bunx prisma migrate dev --name <description>` to apply against a real database (needs `DATABASE_URL`).
 
 ### Modifying the design system
 
-Edit `app/globals.css` directly. The `ink-design-system/` directory contains the modular source but `globals.css` is the consumed version. Keep both in sync if modifying tokens or adding new component classes.
+Edit `app/globals.css` directly — tokens, reset, a11y, keyframes. There's no separate design-system
+source directory. Keep the light-only, no-toggle approach unless explicitly asked to add dark mode.
