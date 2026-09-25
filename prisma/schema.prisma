@@ -195,21 +195,21 @@ model KnowledgeSource {
 /// codebase — auth uses JWT sessions, no Prisma adapter, no DB-backed auth
 /// session table).
 model ChatSession {
-  id        String    @id @default(cuid())
-  agentId   String
-  agent     Agent     @relation(fields: [agentId], references: [id])
+  id            String               @id @default(cuid())
+  agentId       String
+  agent         Agent                @relation(fields: [agentId], references: [id])
   apiKeyId      String
-  apiKey        ApiKey                @relation(fields: [apiKeyId], references: [id])
+  apiKey        ApiKey               @relation(fields: [apiKeyId], references: [id])
   messages      Message[]
   leads         Lead[]
   unanswered    UnansweredQuestion[]
   // Conversation-log bookkeeping (dashboard → Conversations). pageUrl is the
   // page the widget was opened on when the conversation started.
   pageUrl       String?
-  messageCount  Int                   @default(0)
+  messageCount  Int                  @default(0)
   lastMessageAt DateTime?
-  createdAt     DateTime              @default(now())
-  updatedAt     DateTime              @updatedAt
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
 
   @@index([apiKeyId, lastMessageAt])
 }
@@ -244,21 +244,39 @@ model Usage {
 }
 
 model AgentSubscription {
-  id                   String    @id @default(cuid())
-  userId               String
-  user                 User      @relation(fields: [userId], references: [id])
-  agentId              String
-  agent                Agent     @relation(fields: [agentId], references: [id])
-  tierId               String
-  tier                 AgentTier @relation(fields: [tierId], references: [id])
-  paddleCustomerId     String?
-  paddleSubscriptionId String?   @unique
-  status               String    @default("active") // active | canceled | past_due | paused
-  currentPeriodEnd     DateTime?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  id                     String    @id @default(cuid())
+  userId                 String
+  user                   User      @relation(fields: [userId], references: [id])
+  agentId                String
+  agent                  Agent     @relation(fields: [agentId], references: [id])
+  tierId                 String
+  tier                   AgentTier @relation(fields: [tierId], references: [id])
+  // "paddle" (default, all pre-existing rows) or "razorpay" (INR / UPI path)
+  provider               String    @default("paddle")
+  paddleCustomerId       String?
+  paddleSubscriptionId   String?   @unique
+  razorpaySubscriptionId String?   @unique
+  razorpayCustomerId     String?
+  // Razorpay only: owner asked to cancel; access continues until currentPeriodEnd.
+  cancelAtPeriodEnd      Boolean   @default(false)
+  // active | canceled | past_due | paused, plus "created" for a Razorpay
+  // subscription whose checkout hasn't completed yet (never grants access).
+  status                 String    @default("active")
+  currentPeriodEnd       DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
   @@index([userId, agentId])
+}
+
+/// Webhook deliveries already handled, keyed by provider + the provider's
+/// event id (Razorpay: x-razorpay-event-id). Makes retried/duplicated
+/// deliveries a no-op.
+model ProcessedWebhookEvent {
+  id        String   @id // "<provider>:<event id>"
+  provider  String
+  eventType String
+  createdAt DateTime @default(now())
 }
 
 /// A visitor who left their details in the widget's lead form — either

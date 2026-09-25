@@ -6,6 +6,9 @@ import SiteNav from "../../components/SiteNav";
 import SiteFooter from "../../components/SiteFooter";
 import PaddleCheckoutButton from "../../components/PaddleCheckoutButton";
 import StartTrialButton from "../../components/StartTrialButton";
+import RazorpayCheckoutButton from "../../components/RazorpayCheckoutButton";
+import { useRazorpayPlans, type InrTier } from "../../components/useRazorpayPlans";
+import { useState } from "react";
 import { TRIAL_DAYS, TRIAL_MESSAGE_LIMIT, TRIAL_SUMMARY } from "../../lib/trial";
 import LiveDemoChat from "./LiveDemoChat";
 import type { AgentProduct } from "../../lib/agentCatalog";
@@ -206,13 +209,26 @@ function TierCard({
   product,
   dbTier,
   agentId,
+  inr,
 }: {
   tier: AgentProduct["tiers"][number];
   product: AgentProduct;
   dbTier?: OperationalAgent["tiers"][number];
   agentId?: string;
+  // Set when the buyer picked INR and this tier has a Razorpay plan.
+  inr?: InrTier;
 }) {
   const canCheckout = product.status === "live" && !!dbTier && !!agentId;
+  const ctaStyle: React.CSSProperties = {
+    marginTop: "auto",
+    padding: "12px 20px",
+    borderRadius: 8,
+    fontSize: 14,
+    fontWeight: 600,
+    background: "var(--accent)",
+    color: "var(--accent-ink)",
+    width: "100%",
+  };
 
   return (
     <div
@@ -230,8 +246,11 @@ function TierCard({
         <div style={{ fontSize: 12, fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--muted)", marginBottom: 8 }}>
           {tier.name}
         </div>
-        <div style={{ fontSize: 21, fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>{tier.price}</div>
-        <div style={{ fontSize: 12, color: "var(--muted-2)" }}>{tier.messagesIncluded}</div>
+        <div style={{ fontSize: 21, fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>{inr ? inr.priceLabel : tier.price}</div>
+        <div style={{ fontSize: 12, color: "var(--muted-2)" }}>
+          {tier.messagesIncluded}
+          {inr && " · Billed in INR via Razorpay (UPI AutoPay, cards, netbanking)"}
+        </div>
       </div>
       <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 10 }}>
         {tier.features.map((f) => (
@@ -242,23 +261,16 @@ function TierCard({
         ))}
       </ul>
 
-      {canCheckout && dbTier && agentId ? (
+      {canCheckout && inr ? (
+        <RazorpayCheckoutButton tierId={inr.tierId} label="Get this agent (pay in ₹)" className="tier-cta" style={ctaStyle} />
+      ) : canCheckout && dbTier && agentId ? (
         <PaddleCheckoutButton
           agentId={agentId}
           tierId={dbTier.id}
           paddlePriceId={dbTier.paddlePriceId}
           label={dbTier.paddlePriceId ? "Get this agent" : "Notify me when priced"}
           className="tier-cta"
-          style={{
-            marginTop: "auto",
-            padding: "12px 20px",
-            borderRadius: 8,
-            fontSize: 14,
-            fontWeight: 600,
-            background: "var(--accent)",
-            color: "var(--accent-ink)",
-            width: "100%",
-          }}
+          style={ctaStyle}
         />
       ) : (
         <a
@@ -281,7 +293,42 @@ function TierCard({
   );
 }
 
+// USD (Paddle) / INR (Razorpay) switch. Only rendered when Razorpay is
+// configured and at least one tier has an INR plan; defaults to INR for
+// visitors who look Indian (geo header / Accept-Language), USD otherwise.
+function CurrencyToggle({ value, onChange }: { value: "usd" | "inr"; onChange: (v: "usd" | "inr") => void }) {
+  const opt = (v: "usd" | "inr", label: string) => (
+    <button
+      type="button"
+      onClick={() => onChange(v)}
+      aria-pressed={value === v}
+      style={{
+        padding: "7px 14px",
+        borderRadius: 8,
+        fontSize: 13,
+        fontWeight: 600,
+        cursor: "pointer",
+        border: "none",
+        background: value === v ? "var(--surface-alt)" : "transparent",
+        color: value === v ? "var(--text)" : "var(--muted)",
+      }}
+    >
+      {label}
+    </button>
+  );
+  return (
+    <div role="group" aria-label="Currency" style={{ display: "inline-flex", gap: 2, padding: 3, borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg)", marginBottom: 20 }}>
+      {opt("usd", "Pay in USD")}
+      {opt("inr", "Pay in ₹ INR · UPI")}
+    </div>
+  );
+}
+
 function PricingSection({ product, dbAgent }: { product: AgentProduct; dbAgent: OperationalAgent | null }) {
+  const plans = useRazorpayPlans(product.status === "live" ? product.slug : null);
+  const [choice, setChoice] = useState<"usd" | "inr" | null>(null);
+  const inrAvailable = plans.enabled && plans.tiers.length > 0;
+  const currency = inrAvailable ? (choice ?? (plans.suggestInr ? "inr" : "usd")) : "usd";
   return (
     <section id="pricing" style={{ padding: "64px 24px", background: "var(--surface)", borderTop: "1px solid var(--border)" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
@@ -322,11 +369,13 @@ function PricingSection({ product, dbAgent }: { product: AgentProduct; dbAgent: 
             />
           </div>
         )}
+        {inrAvailable && <CurrencyToggle value={currency} onChange={setChoice} />}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }} className="tier-grid">
           {product.tiers.map((tier) => {
             const dbTier = dbAgent?.tiers.find((t) => t.name === tier.name.toLowerCase());
+            const inr = currency === "inr" ? plans.tiers.find((t) => t.tierName === tier.name.toLowerCase()) : undefined;
             return (
-              <TierCard key={tier.name} tier={tier} product={product} dbTier={dbTier} agentId={dbAgent?.id} />
+              <TierCard key={tier.name} tier={tier} product={product} dbTier={dbTier} agentId={dbAgent?.id} inr={inr} />
             );
           })}
         </div>

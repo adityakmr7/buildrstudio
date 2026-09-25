@@ -297,6 +297,40 @@ email via Resend only when `RESEND_API_KEY` + `LEADS_FROM_EMAIL` are set, and a 
 click-to-chat link returned to the visitor when the owner set `ApiKey.whatsappNumber`. Dashboard:
 `/dashboard/leads` + CSV export (`/api/leads/export`), settings modal "Lead handoff".
 
+### INR payments (Razorpay), alongside Paddle
+
+Feature-flagged. Everything is off (Paddle only) unless `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`
+and `RAZORPAY_WEBHOOK_SECRET` are set. Each tier also needs `RAZORPAY_PLAN_<AGENT_SLUG>_<TIER>`,
+e.g. `RAZORPAY_PLAN_SUPPORT_AGENT_STARTER_STANDARD`. INR prices are never in code: they're read
+from the Razorpay plan (`GET /v1/plans/:id`, cached 10 min), and non-INR plans are ignored.
+
+- `app/lib/razorpay.ts`: fetch-based API client, signature checks, status mapping.
+- `app/lib/razorpayServer.ts`: `applyRazorpaySubscription` (upserts AgentSubscription with
+  `provider = "razorpay"`) and `getInrTierOptions`.
+- Flow:
+  - `/api/razorpay/plans?agent=` (public; enabled flag, INR labels, `suggestInr` from
+    `x-vercel-ip-country` / Accept-Language)
+  - `POST /api/razorpay/subscribe` (creates the subscription and a `status: "created"` row)
+  - checkout.js (`RazorpayCheckoutButton`)
+  - `POST /api/razorpay/verify` (HMAC of `payment_id|subscription_id`, then re-reads the status
+    from Razorpay)
+  - `POST /api/webhooks/razorpay` (HMAC of the raw body; idempotent via `ProcessedWebhookEvent`
+    keyed on `x-razorpay-event-id`; the entity's status is the source of truth)
+  - `POST /api/razorpay/cancel` (cancel at cycle end; Razorpay has no customer portal)
+- Access is granted by `app/lib/subscriptionAccess.ts#grantAgentAccess`, which is shared with the
+  Paddle webhook: create a key if the user has none for the agent (trial keys are kept), then mark
+  the trial converted.
+- Only `status: "active"` grants access anywhere.
+- `bun run test:razorpay` checks signatures with fake secrets.
+
+### WordPress plugin
+
+`integrations/wordpress/buildrstudio/` is a standalone GPL WordPress plugin: a settings page and a
+footer enqueue of `widget.js`, with `data-*` attributes added via `script_loader_tag`. It isn't
+part of the Next build. `npm run zip:wordpress` builds `public/downloads/buildrstudio-wordpress.zip`
+(committed, deterministic). Re-run it after any plugin edit. `npm run check:wordpress-zip` detects
+drift. See `integrations/wordpress/README.md`.
+
 ### Conversation log + unanswered questions
 
 The chat route stores every exchange (`ChatSession` with `pageUrl`, `messageCount`,

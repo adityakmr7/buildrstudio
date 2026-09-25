@@ -31,7 +31,7 @@ export const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "What stacks does it work on?",
-    a: "Anything that can render a script tag: plain HTML, WordPress, React, Vue, and the rest. There's no SDK and no build step, and the widget runs in a Shadow DOM so your styles and ours stay separate.",
+    a: "Anything that can render a script tag: plain HTML, WordPress, React, Vue, and the rest. On WordPress there's a free plugin (download it from the install section above), so you don't touch theme code. There's no SDK and no build step, and the widget runs in a Shadow DOM so your styles and ours stay separate.",
   },
 ];
 
