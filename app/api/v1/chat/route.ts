@@ -3,6 +3,7 @@ import { db } from "../../../lib/db";
 import { generateReply } from "../../../lib/gemini";
 import { rateLimit } from "../../../lib/rateLimit";
 import { retrieveRelevantChunks } from "../../../lib/knowledge";
+import { computeTrialStatus } from "../../../lib/trial";
 
 export const runtime = "nodejs";
 
@@ -23,11 +24,11 @@ export function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
 }
 
-// Fallback quota for an ApiKey with no active paid subscription yet — lets
-// the widget be test-driven before purchase. Real per-tier limits come from
-// AgentTier.monthlyLimit once a subscription exists (plan Section 9, #2 is
-// still open, so this number is ours to set — packaging, not pricing).
-const TRIAL_MONTHLY_LIMIT = 20;
+// Fallback quota for an ApiKey with no active paid subscription and no open
+// free trial (e.g. a canceled subscription's key). Real per-tier limits come
+// from AgentTier.monthlyLimit once a subscription exists; no-card free trials
+// use TRIAL_MESSAGE_LIMIT / TRIAL_DAYS from app/lib/trial.ts instead.
+const FALLBACK_MONTHLY_LIMIT = 20;
 
 // req/min per tier — mirrors the plan's "30 for starter, 120 for pro" intent,
 // applied per API key rather than per user account.
@@ -94,7 +95,13 @@ export async function POST(req: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
     const tierName = subscription?.tier.name ?? "trial";
-    const monthlyLimit = subscription?.tier.monthlyLimit ?? TRIAL_MONTHLY_LIMIT;
+    const monthlyLimit = subscription?.tier.monthlyLimit ?? FALLBACK_MONTHLY_LIMIT;
+
+    // ── Free trial (no card) — only when there's no paid subscription ──
+    const trial = subscription
+      ? null
+      : await db.trial.findUnique({ where: { apiKeyId: apiKey.id } });
+    const onTrial = !!trial && trial.convertedAt === null;
 
     // ── Rate limit (per API key) ──────────────────────────────────────
     const { allowed } = rateLimit(apiKey.id, RATE_LIMITS[tierName] ?? RATE_LIMITS.trial);
@@ -102,22 +109,43 @@ export async function POST(req: NextRequest) {
       return json({ error: "Rate limit exceeded. Slow down and try again shortly." }, { status: 429 });
     }
 
-    // ── Monthly quota ─────────────────────────────────────────────────
     const month = currentMonth();
-    const usage = await db.usage.findUnique({
-      where: { userId_agentId_month: { userId: apiKey.userId, agentId: agent.id, month } },
-    });
-    if (usage && usage.messageCount >= monthlyLimit) {
-      return json(
-        { error: "Monthly message quota exceeded for this agent. Upgrade your plan to continue." },
-        { status: 403 },
-      );
+    if (onTrial && trial) {
+      // ── Trial quota: fixed message count over a fixed window ─────────
+      const status = computeTrialStatus(trial);
+      if (status.expired) {
+        return json(
+          {
+            error:
+              status.reason === "time"
+                ? "This agent's free trial has ended. The site owner can upgrade to keep it running."
+                : "This agent's free trial messages are used up. The site owner can upgrade to keep it running.",
+            code: "trial_expired",
+          },
+          { status: 403 },
+        );
+      }
+    } else {
+      // ── Monthly quota ───────────────────────────────────────────────
+      const usage = await db.usage.findUnique({
+        where: { userId_agentId_month: { userId: apiKey.userId, agentId: agent.id, month } },
+      });
+      if (usage && usage.messageCount >= monthlyLimit) {
+        return json(
+          { error: "Monthly message quota exceeded for this agent. Upgrade your plan to continue." },
+          { status: 403 },
+        );
+      }
     }
 
     // ── Resolve / create the chat session ─────────────────────────────
     let chatSession = sessionId
       ? await db.chatSession.findUnique({ where: { id: sessionId } })
       : null;
+    // A session id is client-supplied — never continue a conversation that
+    // belongs to a different install (it would feed another customer's
+    // history into this reply).
+    if (chatSession && chatSession.apiKeyId !== apiKey.id) chatSession = null;
     if (!chatSession) {
       chatSession = await db.chatSession.create({
         data: { agentId: agent.id, apiKeyId: apiKey.id },
@@ -169,6 +197,9 @@ export async function POST(req: NextRequest) {
         create: { userId: apiKey.userId, agentId: agent.id, month, messageCount: 1, tokenCount: totalTokens },
       }),
       db.apiKey.update({ where: { id: apiKey.id }, data: { lastUsedAt: new Date() } }),
+      ...(onTrial && trial
+        ? [db.trial.update({ where: { id: trial.id }, data: { messagesUsed: { increment: 1 } } })]
+        : []),
     ]);
 
     return json({ reply, session_id: chatSession.id });

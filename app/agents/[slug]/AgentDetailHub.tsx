@@ -5,6 +5,8 @@ import { Robot, FlowArrow, Brain, Database, CheckCircle, CaretLeft, Lightning } 
 import SiteNav from "../../components/SiteNav";
 import SiteFooter from "../../components/SiteFooter";
 import PaddleCheckoutButton from "../../components/PaddleCheckoutButton";
+import StartTrialButton from "../../components/StartTrialButton";
+import { TRIAL_DAYS, TRIAL_MESSAGE_LIMIT, TRIAL_SUMMARY } from "../../lib/trial";
 import LiveDemoChat from "./LiveDemoChat";
 import type { AgentProduct } from "../../lib/agentCatalog";
 import type { OperationalAgent } from "./page";
@@ -74,6 +76,20 @@ function DetailHero({ product }: { product: AgentProduct }) {
           <Lightning size={14} />
           {product.installTime}
         </div>
+        {product.status === "live" && (
+          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", marginTop: 24 }}>
+            <StartTrialButton
+              agentSlug={product.slug}
+              label="Start free trial"
+              className="trial-cta"
+              style={{ padding: "12px 22px", borderRadius: 8, fontSize: 14, fontWeight: 600, background: "var(--accent)", color: "var(--accent-ink)", border: "none" }}
+            />
+            <a href="#pricing" style={{ fontSize: 13.5, color: "var(--muted)", textDecoration: "underline", textUnderlineOffset: 3 }}>
+              See pricing
+            </a>
+            <span style={{ fontSize: 12.5, color: "var(--muted-2)" }}>{TRIAL_SUMMARY}.</span>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -277,6 +293,35 @@ function PricingSection({ product, dbAgent }: { product: AgentProduct; dbAgent: 
             ? "Final prices are being finalized — email us for a quote in the meantime."
             : "Subscribe to lock in current pricing."}
         </p>
+        {product.status === "live" && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 16,
+              flexWrap: "wrap",
+              padding: 18,
+              marginBottom: 20,
+              borderRadius: 2,
+              background: "var(--bg)",
+              border: "1px solid var(--border-strong)",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 14.5, fontWeight: 600, color: "var(--text)", marginBottom: 2 }}>Try it on your own site first</div>
+              <div style={{ fontSize: 13, color: "var(--muted)" }}>
+                {TRIAL_DAYS} days, {TRIAL_MESSAGE_LIMIT} messages, no card. Sign in with Google and you get a real embed code.
+              </div>
+            </div>
+            <StartTrialButton
+              agentSlug={product.slug}
+              label="Start free trial"
+              className="trial-cta"
+              style={{ padding: "11px 20px", borderRadius: 8, fontSize: 14, fontWeight: 600, background: "var(--surface-alt)", color: "var(--text)", border: "1px solid var(--border-strong)" }}
+            />
+          </div>
+        )}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }} className="tier-grid">
           {product.tiers.map((tier) => {
             const dbTier = dbAgent?.tiers.find((t) => t.name === tier.name.toLowerCase());
@@ -288,6 +333,7 @@ function PricingSection({ product, dbAgent }: { product: AgentProduct; dbAgent: 
       </div>
       <style>{`
         .tier-cta:hover { background: var(--accent-mid) !important; }
+        .trial-cta:hover { filter: brightness(1.08); }
         @media (max-width: 700px) {
           .tier-grid { grid-template-columns: 1fr !important; }
         }
@@ -296,7 +342,15 @@ function PricingSection({ product, dbAgent }: { product: AgentProduct; dbAgent: 
   );
 }
 
+// Generic trial FAQ, shown on live agents only. Kept here rather than in
+// agentCatalog.ts so the trial numbers come from app/lib/trial.ts.
+const TRIAL_FAQ = {
+  question: "Is there a free trial?",
+  answer: `Yes. Sign in with Google and start a ${TRIAL_DAYS}-day trial with ${TRIAL_MESSAGE_LIMIT} messages. No card needed. You get a real API key and embed code, so you can test it on your own site. When the trial ends or the messages run out, the widget stops replying until you pick a plan. Upgrading keeps the same key, so nothing on your site needs to change. One trial per agent per account.`,
+};
+
 function FAQSection({ product }: { product: AgentProduct }) {
+  const faq = product.status === "live" ? [TRIAL_FAQ, ...product.faq] : product.faq;
   return (
     <section style={{ padding: "64px 24px" }}>
       <div style={{ maxWidth: 780, margin: "0 auto" }}>
@@ -304,7 +358,7 @@ function FAQSection({ product }: { product: AgentProduct }) {
           FAQ
         </h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          {product.faq.map((f) => (
+          {faq.map((f) => (
             <div key={f.question} style={{ paddingBottom: 18, borderBottom: "1px solid var(--border)" }}>
               <h3 style={{ fontSize: 14.5, fontWeight: 600, color: "var(--text)", margin: "0 0 8px" }}>{f.question}</h3>
               <p style={{ fontSize: 13.5, lineHeight: 1.65, color: "var(--muted)", margin: 0 }}>{f.answer}</p>

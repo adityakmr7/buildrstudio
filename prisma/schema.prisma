@@ -32,6 +32,7 @@ model User {
   apiKeys       ApiKey[]
   subscriptions AgentSubscription[]
   usage         Usage[]
+  trials        Trial[]
 }
 
 /// One row per catalog product (see app/lib/agentCatalog.ts). Not user-owned —
@@ -55,6 +56,7 @@ model Agent {
   chatSessions  ChatSession[]
   messages      Message[]
   usage         Usage[]
+  trials        Trial[]
 }
 
 /// Standard / Pro packaging per agent. `paddlePriceId` is null until real
@@ -95,8 +97,35 @@ model ApiKey {
 
   chatSessions   ChatSession[]
   documentChunks DocumentChunk[]
+  trial          Trial?
 
   @@index([userId, agentId])
+}
+
+/// A no-card free trial of one live agent (see app/lib/trial.ts for the
+/// limits and app/lib/trialServer.ts for issuance). One row per user per
+/// agent, ever — the unique constraint is the "one trial per agent" rule.
+/// The trial's ApiKey is the same key a paid subscription later keeps using
+/// (the Paddle webhook reuses an existing key for user+agent), so upgrading
+/// never breaks an embed that's already live. `convertedAt` is set when a
+/// paid subscription activates; after that the subscription's tier limits
+/// apply and the trial limits are ignored.
+model Trial {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  agentId      String
+  agent        Agent     @relation(fields: [agentId], references: [id])
+  apiKeyId     String    @unique
+  apiKey       ApiKey    @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  messageLimit Int
+  messagesUsed Int       @default(0)
+  startedAt    DateTime  @default(now())
+  endsAt       DateTime
+  convertedAt  DateTime?
+
+  @@unique([userId, agentId])
+  @@index([userId])
 }
 
 /// One customer's knowledge base, scoped to their ApiKey (one install = one

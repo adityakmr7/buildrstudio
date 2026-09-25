@@ -1,5 +1,6 @@
 import { Plus } from "@phosphor-icons/react/dist/ssr";
 import SectionHeading from "./SectionHeading";
+import { TRIAL_DAYS, TRIAL_MESSAGE_LIMIT } from "../../lib/trial";
 
 // Only answers that can be verified against the code in this repo:
 //   - agents only run inside the embed widget (public/widget.js, /api/v1/chat)
@@ -8,7 +9,12 @@ import SectionHeading from "./SectionHeading";
 //   - brand color / greeting / position: window.BuildrAgentConfig in
 //     public/widget.js (also editable in the dashboard's Widget config)
 //   - stacks: plain <script> tag appended to <body>, Shadow DOM isolated
+//   - free trial: app/lib/trial.ts limits, enforced in /api/v1/chat
 export const FAQS: { q: string; a: string }[] = [
+  {
+    q: "Can I try it before paying?",
+    a: `Yes. Every live agent has a ${TRIAL_DAYS}-day free trial with ${TRIAL_MESSAGE_LIMIT} messages, and you don't need a card. Sign in with Google, start the trial from the agent's page or your dashboard, and put the embed code on your real site. When it ends, the widget stops replying until you choose a plan. Upgrading keeps the same key, so you don't have to touch your site again.`,
+  },
   {
     q: "Does it post or send anything for me?",
     a: "No. The live agents answer questions inside the chat widget on your own site. They don't post to social media, send email, or publish anything on your behalf.",

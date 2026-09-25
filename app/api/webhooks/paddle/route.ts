@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import { getPaddle } from "../../../lib/paddle";
 import { db } from "../../../lib/db";
+import { markTrialConverted } from "../../../lib/trialServer";
 
 export const runtime = "nodejs";
 
@@ -74,7 +75,9 @@ export async function POST(req: NextRequest) {
         });
 
         // Auto-provision an API key for this user+agent if they don't have
-        // one yet, so the dashboard has something to show immediately.
+        // one yet, so the dashboard has something to show immediately. A
+        // free-trial key counts as "already have one": it's reused as-is,
+        // so an embed installed during the trial keeps working after payment.
         const existingKey = await db.apiKey.findFirst({
           where: { userId: customData.userId, agentId: customData.agentId },
         });
@@ -87,6 +90,7 @@ export async function POST(req: NextRequest) {
             },
           });
         }
+        await markTrialConverted(customData.userId, customData.agentId);
         break;
       }
 

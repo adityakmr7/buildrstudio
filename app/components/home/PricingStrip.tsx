@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { LIVE_AGENTS, COMING_SOON_AGENTS } from "./homeData";
 import SectionHeading from "./SectionHeading";
+import { TRIAL_SUMMARY } from "../../lib/trial";
 
 // Prices come straight from app/lib/agentCatalog.ts — nothing is restated here.
 export default function PricingStrip() {
@@ -11,6 +12,7 @@ export default function PricingStrip() {
         <div className="lg:col-span-4">
           <SectionHeading index="04" kicker="Pricing" id="pricing-title" title="Priced per agent.">
             <p>Monthly, per agent, billed through Paddle. Full tier details live on each agent&apos;s page.</p>
+            <p className="mt-3">Every live agent starts with a {TRIAL_SUMMARY}.</p>
           </SectionHeading>
         </div>
 

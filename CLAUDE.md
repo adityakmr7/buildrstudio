@@ -252,6 +252,17 @@ context + last 10 messages, and persists the exchange. It's deliberately CORS-op
 (`Access-Control-Allow-Origin: *`) — the widget embeds on arbitrary third-party origins, so auth is
 the API key, not same-origin cookies.
 
+### Free trial (no card)
+
+`app/lib/trial.ts` holds the limits (`TRIAL_MESSAGE_LIMIT = 100`, `TRIAL_DAYS = 14`) and is
+client-safe so copy and the dashboard read the same numbers. `app/lib/trialServer.ts#startTrial`
+(called by `POST /api/trials`, which the dashboard calls — agent pages link to
+`/dashboard/integrations?trial=<slug>`) creates an `ApiKey` + `Trial` row without Paddle. Rules:
+one trial per user per agent (DB unique), one active trial per account, live agents only. The chat
+route enforces the trial window + message count when there's no active subscription. On payment
+the Paddle webhook reuses the trial key (its existing "reuse a key for user+agent" behaviour) and
+calls `markTrialConverted()`, so the customer's embed keeps working after upgrading.
+
 ### Knowledge base / retrieval-augmented generation
 
 **This is what makes an agent actually useful, not just a demo** — without it, every subscriber to

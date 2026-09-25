@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { auth } from "../../../auth";
 import { db } from "../../lib/db";
-import IntegrationsHub, { type IntegrationRow } from "./IntegrationsHub";
+import { AGENT_CATALOG } from "../../lib/agentCatalog";
+import { computeTrialStatus } from "../../lib/trial";
+import IntegrationsHub, { type IntegrationRow, type TrialOption, type UpgradeTier } from "./IntegrationsHub";
 
 export const metadata: Metadata = {
   title: "Your agents — Buildr Studio",
@@ -19,7 +21,7 @@ async function getIntegrations(userId: string): Promise<IntegrationRow[]> {
 
   const keys = await db.apiKey.findMany({
     where: { userId },
-    include: { agent: true },
+    include: { agent: { include: { tiers: true } }, trial: true },
     orderBy: { createdAt: "asc" },
   });
 
@@ -36,8 +38,21 @@ async function getIntegrations(userId: string): Promise<IntegrationRow[]> {
         }),
       ]);
 
+      const product = AGENT_CATALOG.find((p) => p.slug === key.agent.slug);
+      const upgradeTiers: UpgradeTier[] = key.agent.tiers
+        .map((t) => ({
+          id: t.id,
+          name: t.name,
+          paddlePriceId: t.paddlePriceId,
+          priceLabel: product?.tiers.find((pt) => pt.name.toLowerCase() === t.name)?.price ?? null,
+        }))
+        .sort((a, b) => (a.name === "standard" ? -1 : b.name === "standard" ? 1 : 0));
+      const trial = key.trial ? computeTrialStatus(key.trial) : null;
+      const onTrial = !!trial && !trial.converted && !subscription;
+
       return {
         id: key.id,
+        agentId: key.agentId,
         apiKey: key.key,
         isActive: key.isActive,
         agentSlug: key.agent.slug,
@@ -47,11 +62,30 @@ async function getIntegrations(userId: string): Promise<IntegrationRow[]> {
         position: key.position,
         messageCount: usage?.messageCount ?? 0,
         monthlyLimit: subscription?.tier.monthlyLimit ?? 20,
-        tierName: subscription?.tier.name ?? "trial",
+        tierName: subscription?.tier.name ?? (onTrial ? "trial" : "no plan"),
         subscriptionId: subscription?.id ?? null,
+        trial: onTrial ? trial : null,
+        upgradeTiers,
       };
     }),
   );
+}
+
+// Live agents the user can still start a free trial for. Returns an empty
+// list while they have an active trial (one at a time).
+async function getTrialOptions(userId: string): Promise<TrialOption[]> {
+  const liveSlugs = AGENT_CATALOG.filter((p) => p.status === "live").map((p) => p.slug);
+  const [agents, keys, trials] = await Promise.all([
+    db.agent.findMany({ where: { slug: { in: liveSlugs }, isPublic: true }, select: { id: true, slug: true, name: true } }),
+    db.apiKey.findMany({ where: { userId }, select: { agentId: true } }),
+    db.trial.findMany({ where: { userId } }),
+  ]);
+  const hasActiveTrial = trials.some((t) => t.convertedAt === null && !computeTrialStatus(t).expired);
+  if (hasActiveTrial) return [];
+  const taken = new Set([...keys.map((k) => k.agentId), ...trials.map((t) => t.agentId)]);
+  return agents
+    .filter((a) => !taken.has(a.id))
+    .map((a) => ({ slug: a.slug, name: a.name, tagline: AGENT_CATALOG.find((p) => p.slug === a.slug)?.tagline ?? "" }));
 }
 
 export default async function IntegrationsPage() {
@@ -66,9 +100,10 @@ export default async function IntegrationsPage() {
   }
 
   let rows: IntegrationRow[] = [];
+  let trialOptions: TrialOption[] = [];
   let loadError = false;
   try {
-    rows = await getIntegrations(session.user.id);
+    [rows, trialOptions] = await Promise.all([getIntegrations(session.user.id), getTrialOptions(session.user.id)]);
   } catch (err) {
     console.error("[dashboard/integrations] could not load data:", err);
     loadError = true;
@@ -76,7 +111,7 @@ export default async function IntegrationsPage() {
 
   return (
     <Suspense>
-      <IntegrationsHub rows={rows} loadError={loadError} userName={session.user.name ?? null} />
+      <IntegrationsHub rows={rows} trialOptions={trialOptions} loadError={loadError} userName={session.user.name ?? null} />
     </Suspense>
   );
 }

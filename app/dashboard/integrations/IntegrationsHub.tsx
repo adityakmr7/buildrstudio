@@ -3,10 +3,25 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Copy, ArrowsClockwise, Gear, X, CreditCard, Sparkle, BookOpenText, UploadSimple, Trash, CheckCircle } from "@phosphor-icons/react";
+import { Copy, ArrowsClockwise, Gear, X, CreditCard, Sparkle, BookOpenText, UploadSimple, Trash, CheckCircle, Timer } from "@phosphor-icons/react";
 import SiteNav from "../../components/SiteNav";
 import SiteFooter from "../../components/SiteFooter";
+import PaddleCheckoutButton from "../../components/PaddleCheckoutButton";
 import { useToast } from "../../components/Toast";
+import { TRIAL_DAYS, TRIAL_MESSAGE_LIMIT, type TrialStatus } from "../../lib/trial";
+
+export interface UpgradeTier {
+  id: string;
+  name: string; // "standard" | "pro"
+  paddlePriceId: string | null;
+  priceLabel: string | null; // from agentCatalog.ts, e.g. "$19/mo"
+}
+
+export interface TrialOption {
+  slug: string;
+  name: string;
+  tagline: string;
+}
 
 export interface IntegrationRow {
   id: string;
@@ -23,6 +38,10 @@ export interface IntegrationRow {
   // null when there's no active paid subscription (trial-only) — the
   // "Manage subscription" button only makes sense once one exists.
   subscriptionId: string | null;
+  agentId: string;
+  // Set only while on an unconverted no-card free trial.
+  trial: TrialStatus | null;
+  upgradeTiers: UpgradeTier[];
 }
 
 function embedSnippet(row: IntegrationRow) {
@@ -158,6 +177,133 @@ function KnowledgeBaseSection({ apiKeyId }: { apiKeyId: string }) {
   );
 }
 
+function capitalize(s: string) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+// Trial status + upgrade. Upgrading goes through the existing Paddle
+// checkout; the webhook then keeps this same API key (so the embed that's
+// already on the customer's site keeps working) and marks the trial converted.
+function TrialPanel({ row }: { row: IntegrationRow }) {
+  const trial = row.trial;
+  if (!trial) return null;
+  const ended = trial.expired;
+  const tone = ended ? "rgba(240,128,110," : "rgba(228,177,90,";
+  return (
+    <div style={{ padding: 18, borderRadius: 2, background: `${tone}0.07)`, border: `1px solid ${tone}0.3)` }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+        <Timer size={15} weight="bold" style={{ color: ended ? "#f0a08f" : "var(--accent)" }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>
+          {ended
+            ? trial.reason === "time"
+              ? "Your free trial has ended"
+              : "You've used all your trial messages"
+            : "Free trial — no card on file"}
+        </span>
+      </div>
+      <p style={{ fontSize: 12.5, color: "var(--muted)", margin: "0 0 12px" }}>
+        {ended
+          ? "The widget on your site has stopped replying. Upgrade to switch it back on — your embed code and knowledge base stay exactly as they are."
+          : `${trial.messagesLeft} of ${trial.messageLimit} messages left · ${trial.daysLeft} day${trial.daysLeft === 1 ? "" : "s"} left (ends ${new Date(trial.endsAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}). Upgrade any time — same key, same embed code.`}
+      </p>
+      <div style={{ height: 6, borderRadius: 999, background: "var(--surface-alt)", overflow: "hidden", marginBottom: 14 }}>
+        <div
+          style={{
+            height: "100%",
+            width: `${Math.min(100, Math.round((trial.messagesUsed / Math.max(1, trial.messageLimit)) * 100))}%`,
+            background: ended ? "#f0a08f" : "var(--accent)",
+            borderRadius: 999,
+          }}
+        />
+      </div>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        {row.upgradeTiers.map((tier) => (
+          <PaddleCheckoutButton
+            key={tier.id}
+            agentId={row.agentId}
+            tierId={tier.id}
+            paddlePriceId={tier.paddlePriceId}
+            label={`Upgrade to ${capitalize(tier.name)}${tier.priceLabel ? ` — ${tier.priceLabel}` : ""}`}
+            className="dash-btn"
+            style={tier.name === "standard" ? btnStyle("solid") : btnStyle("outline")}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// "Start free trial" — lists live agents the user hasn't tried or bought.
+function StartTrialCard({ options, autoStartSlug }: { options: TrialOption[]; autoStartSlug: string | null }) {
+  const { toast } = useToast();
+  const router = useRouter();
+  const [busySlug, setBusySlug] = useState<string | null>(null);
+
+  const start = async (slug: string) => {
+    setBusySlug(slug);
+    try {
+      const res = await fetch("/api/trials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ agentSlug: slug }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      toast(data.alreadyHadKey ? "You already have this agent — it's below." : "Trial started. Copy the embed code below to go live.");
+      router.replace("/dashboard/integrations");
+      router.refresh();
+    } catch (err) {
+      toast(err instanceof Error && err.message ? err.message : "Couldn't start the trial.", "error");
+    } finally {
+      setBusySlug(null);
+    }
+  };
+
+  // Arriving from an agent page's "Start free trial" button (?trial=<slug>)
+  // after sign-in — start it straight away instead of making them click twice.
+  // Deferred via setTimeout (cleared on cleanup) so StrictMode's double
+  // effect run still only fires one request.
+  useEffect(() => {
+    if (!autoStartSlug) return;
+    const slug = autoStartSlug;
+    // Always ask the server, even if this agent isn't in `options`: it
+    // explains why (already used / another trial active / already owned).
+    const t = setTimeout(() => {
+      start(slug).finally(() => router.replace("/dashboard/integrations"));
+    }, 0);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStartSlug]);
+
+  if (options.length === 0) return null;
+
+  return (
+    <div style={{ padding: 24, borderRadius: 2, background: "var(--surface)", border: "1px solid var(--border)", marginBottom: 16 }}>
+      <h2 style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", margin: "0 0 4px" }}>Start a free trial</h2>
+      <p style={{ fontSize: 13, color: "var(--muted)", margin: "0 0 16px" }}>
+        {TRIAL_DAYS} days, {TRIAL_MESSAGE_LIMIT} messages, no card. You get a real API key and embed code — put it on your
+        site and see how it does with your actual visitors. One trial per agent, one at a time.
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {options.map((o) => (
+          <div
+            key={o.slug}
+            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", padding: 14, borderRadius: 2, background: "var(--bg)", border: "1px solid var(--border)" }}
+          >
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{o.name}</div>
+              <div style={{ fontSize: 12.5, color: "var(--muted)" }}>{o.tagline}</div>
+            </div>
+            <button onClick={() => start(o.slug)} disabled={busySlug !== null} className="dash-btn" style={btnStyle("solid")}>
+              {busySlug === o.slug ? "Starting…" : "Start free trial"}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: IntegrationRow) => void }) {
   const { toast } = useToast();
   const [busy, setBusy] = useState(false);
@@ -249,10 +395,13 @@ function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: In
             background: "var(--surface-alt)",
           }}
         >
-          {row.tierName} tier
+          {row.trial ? "Free trial" : `${row.tierName} tier`}
         </span>
       </div>
 
+      <TrialPanel row={row} />
+
+      {!row.trial && (
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, color: "var(--muted)", marginBottom: 6 }}>
           <span>Messages this month</span>
@@ -264,6 +413,7 @@ function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: In
           <div style={{ height: "100%", width: `${pct}%`, background: "var(--text)", borderRadius: 999 }} />
         </div>
       </div>
+      )}
 
       <div>
         <div style={{ fontSize: 12, fontWeight: 600, color: "var(--muted)", marginBottom: 8 }}>Embed code</div>
@@ -383,10 +533,12 @@ const inputStyle: React.CSSProperties = {
 
 export default function IntegrationsHub({
   rows: initialRows,
+  trialOptions,
   loadError,
   userName,
 }: {
   rows: IntegrationRow[];
+  trialOptions: TrialOption[];
   loadError: boolean;
   userName: string | null;
 }) {
@@ -394,6 +546,14 @@ export default function IntegrationsHub({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [showWelcome, setShowWelcome] = useState(searchParams.get("welcome") === "1");
+  const autoTrialSlug = searchParams.get("trial");
+  // Server data changes after a trial starts (router.refresh()) — keep local
+  // edits (config/regenerate) but pick up newly created rows.
+  const [prevInitial, setPrevInitial] = useState(initialRows);
+  if (prevInitial !== initialRows) {
+    setPrevInitial(initialRows);
+    setRows(initialRows);
+  }
 
   useEffect(() => {
     if (searchParams.get("welcome") === "1") {
@@ -457,7 +617,9 @@ export default function IntegrationsHub({
             </div>
           )}
 
-          {!loadError && rows.length === 0 && (
+          {!loadError && <StartTrialCard options={trialOptions} autoStartSlug={autoTrialSlug} />}
+
+          {!loadError && rows.length === 0 && trialOptions.length === 0 && (
             <div style={{ padding: 32, borderRadius: 2, background: "var(--surface)", border: "1px solid var(--border)", textAlign: "center" }}>
               <p style={{ fontSize: 14.5, color: "var(--muted)", margin: "0 0 16px" }}>
                 You haven&apos;t subscribed to any agents yet.
