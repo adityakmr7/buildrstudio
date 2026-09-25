@@ -104,15 +104,15 @@ function KnowledgeBaseSection({ apiKeyId }: { apiKeyId: string }) {
   };
 
   return (
-    <div style={{ padding: 18, borderRadius: 12, background: "var(--bg)", border: "1px solid var(--border)" }}>
+    <div style={{ padding: 18, borderRadius: 2, background: "var(--bg)", border: "1px solid var(--border)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-        <BookOpenText size={15} style={{ color: "var(--accent)" }} />
+        <BookOpenText size={15} style={{ color: "var(--text)" }} />
         <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>Knowledge base</span>
       </div>
 
       {status && status.chunkCount > 0 ? (
         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--muted)", marginBottom: 12 }}>
-          <CheckCircle size={13} weight="fill" style={{ color: "#16A34A" }} />
+          <CheckCircle size={13} weight="fill" style={{ color: "var(--success)" }} />
           {status.chunkCount} chunks indexed from &ldquo;{status.source}&rdquo;
         </div>
       ) : (
@@ -149,7 +149,7 @@ function KnowledgeBaseSection({ apiKeyId }: { apiKeyId: string }) {
           Save knowledge base
         </button>
         {status && status.chunkCount > 0 && (
-          <button onClick={clear} disabled={busy} className="dash-btn" style={{ ...btnStyle("outline"), color: "#B91C1C" }}>
+          <button onClick={clear} disabled={busy} className="dash-btn" style={{ ...btnStyle("outline"), color: "#f0a08f" }}>
             <Trash size={13} weight="bold" /> Clear
           </button>
         )}
@@ -229,24 +229,24 @@ function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: In
   const pct = Math.min(100, Math.round((row.messageCount / Math.max(1, row.monthlyLimit)) * 100));
 
   return (
-    <div style={{ padding: 24, borderRadius: 16, background: "var(--surface)", border: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: 16 }}>
+    <div style={{ padding: 24, borderRadius: 2, background: "var(--surface)", border: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: 16 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
         <div>
           <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", margin: "0 0 4px" }}>{row.agentName}</h3>
-          <Link href={`/agents/${row.agentSlug}`} style={{ fontSize: 12.5, color: "var(--accent)" }}>
+          <Link href={`/agents/${row.agentSlug}`} style={{ fontSize: 12.5, color: "var(--muted)", textDecoration: "underline", textUnderlineOffset: 3 }}>
             View agent page
           </Link>
         </div>
         <span
           style={{
             fontSize: 11,
-            fontFamily: "monospace",
+            fontFamily: "var(--font-mono)",
             textTransform: "uppercase",
             letterSpacing: "0.06em",
             padding: "4px 10px",
-            borderRadius: 999,
-            color: "var(--accent)",
-            background: "var(--accent-soft)",
+            borderRadius: 2,
+            color: "var(--text)",
+            background: "var(--surface-alt)",
           }}
         >
           {row.tierName} tier
@@ -261,7 +261,7 @@ function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: In
           </span>
         </div>
         <div style={{ height: 6, borderRadius: 999, background: "var(--surface-alt)", overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${pct}%`, background: "var(--accent)", borderRadius: 999 }} />
+          <div style={{ height: "100%", width: `${pct}%`, background: "var(--text)", borderRadius: 999 }} />
         </div>
       </div>
 
@@ -271,14 +271,14 @@ function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: In
           style={{
             margin: 0,
             padding: 14,
-            borderRadius: 10,
+            borderRadius: 8,
             background: "var(--bg)",
             border: "1px solid var(--border)",
             fontSize: 12,
             lineHeight: 1.6,
             color: "var(--text)",
             overflowX: "auto",
-            fontFamily: "monospace",
+            fontFamily: "var(--font-mono)",
           }}
         >
           {embedSnippet(row)}
@@ -309,7 +309,7 @@ function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: In
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(15,23,42,0.35)",
+            background: "rgba(12,11,9,0.72)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -320,7 +320,7 @@ function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: In
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            style={{ background: "var(--surface)", borderRadius: 16, padding: 24, width: "100%", maxWidth: 380, border: "1px solid var(--border)" }}
+            style={{ background: "var(--surface)", borderRadius: 2, padding: 24, width: "100%", maxWidth: 380, border: "1px solid var(--border)" }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
               <h4 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", margin: 0 }}>Widget config</h4>
@@ -359,13 +359,13 @@ function btnStyle(variant: "solid" | "outline"): React.CSSProperties {
     alignItems: "center",
     gap: 7,
     padding: "9px 16px",
-    borderRadius: 9,
+    borderRadius: 8,
     fontSize: 13,
     fontWeight: 600,
     cursor: "pointer",
     border: variant === "solid" ? "none" : "1px solid var(--border)",
     background: variant === "solid" ? "var(--accent)" : "var(--surface)",
-    color: variant === "solid" ? "#fff" : "var(--text)",
+    color: variant === "solid" ? "var(--accent-ink)" : "var(--text)",
   };
 }
 
@@ -412,7 +412,7 @@ export default function IntegrationsHub({
       <SiteNav />
       <section style={{ padding: "48px 24px 80px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <h1 style={{ fontSize: "clamp(26px, 3.5vw, 36px)", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text)", margin: "0 0 8px" }}>
+          <h1 style={{ fontSize: "clamp(26px, 3.5vw, 36px)", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--text)", margin: "0 0 8px" }}>
             {userName ? `${userName.split(" ")[0]}'s agents` : "Your agents"}
           </h1>
           <p style={{ fontSize: 14.5, color: "var(--muted)", margin: "0 0 32px" }}>
@@ -426,13 +426,13 @@ export default function IntegrationsHub({
                 alignItems: "flex-start",
                 gap: 12,
                 padding: 18,
-                borderRadius: 12,
-                background: "var(--accent-soft)",
-                border: "1px solid rgba(37,99,235,0.24)",
+                borderRadius: 2,
+                background: "rgba(125,206,160,0.08)",
+                border: "1px solid rgba(125,206,160,0.28)",
                 marginBottom: 24,
               }}
             >
-              <Sparkle size={18} weight="fill" style={{ color: "var(--accent)", flexShrink: 0, marginTop: 2 }} />
+              <Sparkle size={18} weight="fill" style={{ color: "var(--success)", flexShrink: 0, marginTop: 2 }} />
               <div style={{ flex: 1 }}>
                 <p style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", margin: "0 0 2px" }}>
                   You&apos;re all set!
@@ -452,19 +452,19 @@ export default function IntegrationsHub({
           )}
 
           {loadError && (
-            <div style={{ padding: 20, borderRadius: 12, background: "#FEF2F2", border: "1px solid #FCA5A5", color: "#B91C1C", fontSize: 13.5, marginBottom: 24 }}>
+            <div style={{ padding: 20, borderRadius: 2, background: "rgba(240,128,110,0.08)", border: "1px solid rgba(240,128,110,0.32)", color: "#f0a08f", fontSize: 13.5, marginBottom: 24 }}>
               Couldn&apos;t load your dashboard data right now. Try refreshing the page.
             </div>
           )}
 
           {!loadError && rows.length === 0 && (
-            <div style={{ padding: 32, borderRadius: 16, background: "var(--surface)", border: "1px solid var(--border)", textAlign: "center" }}>
+            <div style={{ padding: 32, borderRadius: 2, background: "var(--surface)", border: "1px solid var(--border)", textAlign: "center" }}>
               <p style={{ fontSize: 14.5, color: "var(--muted)", margin: "0 0 16px" }}>
                 You haven&apos;t subscribed to any agents yet.
               </p>
               <Link
                 href="/agents"
-                style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 22px", borderRadius: 9, background: "var(--accent)", color: "#fff", fontSize: 14, fontWeight: 600 }}
+                style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 22px", borderRadius: 8, background: "var(--accent)", color: "var(--accent-ink)", fontSize: 14, fontWeight: 600 }}
               >
                 Browse the catalog
               </Link>

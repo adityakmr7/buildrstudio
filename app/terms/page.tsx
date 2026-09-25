@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
+import SiteNav from "../components/SiteNav";
+import SiteFooter from "../components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "Terms and Conditions",
@@ -37,10 +39,10 @@ export default function TermsPage() {
 
       <style>{`
         .legal-wrap {
-          max-width: 720px;
+          max-width: 760px;
           margin: 0 auto;
-          padding: 80px 24px 80px;
-          font-family: var(--font-dm-sans, sans-serif);
+          padding: 64px 16px 96px;
+          font-family: var(--font-sans);
           color: var(--text);
         }
         .legal-back {
@@ -51,46 +53,59 @@ export default function TermsPage() {
           color: var(--muted-2);
           text-decoration: none;
           margin-bottom: 40px;
+          border-radius: 2px;
           transition: color .2s;
         }
         .legal-back:hover { color: var(--text); }
         .legal-wrap h1 {
-          font-size: 32px;
-          font-weight: 700;
-          letter-spacing: -0.03em;
+          font-size: clamp(36px, 5vw, 56px);
+          font-weight: 600;
+          line-height: 1.02;
+          letter-spacing: -0.04em;
           color: var(--text);
           margin-bottom: 8px;
         }
         .legal-date {
           font-size: 13px;
           color: var(--muted-2);
-          margin-bottom: 44px;
+          margin-bottom: 40px;
+          font-family: var(--font-mono);
+          font-size: 12px;
+          letter-spacing: 0.04em;
         }
         .legal-wrap h2 {
-          font-size: 18px;
+          font-size: 20px;
           font-weight: 600;
           color: var(--text);
-          margin-top: 36px;
-          margin-bottom: 10px;
+          margin-top: 40px;
+          margin-bottom: 12px;
+          padding-top: 24px;
+          border-top: 1px solid var(--border);
           letter-spacing: -0.02em;
         }
         .legal-wrap p, .legal-wrap li {
-          font-size: 15px;
+          max-width: 68ch;
+          font-size: 16px;
           line-height: 1.75;
           color: var(--muted);
         }
+        .legal-wrap strong { color: var(--text); font-weight: 600; }
         .legal-wrap ul {
-          padding-left: 20px;
-          margin: 10px 0;
+          padding-left: 24px;
+          margin: 12px 0;
+          list-style: disc;
         }
         .legal-wrap li { margin-bottom: 5px; }
         .legal-wrap a {
-          color: var(--accent);
+          color: var(--text);
           text-decoration: underline;
-          text-underline-offset: 3px;
+          text-decoration-color: var(--border-strong);
+          text-underline-offset: 4px;
+          border-radius: 2px;
         }
+        .legal-wrap a:hover { text-decoration-color: var(--text); }
         .legal-footer {
-          margin-top: 60px;
+          margin-top: 64px;
           padding-top: 24px;
           border-top: 1px solid var(--border);
           display: flex;
@@ -106,7 +121,8 @@ export default function TermsPage() {
         .legal-footer a:hover { color: var(--text); }
       `}</style>
 
-      <div className="legal-wrap">
+      <SiteNav />
+      <main className="legal-wrap">
         <Link href="/" className="legal-back">← Back to Buildr Studio</Link>
 
         <h1>Terms and Conditions</h1>
@@ -193,7 +209,8 @@ export default function TermsPage() {
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/">Home</Link>
         </div>
-      </div>
+      </main>
+      <SiteFooter />
     </>
   );
 }

@@ -20,17 +20,17 @@ function StatusChip({ status }: { status: AgentProduct["status"] }) {
         alignItems: "center",
         gap: 6,
         fontSize: 11,
-        fontFamily: "monospace",
+        fontFamily: "var(--font-mono)",
         textTransform: "uppercase",
         letterSpacing: "0.08em",
         padding: "4px 10px",
-        borderRadius: 999,
-        color: live ? "#16A34A" : "var(--muted)",
-        background: live ? "rgba(22,163,74,0.10)" : "var(--surface-alt)",
-        border: live ? "1px solid rgba(22,163,74,0.24)" : "1px solid var(--border)",
+        borderRadius: 2,
+        color: live ? "var(--success)" : "var(--muted)",
+        background: live ? "rgba(125,206,160,0.10)" : "var(--surface-alt)",
+        border: live ? "1px solid rgba(125,206,160,0.28)" : "1px solid var(--border)",
       }}
     >
-      <span style={{ width: 5, height: 5, borderRadius: "50%", background: live ? "#16A34A" : "var(--muted-2)" }} />
+      <span style={{ width: 5, height: 5, borderRadius: "50%", background: live ? "var(--success)" : "var(--muted-2)" }} />
       {live ? "Live" : "Coming soon"}
     </span>
   );
@@ -40,7 +40,7 @@ function DetailHero({ product }: { product: AgentProduct }) {
   const Icon = ICONS[product.icon];
   return (
     <section style={{ padding: "48px 24px 36px" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <Link href="/agents" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--muted)", marginBottom: 24 }}>
           <CaretLeft size={12} weight="bold" /> All agents
         </Link>
@@ -50,12 +50,12 @@ function DetailHero({ product }: { product: AgentProduct }) {
             style={{
               width: 48,
               height: 48,
-              borderRadius: 10,
+              borderRadius: 8,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              background: `${product.accent}1A`,
-              color: product.accent,
+              background: "var(--surface-alt)",
+              color: "var(--text)",
               flexShrink: 0,
             }}
           >
@@ -64,7 +64,7 @@ function DetailHero({ product }: { product: AgentProduct }) {
           <StatusChip status={product.status} />
         </div>
 
-        <h1 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 700, lineHeight: 1.1, letterSpacing: "-0.03em", color: "var(--text)", margin: "0 0 14px", maxWidth: "22ch" }}>
+        <h1 style={{ fontSize: "clamp(36px, 5.5vw, 64px)", fontWeight: 600, lineHeight: 1.02, letterSpacing: "-0.04em", color: "var(--text)", margin: "0 0 14px", maxWidth: "22ch" }}>
           {product.name}
         </h1>
         <p style={{ fontSize: 16, lineHeight: 1.65, color: "var(--muted)", maxWidth: "58ch", margin: "0 0 20px" }}>
@@ -88,7 +88,7 @@ function LiveDemoSection({ product }: { product: AgentProduct }) {
         ) : (
           <div
             style={{
-              borderRadius: 16,
+              borderRadius: 2,
               border: "1px dashed var(--border-strong)",
               background: "var(--surface)",
               padding: "32px 24px",
@@ -114,10 +114,10 @@ function InfoGrid({ product }: { product: AgentProduct }) {
   ];
   return (
     <section style={{ padding: "40px 24px", background: "var(--surface)", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }} className="info-grid">
+      <div style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }} className="info-grid">
         {rows.map((row) => (
           <div key={row.label}>
-            <h3 style={{ fontSize: 12, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--muted-2)", margin: "0 0 8px" }}>
+            <h3 style={{ fontSize: 12, fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--muted-2)", margin: "0 0 8px" }}>
               {row.label}
             </h3>
             <p style={{ fontSize: 14.5, lineHeight: 1.65, color: "var(--text)", margin: 0 }}>{row.value}</p>
@@ -137,13 +137,13 @@ function WhatsIncluded({ product }: { product: AgentProduct }) {
   return (
     <section style={{ padding: "64px 24px" }}>
       <div style={{ maxWidth: 780, margin: "0 auto" }}>
-        <h2 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text)", margin: "0 0 24px" }}>
+        <h2 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--text)", margin: "0 0 24px" }}>
           What&apos;s included
         </h2>
         <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 14 }}>
           {product.whatsIncluded.map((item) => (
             <li key={item} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 14.5, color: "var(--text)" }}>
-              <CheckCircle size={18} weight="fill" style={{ color: product.accent, flexShrink: 0, marginTop: 2 }} />
+              <CheckCircle size={18} weight="fill" style={{ color: "var(--muted)", flexShrink: 0, marginTop: 2 }} />
               {item}
             </li>
           ))}
@@ -162,13 +162,13 @@ function TrustInfo({ product }: { product: AgentProduct }) {
   return (
     <section style={{ padding: "0 24px 64px" }}>
       <div style={{ maxWidth: 780, margin: "0 auto" }}>
-        <h3 style={{ fontSize: 12, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--muted-2)", margin: "0 0 14px" }}>
+        <h3 style={{ fontSize: 12, fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--muted-2)", margin: "0 0 14px" }}>
           Connects to
         </h3>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }} className="trust-info-grid">
           {rows.map((row) => (
-            <div key={row.label} style={{ padding: 18, borderRadius: 12, background: "var(--bg)", border: "1px solid var(--border)" }}>
-              <div style={{ fontSize: 11, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--muted-2)", marginBottom: 6 }}>
+            <div key={row.label} style={{ padding: 18, borderRadius: 2, background: "var(--bg)", border: "1px solid var(--border)" }}>
+              <div style={{ fontSize: 11, fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--muted-2)", marginBottom: 6 }}>
                 {row.label}
               </div>
               <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{row.value}</div>
@@ -202,7 +202,7 @@ function TierCard({
     <div
       style={{
         padding: 26,
-        borderRadius: 16,
+        borderRadius: 2,
         background: "var(--bg)",
         border: "1px solid var(--border)",
         display: "flex",
@@ -211,7 +211,7 @@ function TierCard({
       }}
     >
       <div>
-        <div style={{ fontSize: 12, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.08em", color: product.accent, marginBottom: 8 }}>
+        <div style={{ fontSize: 12, fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--muted)", marginBottom: 8 }}>
           {tier.name}
         </div>
         <div style={{ fontSize: 21, fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>{tier.price}</div>
@@ -220,7 +220,7 @@ function TierCard({
       <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 10 }}>
         {tier.features.map((f) => (
           <li key={f} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--muted)" }}>
-            <CheckCircle size={14} weight="fill" style={{ color: product.accent, flexShrink: 0, marginTop: 3 }} />
+            <CheckCircle size={14} weight="fill" style={{ color: "var(--muted)", flexShrink: 0, marginTop: 3 }} />
             {f}
           </li>
         ))}
@@ -236,11 +236,11 @@ function TierCard({
           style={{
             marginTop: "auto",
             padding: "12px 20px",
-            borderRadius: 9,
+            borderRadius: 8,
             fontSize: 14,
             fontWeight: 600,
-            background: product.accent,
-            color: "#fff",
+            background: "var(--accent)",
+            color: "var(--accent-ink)",
             width: "100%",
           }}
         />
@@ -250,7 +250,7 @@ function TierCard({
           style={{
             marginTop: "auto",
             padding: "12px 20px",
-            borderRadius: 9,
+            borderRadius: 8,
             fontSize: 14,
             fontWeight: 600,
             background: "var(--surface-alt)",
@@ -268,8 +268,8 @@ function TierCard({
 function PricingSection({ product, dbAgent }: { product: AgentProduct; dbAgent: OperationalAgent | null }) {
   return (
     <section id="pricing" style={{ padding: "64px 24px", background: "var(--surface)", borderTop: "1px solid var(--border)" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-        <h2 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text)", margin: "0 0 8px" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        <h2 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--text)", margin: "0 0 8px" }}>
           Pricing
         </h2>
         <p style={{ fontSize: 13.5, color: "var(--muted-2)", margin: "0 0 28px" }}>
@@ -287,7 +287,7 @@ function PricingSection({ product, dbAgent }: { product: AgentProduct; dbAgent: 
         </div>
       </div>
       <style>{`
-        .tier-cta:hover { filter: brightness(1.1); }
+        .tier-cta:hover { background: var(--accent-mid) !important; }
         @media (max-width: 700px) {
           .tier-grid { grid-template-columns: 1fr !important; }
         }
@@ -300,7 +300,7 @@ function FAQSection({ product }: { product: AgentProduct }) {
   return (
     <section style={{ padding: "64px 24px" }}>
       <div style={{ maxWidth: 780, margin: "0 auto" }}>
-        <h2 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text)", margin: "0 0 24px" }}>
+        <h2 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--text)", margin: "0 0 24px" }}>
           FAQ
         </h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>

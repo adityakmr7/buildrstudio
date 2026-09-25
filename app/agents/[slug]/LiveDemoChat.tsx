@@ -55,7 +55,7 @@ export default function LiveDemoChat({ product }: { product: AgentProduct }) {
   return (
     <div
       style={{
-        borderRadius: 16,
+        borderRadius: 2,
         border: "1px solid var(--border)",
         background: "var(--surface)",
         overflow: "hidden",
@@ -67,8 +67,9 @@ export default function LiveDemoChat({ product }: { product: AgentProduct }) {
       <div
         style={{
           padding: "12px 16px",
-          background: product.accent,
-          color: "#fff",
+          background: "var(--surface-alt)",
+          color: "var(--text)",
+          borderBottom: "1px solid var(--border)",
           fontSize: 13,
           fontWeight: 600,
           display: "flex",
@@ -76,7 +77,7 @@ export default function LiveDemoChat({ product }: { product: AgentProduct }) {
           gap: 8,
         }}
       >
-        <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#fff", opacity: 0.8 }} />
+        <span style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--success)" }} />
         Live demo — {product.name}
       </div>
 
@@ -88,13 +89,13 @@ export default function LiveDemoChat({ product }: { product: AgentProduct }) {
               alignSelf: m.role === "user" ? "flex-end" : "flex-start",
               maxWidth: "80%",
               padding: "9px 13px",
-              borderRadius: 12,
+              borderRadius: 2,
               fontSize: 13.5,
               lineHeight: 1.5,
               whiteSpace: "pre-wrap",
               wordBreak: "break-word",
-              background: m.role === "user" ? product.accent : "var(--surface)",
-              color: m.role === "user" ? "#fff" : "var(--text)",
+              background: m.role === "user" ? "var(--text)" : "var(--surface)",
+              color: m.role === "user" ? "var(--bg)" : "var(--text)",
               border: m.role === "user" ? "none" : "1px solid var(--border)",
             }}
           >
@@ -110,7 +111,7 @@ export default function LiveDemoChat({ product }: { product: AgentProduct }) {
               padding: "10px 13px",
               background: "var(--surface)",
               border: "1px solid var(--border)",
-              borderRadius: 12,
+              borderRadius: 2,
             }}
           >
             <span className="demo-typing-dot" />
@@ -119,7 +120,7 @@ export default function LiveDemoChat({ product }: { product: AgentProduct }) {
           </div>
         )}
         {error && (
-          <div style={{ alignSelf: "flex-start", maxWidth: "80%", padding: "9px 13px", borderRadius: 12, fontSize: 13, background: "#FEF2F2", color: "#B91C1C", border: "1px solid #FCA5A5" }}>
+          <div style={{ alignSelf: "flex-start", maxWidth: "80%", padding: "9px 13px", borderRadius: 2, fontSize: 13, background: "rgba(240,128,110,0.08)", color: "#f0a08f", border: "1px solid rgba(240,128,110,0.32)" }}>
             {error}
           </div>
         )}
@@ -134,7 +135,7 @@ export default function LiveDemoChat({ product }: { product: AgentProduct }) {
               disabled={busy}
               style={{
                 padding: "6px 12px",
-                borderRadius: 999,
+                borderRadius: 8,
                 fontSize: 12,
                 fontWeight: 500,
                 cursor: busy ? "default" : "pointer",
@@ -157,7 +158,7 @@ export default function LiveDemoChat({ product }: { product: AgentProduct }) {
             if (e.key === "Enter") send();
           }}
           placeholder="Ask this agent something…"
-          style={{ flex: 1, border: "1px solid var(--border)", borderRadius: 10, padding: "9px 12px", fontSize: 13.5, outline: "none", fontFamily: "var(--font)", color: "var(--text)", background: "var(--bg)" }}
+          style={{ flex: 1, border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontSize: 13.5, outline: "none", fontFamily: "var(--font)", color: "var(--text)", background: "var(--bg)" }}
         />
         <button
           onClick={() => send()}
@@ -165,10 +166,10 @@ export default function LiveDemoChat({ product }: { product: AgentProduct }) {
           style={{
             width: 38,
             height: 38,
-            borderRadius: 10,
+            borderRadius: 8,
             border: "none",
-            background: product.accent,
-            color: "#fff",
+            background: "var(--accent)",
+            color: "var(--accent-ink)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
