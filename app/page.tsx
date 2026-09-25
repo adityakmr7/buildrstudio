@@ -1,26 +1,38 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Suspense } from "react";
-import MarketplaceLandingPage from "./components/MarketplaceLandingPage";
+import SiteNav from "./components/SiteNav";
+import SiteFooter from "./components/SiteFooter";
+import Hero from "./components/home/Hero";
+import JobsMarquee from "./components/home/JobsMarquee";
+import JobsSection from "./components/home/JobsSection";
+import EmbedSection from "./components/home/EmbedSection";
+import BuyVsBuild from "./components/home/BuyVsBuild";
+import PricingStrip from "./components/home/PricingStrip";
+import FaqSection, { FAQS } from "./components/home/FaqSection";
+import CloseSection from "./components/home/CloseSection";
 import { siteConfig } from "./lib/siteConfig";
 
+const TITLE = "BuildrStudio — AI employees for your business";
+const DESCRIPTION =
+  "Skip the build. Keep the control. Deploy a pre-built AI agent for customer support or internal knowledge in minutes. One script tag, no AI team required.";
+
 export const metadata: Metadata = {
-  title: `Buildr Studio — ${siteConfig.tagline}`,
-  description: siteConfig.description,
+  title: { absolute: TITLE },
+  description: DESCRIPTION,
   alternates: {
     canonical: siteConfig.url,
   },
   openGraph: {
-    title: `Buildr Studio — ${siteConfig.tagline}`,
-    description: siteConfig.description,
+    title: TITLE,
+    description: DESCRIPTION,
     type: "website",
     url: siteConfig.url,
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: `Buildr Studio — ${siteConfig.tagline}`,
-    description: siteConfig.description,
+    title: TITLE,
+    description: DESCRIPTION,
   },
   keywords: [
     "AI employees for small business",
@@ -40,34 +52,22 @@ const jsonLd = {
       "@type": "WebSite",
       "@id": "https://buildrstudio.in/#website",
       url: siteConfig.url,
-      name: "Buildr Studio",
-      description: siteConfig.description,
+      name: "BuildrStudio",
+      description: DESCRIPTION,
       publisher: {
         "@type": "Organization",
-        name: "Buildr Studio",
+        name: "BuildrStudio",
         url: siteConfig.url,
+        email: siteConfig.contact.email,
       },
     },
     {
       "@type": "FAQPage",
-      mainEntity: [
-        {
-          "@type": "Question",
-          name: "Do I need a developer to install an agent?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "No. After subscribing, your dashboard gives you a single script tag to paste into any website — no code required.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "Can I try an agent before paying?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "Yes — every agent works on a small trial message quota as soon as you generate an API key.",
-          },
-        },
-      ],
+      mainEntity: FAQS.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
     },
   ],
 };
@@ -80,9 +80,18 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Suspense>
-        <MarketplaceLandingPage />
-      </Suspense>
+      <SiteNav />
+      <main>
+        <Hero />
+        <JobsMarquee />
+        <JobsSection />
+        <EmbedSection />
+        <BuyVsBuild />
+        <PricingStrip />
+        <FaqSection />
+        <CloseSection />
+      </main>
+      <SiteFooter />
     </>
   );
 }

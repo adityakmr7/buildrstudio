@@ -23,13 +23,13 @@ export default function BusinessTypeSelector({
               onClick={() => onChange(active ? null : type)}
               style={{
                 padding: "7px 14px",
-                borderRadius: 999,
+                borderRadius: 8,
                 fontSize: 12.5,
                 fontWeight: 600,
                 cursor: "pointer",
-                border: active ? "1px solid var(--accent)" : "1px solid var(--border)",
-                background: active ? "var(--accent-soft)" : "var(--surface)",
-                color: active ? "var(--accent)" : "var(--muted)",
+                border: active ? "1px solid var(--text)" : "1px solid var(--border)",
+                background: active ? "var(--surface-alt)" : "transparent",
+                color: active ? "var(--text)" : "var(--muted)",
               }}
             >
               {type}

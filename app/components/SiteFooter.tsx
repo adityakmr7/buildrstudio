@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Wordmark from "./Wordmark";
 
 const FOOTER_LINKS = [
   { label: "Agents", href: "/agents" },
@@ -9,41 +10,27 @@ const FOOTER_LINKS = [
 
 export default function SiteFooter() {
   return (
-    <footer style={{ padding: "32px 0", background: "var(--surface)", borderTop: "1px solid var(--border)" }}>
-      <div
-        style={{
-          maxWidth: 1280,
-          margin: "0 auto",
-          padding: "0 24px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          flexWrap: "wrap",
-          gap: 16,
-        }}
-      >
-        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>
-          Buildr<span style={{ color: "var(--accent)" }}>Studio</span>
-        </span>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
-          {FOOTER_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="site-footer-link"
-              style={{ fontSize: 12, color: "var(--muted-2)" }}
-            >
-              {link.label}
-            </Link>
-          ))}
+    <footer className="border-t border-line bg-ink">
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-2">
+          <Wordmark />
+          <p className="text-[13px] text-faint">AI employees for your business. A BuildrStudio product.</p>
         </div>
 
-        <p style={{ fontSize: 12, color: "var(--muted-2)", margin: 0 }}>
-          © {new Date().getFullYear()} Buildr Studio
-        </p>
+        <nav aria-label="Footer">
+          <ul className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            {FOOTER_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="link-quiet rounded-[2px] text-[13px]">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <p className="text-[13px] text-faint">© {new Date().getFullYear()} BuildrStudio</p>
       </div>
-      <style>{`.site-footer-link:hover { color: var(--text) !important; }`}</style>
     </footer>
   );
 }

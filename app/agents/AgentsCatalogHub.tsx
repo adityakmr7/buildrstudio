@@ -30,17 +30,17 @@ function StatusChip({ status }: { status: AgentProduct["status"] }) {
         alignItems: "center",
         gap: 6,
         fontSize: 11,
-        fontFamily: "monospace",
+        fontFamily: "var(--font-mono)",
         textTransform: "uppercase",
         letterSpacing: "0.08em",
         padding: "4px 10px",
-        borderRadius: 999,
-        color: live ? "#16A34A" : "var(--muted)",
-        background: live ? "rgba(22,163,74,0.10)" : "var(--surface-alt)",
-        border: live ? "1px solid rgba(22,163,74,0.24)" : "1px solid var(--border)",
+        borderRadius: 2,
+        color: live ? "var(--success)" : "var(--muted)",
+        background: live ? "rgba(125,206,160,0.10)" : "var(--surface-alt)",
+        border: live ? "1px solid rgba(125,206,160,0.28)" : "1px solid var(--border)",
       }}
     >
-      <span style={{ width: 5, height: 5, borderRadius: "50%", background: live ? "#16A34A" : "var(--muted-2)" }} />
+      <span style={{ width: 5, height: 5, borderRadius: "50%", background: live ? "var(--success)" : "var(--muted-2)" }} />
       {live ? "Live" : "Coming soon"}
     </span>
   );
@@ -56,7 +56,7 @@ function ProductCard({ product }: { product: AgentProduct }) {
         flexDirection: "column",
         gap: 16,
         padding: 26,
-        borderRadius: 16,
+        borderRadius: 2,
         background: "var(--surface)",
         border: "1px solid var(--border)",
       }}
@@ -67,12 +67,12 @@ function ProductCard({ product }: { product: AgentProduct }) {
             style={{
               width: 44,
               height: 44,
-              borderRadius: 10,
+              borderRadius: 8,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              background: `${product.accent}1A`,
-              color: product.accent,
+              background: "var(--surface-alt)",
+              color: "var(--text)",
               flexShrink: 0,
             }}
           >
@@ -82,7 +82,7 @@ function ProductCard({ product }: { product: AgentProduct }) {
         </div>
 
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: product.accent, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--muted-2)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>
             {product.category}
           </div>
           <h3 style={{ fontSize: 17, fontWeight: 600, color: "var(--text)", margin: "0 0 8px" }}>{product.name}</h3>
@@ -97,7 +97,7 @@ function ProductCard({ product }: { product: AgentProduct }) {
 
       {product.status === "live" ? (
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <Link href={`/agents/${product.slug}#demo`} className="agent-card-arrow" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, fontWeight: 600, color: product.accent }}>
+          <Link href={`/agents/${product.slug}#demo`} className="agent-card-arrow" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, fontWeight: 600, color: "var(--text)" }}>
             Try live <CaretRight size={11} weight="bold" />
           </Link>
           <Link href={`/agents/${product.slug}#pricing`} style={{ fontSize: 12, fontWeight: 600, color: "var(--muted-2)" }}>
@@ -105,11 +105,11 @@ function ProductCard({ product }: { product: AgentProduct }) {
           </Link>
         </div>
       ) : (
-        <Link href={`/agents/${product.slug}`} className="agent-card-arrow" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, fontWeight: 600, color: product.accent }}>
+        <Link href={`/agents/${product.slug}`} className="agent-card-arrow" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, fontWeight: 600, color: "var(--text)" }}>
           View details <CaretRight size={11} weight="bold" />
         </Link>
       )}
-      <style>{`.agent-card:hover { border-color: var(--border-strong) !important; box-shadow: 0 8px 24px rgba(15,23,42,0.06); }`}</style>
+      <style>{`.agent-card:hover { border-color: var(--border-strong) !important; } .agent-card a { border-radius: 2px; } .agent-card a:hover { color: var(--text); }`}</style>
     </div>
   );
 }
@@ -117,13 +117,13 @@ function ProductCard({ product }: { product: AgentProduct }) {
 function AgentsHero({ query, setQuery }: { query: string; setQuery: (v: string) => void }) {
   return (
     <section style={{ padding: "56px 24px 36px" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <h1
           style={{
-            fontSize: "clamp(30px, 4.5vw, 48px)",
-            fontWeight: 700,
-            lineHeight: 1.1,
-            letterSpacing: "-0.03em",
+            fontSize: "clamp(40px, 6vw, 72px)",
+            fontWeight: 600,
+            lineHeight: 1,
+            letterSpacing: "-0.04em",
             color: "var(--text)",
             margin: "0 0 14px",
           }}
@@ -132,7 +132,7 @@ function AgentsHero({ query, setQuery }: { query: string; setQuery: (v: string) 
         </h1>
         <p style={{ fontSize: 15, lineHeight: 1.65, color: "var(--muted)", maxWidth: "56ch", margin: "0 0 28px" }}>
           Each one embeds on your site with a single script tag. Need something that isn&apos;t here yet?{" "}
-          <a href="mailto:hello@buildrstudio.in" style={{ color: "var(--accent)", textDecoration: "underline" }}>
+          <a href="mailto:hello@buildrstudio.in" style={{ color: "var(--text)", textDecoration: "underline", textUnderlineOffset: 4 }}>
             Tell us what you need.
           </a>
         </p>
@@ -144,7 +144,7 @@ function AgentsHero({ query, setQuery }: { query: string; setQuery: (v: string) 
             gap: 10,
             maxWidth: 420,
             padding: "10px 16px",
-            borderRadius: 12,
+            borderRadius: 2,
             background: "var(--surface)",
             border: "1px solid var(--border)",
           }}
@@ -202,13 +202,13 @@ export default function AgentsCatalogHub() {
       <AgentsHero query={query} setQuery={setQuery} />
 
       <section style={{ padding: "0 24px 20px" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <BusinessTypeSelector value={businessType} onChange={setBusinessType} />
         </div>
       </section>
 
       <section style={{ padding: "0 24px 16px" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", gap: 8, flexWrap: "wrap" }}>
           {CATEGORIES.map((c) => {
             const active = category === c;
             return (
@@ -217,13 +217,13 @@ export default function AgentsCatalogHub() {
                 onClick={() => setCategory(c)}
                 style={{
                   padding: "8px 16px",
-                  borderRadius: 999,
+                  borderRadius: 8,
                   fontSize: 13,
                   fontWeight: 600,
                   cursor: "pointer",
-                  border: active ? "1px solid var(--accent)" : "1px solid var(--border)",
-                  background: active ? "var(--accent-soft)" : "var(--surface)",
-                  color: active ? "var(--accent)" : "var(--muted)",
+                  border: active ? "1px solid var(--text)" : "1px solid var(--border)",
+                  background: active ? "var(--surface-alt)" : "transparent",
+                  color: active ? "var(--text)" : "var(--muted)",
                 }}
               >
                 {c}
@@ -235,7 +235,7 @@ export default function AgentsCatalogHub() {
 
       <section style={{ padding: "24px 24px 96px" }}>
         <div
-          style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}
+          style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}
           className="catalog-grid"
         >
           {filtered.map((product) => (
@@ -250,14 +250,14 @@ export default function AgentsCatalogHub() {
             </p>
             <a
               href="mailto:hello@buildrstudio.in"
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 22px", borderRadius: 9, background: "var(--accent)", color: "#fff", fontSize: 14, fontWeight: 600 }}
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 22px", borderRadius: 8, background: "var(--accent)", color: "var(--accent-ink)", fontSize: 14, fontWeight: 600 }}
             >
               Tell us what you need
             </a>
           </div>
         )}
         {filtered.length === 0 && !activeOutcome && (
-          <div style={{ maxWidth: 1280, margin: "40px auto 0", textAlign: "center", color: "var(--muted)", fontSize: 14 }}>
+          <div style={{ maxWidth: 1200, margin: "40px auto 0", textAlign: "center", color: "var(--muted)", fontSize: 14 }}>
             No agents match that search — try a different term or category.
           </div>
         )}
