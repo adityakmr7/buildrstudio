@@ -11,7 +11,8 @@
     "test:leads": "tsx scripts/test-leads.ts",
     "zip:wordpress": "node scripts/zip-wordpress-plugin.mjs",
     "check:wordpress-zip": "node scripts/zip-wordpress-plugin.mjs --check",
-    "test:razorpay": "tsx scripts/test-razorpay-signature.ts"
+    "test:razorpay": "tsx scripts/test-razorpay-signature.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@auth/core": "^0.34.3",
