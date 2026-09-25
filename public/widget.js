@@ -4,8 +4,10 @@
  *   <script src="https://buildrstudio.in/widget.js"
  *           data-agent-id="support-agent-starter"
  *           data-key="pk_live_xxxxxxxx"></script>
- * Optional overrides via window.BuildrAgentConfig = { greeting, color, position, apiUrl }
- * set *before* this script tag. Renders in a Shadow DOM so host page CSS
+ * Optional overrides via window.BuildrAgentConfig = { greeting, color, position, apiUrl, leadsUrl }
+ * set *before* this script tag. When the agent can't answer (or the visitor
+ * asks for a person), the widget shows a small lead form that posts to
+ * /api/v1/leads; there's also a "Talk to a person" link in the header. Renders in a Shadow DOM so host page CSS
  * never leaks in (and this widget's CSS never leaks out).
  */
 (function () {
@@ -29,6 +31,8 @@
     position: userConfig.position || "bottom-right", // "bottom-right" | "bottom-left"
     apiUrl: userConfig.apiUrl || apiUrlAttr || "https://buildrstudio.in/api/v1/chat",
   };
+  config.leadsUrl = userConfig.leadsUrl || config.apiUrl.replace(/\/chat\/?$/, "/leads");
+  var LEAD_KEY = "buildr_agent_lead_" + agentId;
 
   var STORAGE_KEY = "buildr_agent_session_" + agentId;
   var sessionId = null;
@@ -64,6 +68,18 @@
       "display:flex;align-items:center;justify-content:space-between;flex-shrink:0}" +
     ".head button{background:none;border:none;color:#fff;cursor:pointer;padding:4px;opacity:.85}" +
     ".head button:hover{opacity:1}" +
+    ".head .human{font-size:12px;font-weight:500;text-decoration:underline;text-underline-offset:2px;margin-right:6px}" +
+    ".lead{align-self:stretch;background:#fff;border:1px solid #eaeaea;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:7px}" +
+    ".lead p{margin:0 0 2px;font-size:13px;color:#1a1a1a;line-height:1.45}" +
+    ".lead input,.lead textarea{width:100%;border:1px solid #ddd;border-radius:8px;padding:8px 10px;font-size:13px;outline:none;resize:vertical;color:#1a1a1a;background:#fff}" +
+    ".lead input:focus,.lead textarea:focus{border-color:" + config.color + "}" +
+    ".lead .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}" +
+    ".lead .row{display:flex;gap:8px;align-items:center}" +
+    ".lead button{background:" + config.color + ";color:#fff;border:none;border-radius:8px;padding:9px 12px;font-size:13px;font-weight:600;cursor:pointer}" +
+    ".lead button.ghost{background:none;color:#666;font-weight:500;padding:9px 4px}" +
+    ".lead button:disabled{opacity:.6;cursor:default}" +
+    ".lead .err{color:#B91C1C;font-size:12px}" +
+    ".lead a.wa{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#25D366;color:#fff;text-decoration:none;border-radius:8px;padding:9px 12px;font-size:13px;font-weight:600}" +
     ".msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#F7F8FA}" +
     ".msg{max-width:80%;padding:9px 13px;border-radius:12px;font-size:13.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word}" +
     ".msg.user{align-self:flex-end;background:" + config.color + ";color:#fff;border-bottom-right-radius:3px}" +
@@ -88,7 +104,7 @@
       '<svg viewBox="0 0 24 24"><path d="M4 4h16v12H7l-3 3V4z"/></svg>' +
     "</button>" +
     '<div class="panel">' +
-      '<div class="head"><span>Chat with us</span><button aria-label="Close chat">&#10005;</button></div>' +
+      '<div class="head"><span>Chat with us</span><span><button class="human" type="button">Talk to a person</button><button class="close" aria-label="Close chat">&#10005;</button></span></div>' +
       '<div class="msgs"></div>' +
       '<div class="inputRow">' +
         '<input type="text" placeholder="Type a message…" />' +
@@ -99,7 +115,8 @@
 
   var bubble = root.querySelector(".bubble");
   var panel = root.querySelector(".panel");
-  var closeBtn = root.querySelector(".head button");
+  var closeBtn = root.querySelector(".head .close");
+  var humanBtn = root.querySelector(".head .human");
   var msgsEl = root.querySelector(".msgs");
   var input = root.querySelector(".inputRow input");
   var sendBtn = root.querySelector(".inputRow button");
@@ -134,6 +151,120 @@
 
   bubble.addEventListener("click", togglePanel);
   closeBtn.addEventListener("click", togglePanel);
+
+  // ── Lead form (handoff to a person) ─────────────────────────────────────
+  var leadFormOpen = false;
+
+  function leadAlreadySent() {
+    try {
+      return localStorage.getItem(LEAD_KEY) === "1";
+    } catch {
+      return false;
+    }
+  }
+
+  function el(tag, attrs, text) {
+    var node = document.createElement(tag);
+    for (var k in attrs) if (Object.prototype.hasOwnProperty.call(attrs, k)) node.setAttribute(k, attrs[k]);
+    if (text) node.textContent = text;
+    return node;
+  }
+
+  function showLeadForm(trigger) {
+    if (leadFormOpen) return;
+    leadFormOpen = true;
+    var form = el("form", { class: "lead", novalidate: "" });
+    form.appendChild(
+      el(
+        "p",
+        {},
+        trigger === "manual"
+          ? "Leave your details and someone from the team will get back to you."
+          : "Want someone from the team to get back to you? Leave your details.",
+      ),
+    );
+    var name = el("input", { type: "text", name: "name", placeholder: "Your name", autocomplete: "name", maxlength: "120", required: "" });
+    var email = el("input", { type: "email", name: "email", placeholder: "Email", autocomplete: "email", maxlength: "200", required: "" });
+    var phone = el("input", { type: "tel", name: "phone", placeholder: "Phone (optional)", autocomplete: "tel", maxlength: "30" });
+    var message = el("textarea", { name: "message", rows: "2", placeholder: "Anything we should know? (optional)", maxlength: "2000" });
+    var hp = el("input", { type: "text", name: "website", class: "hp", tabindex: "-1", autocomplete: "off", "aria-hidden": "true" });
+    var err = el("div", { class: "err", role: "alert" });
+    var row = el("div", { class: "row" });
+    var submit = el("button", { type: "submit" }, "Send");
+    var cancel = el("button", { type: "button", class: "ghost" }, "No thanks");
+    row.appendChild(submit);
+    row.appendChild(cancel);
+    [name, email, phone, message, hp, err, row].forEach(function (n) {
+      form.appendChild(n);
+    });
+    msgsEl.appendChild(form);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+    name.focus();
+
+    cancel.addEventListener("click", function () {
+      form.remove();
+      leadFormOpen = false;
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      err.textContent = "";
+      if (!name.value.trim()) return (err.textContent = "Please add your name.");
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim())) return (err.textContent = "Please add a valid email.");
+      submit.disabled = true;
+      fetch(config.leadsUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + apiKey },
+        body: JSON.stringify({
+          agent_id: agentId,
+          session_id: sessionId,
+          name: name.value,
+          email: email.value,
+          phone: phone.value,
+          message: message.value,
+          website: hp.value,
+          trigger: trigger,
+          page_url: location.href.slice(0, 500),
+        }),
+      })
+        .then(function (res) {
+          return res.json().then(function (data) {
+            return { ok: res.ok, data: data };
+          });
+        })
+        .then(function (result) {
+          if (!result.ok) {
+            err.textContent = (result.data && result.data.error) || "Couldn't send. Please try again.";
+            submit.disabled = false;
+            return;
+          }
+          try {
+            localStorage.setItem(LEAD_KEY, "1");
+          } catch {
+            /* ignore */
+          }
+          var done = el("div", { class: "lead" });
+          done.appendChild(el("p", {}, "Thanks, " + name.value.trim() + "! Someone will get back to you at " + email.value.trim() + "."));
+          var wa = result.data && result.data.whatsapp_url;
+          if (typeof wa === "string" && wa.indexOf("https://wa.me/") === 0) {
+            var link = el("a", { class: "wa", href: wa, target: "_blank", rel: "noopener noreferrer" }, "Chat on WhatsApp now");
+            done.appendChild(link);
+          }
+          form.replaceWith(done);
+          leadFormOpen = false;
+          msgsEl.scrollTop = msgsEl.scrollHeight;
+        })
+        .catch(function () {
+          err.textContent = "Couldn't send. Please try again.";
+          submit.disabled = false;
+        });
+    });
+  }
+
+  humanBtn.addEventListener("click", function () {
+    if (!panel.classList.contains("open")) togglePanel();
+    showLeadForm("manual");
+  });
 
   function send() {
     var text = input.value.trim();
@@ -171,6 +302,11 @@
           }
         }
         addMessage("assistant", result.data.reply || "…");
+        // The API flags replies where the agent couldn't help or the visitor
+        // asked for a person — offer the lead form once (unless already sent).
+        if (result.data.handoff && !leadAlreadySent()) {
+          showLeadForm(result.data.handoff.reason === "asked_human" ? "asked_human" : "no_answer");
+        }
       })
       .catch(function () {
         typingEl.remove();

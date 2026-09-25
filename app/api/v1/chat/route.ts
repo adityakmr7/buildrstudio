@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "../../../lib/db";
 import { generateReply } from "../../../lib/gemini";
 import { rateLimit } from "../../../lib/rateLimit";
-import { retrieveRelevantChunks } from "../../../lib/knowledge";
+import { retrieveContext } from "../../../lib/knowledge";
+import { HANDOFF_INSTRUCTION, decideHandoff, extractHandoffToken } from "../../../lib/handoff";
 import { computeTrialStatus } from "../../../lib/trial";
 
 export const runtime = "nodejs";
@@ -163,18 +164,28 @@ export async function POST(req: NextRequest) {
     // ── Retrieval-augmented context, if this customer has a knowledge base ──
     // Empty for anyone who hasn't uploaded one yet — agent just answers
     // generically in that case, same as before this existed.
-    const relevantChunks = await retrieveRelevantChunks(apiKey.id, message);
-    const systemPrompt = relevantChunks.length
-      ? `${agent.systemPrompt}\n\nUse the following context from the business's knowledge base to answer, where relevant:\n\n${relevantChunks.join("\n\n---\n\n")}`
+    const context = await retrieveContext(apiKey.id, message);
+    const basePrompt = context.chunks.length
+      ? `${agent.systemPrompt}\n\nUse the following context from the business's knowledge base to answer, where relevant:\n\n${context.chunks.join("\n\n---\n\n")}`
       : agent.systemPrompt;
+    // The handoff instruction lets the model tell us when it can't answer,
+    // so the widget can offer the lead form (see app/lib/handoff.ts).
+    const systemPrompt = basePrompt + HANDOFF_INSTRUCTION;
 
-    const { reply, totalTokens } = await generateReply({
+    const { reply: rawReply, totalTokens } = await generateReply({
       systemPrompt,
       model: agent.model,
       maxTokens: agent.maxTokens,
       temperature: agent.temperature,
       history: history.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
       message,
+    });
+    const { reply, flagged: modelFlagged } = extractHandoffToken(rawReply);
+    const handoff = decideHandoff({
+      message,
+      modelFlagged,
+      hasKnowledge: context.hasKnowledge,
+      topScore: context.topScore,
     });
 
     // ── Persist messages + usage ───────────────────────────────────────
@@ -202,7 +213,8 @@ export async function POST(req: NextRequest) {
         : []),
     ]);
 
-    return json({ reply, session_id: chatSession.id });
+    // `handoff` is additive — older widget builds simply ignore it.
+    return json({ reply, session_id: chatSession.id, handoff: handoff ? { reason: handoff } : null });
   } catch (err) {
     console.error("[api/v1/chat] error:", err);
     return json({ error: "Something went wrong. Please try again." }, { status: 500 });

@@ -275,6 +275,21 @@ chunks per page, embeds with `batchEmbedContents`, and replaces only that `Knowl
 (`DocumentChunk.sourceId`). Pasted text is `sourceId = null` and is still replaced as a whole on save.
 All sources share `MAX_CHUNKS_PER_KEY`. Runs synchronously in the request (`maxDuration = 60`).
 
+### Lead capture + handoff
+
+`app/lib/handoff.ts` decides when the chat API returns `handoff: { reason }`: the visitor asked for a
+person / callback / pricing (regex), the model ended its reply with `[[HANDOFF]]` (instruction
+appended to every system prompt, token stripped before returning), or the install has knowledge
+but the best chunk scored under `LOW_CONFIDENCE_SCORE`. `public/widget.js` then shows a lead form
+(also reachable via "Talk to a person" in the header) that posts to `POST /api/v1/leads`
+(CORS-open, key-authenticated, honeypot + per-IP/per-key rate limits). Leads are stored in `Lead`
+(tied to ApiKey/Agent/User and the ChatSession). `app/lib/leads.ts#notifyLead` runs in `after()`:
+email via Resend only when `RESEND_API_KEY` + `LEADS_FROM_EMAIL` are set, and a per-install webhook
+(`ApiKey.leadWebhookUrl`, https only, sent via `safePost` for SSRF safety, signed
+`X-BuildrStudio-Signature: sha256=HMAC(secret, "<timestamp>.<body>")`). WhatsApp is a wa.me
+click-to-chat link returned to the visitor when the owner set `ApiKey.whatsappNumber`. Dashboard:
+`/dashboard/leads` + CSV export (`/api/leads/export`), settings modal "Lead handoff".
+
 ### Knowledge base / retrieval-augmented generation
 
 **This is what makes an agent actually useful, not just a demo** — without it, every subscriber to

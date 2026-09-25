@@ -33,6 +33,7 @@ model User {
   subscriptions AgentSubscription[]
   usage         Usage[]
   trials        Trial[]
+  leads         Lead[]
 }
 
 /// One row per catalog product (see app/lib/agentCatalog.ts). Not user-owned —
@@ -57,6 +58,7 @@ model Agent {
   messages      Message[]
   usage         Usage[]
   trials        Trial[]
+  leads         Lead[]
 }
 
 /// Standard / Pro packaging per agent. `paddlePriceId` is null until real
@@ -95,9 +97,17 @@ model ApiKey {
   color    String @default("#2563EB")
   position String @default("bottom-right") // "bottom-right" | "bottom-left"
 
+  // Lead handoff (see app/lib/leads.ts). All optional — with none set, leads
+  // still land in the dashboard (and by email if RESEND_API_KEY is set).
+  leadEmailEnabled  Boolean @default(true)
+  leadWebhookUrl    String?
+  leadWebhookSecret String? // HMAC-SHA256 signing secret for leadWebhookUrl
+  whatsappNumber    String? // digits incl. country code, e.g. 919876543210
+
   chatSessions     ChatSession[]
   documentChunks   DocumentChunk[]
   knowledgeSources KnowledgeSource[]
+  leads            Lead[]
   trial            Trial?
 
   @@index([userId, agentId])
@@ -190,6 +200,7 @@ model ChatSession {
   apiKeyId  String
   apiKey    ApiKey    @relation(fields: [apiKeyId], references: [id])
   messages  Message[]
+  leads     Lead[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -239,4 +250,33 @@ model AgentSubscription {
   updatedAt            DateTime  @updatedAt
 
   @@index([userId, agentId])
+}
+
+/// A visitor who left their details in the widget's lead form — either
+/// because the agent couldn't answer / they asked for a person (the chat API
+/// returns a `handoff` signal) or via the widget's "Talk to a person" link.
+/// Owned by the install (ApiKey) and its owner (User); linked to the
+/// conversation it came from when there is one.
+model Lead {
+  id            String       @id @default(cuid())
+  apiKeyId      String
+  apiKey        ApiKey       @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  agentId       String
+  agent         Agent        @relation(fields: [agentId], references: [id])
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  chatSessionId String?
+  chatSession   ChatSession? @relation(fields: [chatSessionId], references: [id], onDelete: SetNull)
+  name          String
+  email         String
+  phone         String?
+  message       String?      @db.Text
+  trigger       String // "no_answer" | "asked_human" | "manual"
+  pageUrl       String?
+  emailStatus   String? // "sent" | "skipped" | "failed"
+  webhookStatus String? // "sent" | "skipped" | "failed"
+  createdAt     DateTime     @default(now())
+
+  @@index([apiKeyId, createdAt])
+  @@index([userId, createdAt])
 }

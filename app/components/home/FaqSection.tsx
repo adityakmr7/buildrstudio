@@ -11,6 +11,7 @@ import { TRIAL_DAYS, TRIAL_MESSAGE_LIMIT } from "../../lib/trial";
 //     public/widget.js (also editable in the dashboard's Widget config)
 //   - stacks: plain <script> tag appended to <body>, Shadow DOM isolated
 //   - free trial: app/lib/trial.ts limits, enforced in /api/v1/chat
+//   - leads: app/lib/leads.ts (dashboard, optional email via Resend, webhook)
 export const FAQS: { q: string; a: string }[] = [
   {
     q: "Can I try it before paying?",
@@ -18,7 +19,7 @@ export const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Does it post or send anything for me?",
-    a: "No. The live agents answer questions inside the chat widget on your own site. They don't post to social media, send email, or publish anything on your behalf.",
+    a: "No. The live agents answer questions inside the chat widget on your own site. They don't post to social media, email your customers, or publish anything on your behalf. The one thing they send is to you: when a visitor leaves their details for a callback, you get the lead in your dashboard, and optionally at your own webhook.",
   },
   {
     q: "Where does my knowledge live?",
