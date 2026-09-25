@@ -263,6 +263,18 @@ route enforces the trial window + message count when there's no active subscript
 the Paddle webhook reuses the trial key (its existing "reuse a key for user+agent" behaviour) and
 calls `markTrialConverted()`, so the customer's embed keeps working after upgrading.
 
+### Website knowledge sources ("Train from a website URL")
+
+`app/lib/crawler.ts` crawls a start URL (BFS over same-site links) or a sitemap.xml (one level of
+sitemap index): max 50 pages, 8s per page, ~35s total budget, 4 concurrent fetches, robots.txt
+honoured (`BuildrStudioBot` group, else `*`), nav/header/footer/script/style stripped with
+`node-html-parser`, content-hash dedupe. All network access goes through `app/lib/safeFetch.ts`
+(SSRF guard: http/https + ports 80/443 only, private/loopback/link-local/CGNAT/metadata IPs refused
+at *connect time* via a custom DNS lookup, redirects re-validated). `app/lib/websiteKnowledge.ts`
+chunks per page, embeds with `batchEmbedContents`, and replaces only that `KnowledgeSource`'s chunks
+(`DocumentChunk.sourceId`). Pasted text is `sourceId = null` and is still replaced as a whole on save.
+All sources share `MAX_CHUNKS_PER_KEY`. Runs synchronously in the request (`maxDuration = 60`).
+
 ### Knowledge base / retrieval-augmented generation
 
 **This is what makes an agent actually useful, not just a demo** — without it, every subscriber to
@@ -274,9 +286,9 @@ that gap, deliberately kept simple for indie/small-business scale rather than en
 - **One knowledge base per `ApiKey`** (one install = one knowledge base), not a multi-document CMS.
   Uploading replaces the previous one entirely (`DocumentChunk.deleteMany` then re-create in a
   `$transaction`) — there's no per-document add/remove.
-- **Plain text only.** Paste text directly, or pick a `.txt`/`.md` file — the browser reads it with
+- **Plain text + websites.** Paste text directly, or pick a `.txt`/`.md` file — the browser reads it with
   `file.text()` client-side and appends it into the same textarea; there's no server-side file
-  upload endpoint, no PDF parsing, no URL scraping. Deliberately deferred, not forgotten — see the
+  upload endpoint and no PDF parsing. Websites are crawled separately (see above). Deliberately deferred, not forgotten — see the
   plan doc if reviving this decision.
 - **Chunking is naive**: fixed-size character windows (800 chars, 100 overlap) in `chunkText()` —
   no sentence-aware or semantic chunking. Fine at this scale; revisit only if quality actually

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Copy, ArrowsClockwise, Gear, X, CreditCard, Sparkle, BookOpenText, UploadSimple, Trash, CheckCircle, Timer } from "@phosphor-icons/react";
+import { Copy, ArrowsClockwise, Gear, X, CreditCard, Sparkle, BookOpenText, UploadSimple, Trash, CheckCircle, Timer, Globe, WarningCircle } from "@phosphor-icons/react";
 import SiteNav from "../../components/SiteNav";
 import SiteFooter from "../../components/SiteFooter";
 import PaddleCheckoutButton from "../../components/PaddleCheckoutButton";
@@ -54,12 +54,202 @@ interface KnowledgeStatus {
   updatedAt: string | null;
 }
 
+interface WebsiteSource {
+  id: string;
+  url: string;
+  status: "pending" | "syncing" | "ok" | "partial" | "failed";
+  pagesFound: number;
+  pagesIngested: number;
+  chunkCount: number;
+  errors: { url: string; error: string }[];
+  lastSyncedAt: string | null;
+}
+
+// "Train from a website": paste a URL or sitemap.xml, we crawl same-origin
+// pages (capped, robots.txt respected) and index the text. Each website is
+// its own source, re-syncable on its own. See app/lib/websiteKnowledge.ts.
+function WebsiteSourcesSection({ apiKeyId }: { apiKeyId: string }) {
+  const { toast } = useToast();
+  const [sources, setSources] = useState<WebsiteSource[] | null>(null);
+  const [maxSources, setMaxSources] = useState(3);
+  const [url, setUrl] = useState("");
+  const [busyId, setBusyId] = useState<string | null>(null); // "new" while adding
+  const [openErrors, setOpenErrors] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/keys/${apiKeyId}/knowledge/sources`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data.sources)) setSources(data.sources);
+        if (data.maxSources) setMaxSources(data.maxSources);
+      })
+      .catch(() => {});
+  }, [apiKeyId]);
+
+  const upsert = (src: WebsiteSource) =>
+    setSources((prev) => {
+      const list = prev ?? [];
+      return list.some((s) => s.id === src.id) ? list.map((s) => (s.id === src.id ? src : s)) : [...list, src];
+    });
+
+  const report = (src: WebsiteSource) => {
+    if (src.status === "failed") {
+      toast(src.errors[0]?.error ?? "Couldn't crawl that site.", "error");
+    } else {
+      toast(`Indexed ${src.pagesIngested} page${src.pagesIngested === 1 ? "" : "s"} (${src.chunkCount} chunks).`);
+    }
+  };
+
+  const add = async () => {
+    if (!url.trim()) {
+      toast("Paste your website URL or sitemap.xml first.", "info");
+      return;
+    }
+    setBusyId("new");
+    try {
+      const res = await fetch(`/api/keys/${apiKeyId}/knowledge/sources`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      upsert(data.source);
+      report(data.source);
+      if (data.source.status !== "failed") setUrl("");
+    } catch (err) {
+      toast(err instanceof Error && err.message ? err.message : "Couldn't add that website.", "error");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const resync = async (id: string) => {
+    setBusyId(id);
+    try {
+      const res = await fetch(`/api/keys/${apiKeyId}/knowledge/sources/${id}`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      upsert(data.source);
+      report(data.source);
+    } catch (err) {
+      toast(err instanceof Error && err.message ? err.message : "Couldn't re-sync.", "error");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm("Remove this website and everything indexed from it?")) return;
+    setBusyId(id);
+    try {
+      const res = await fetch(`/api/keys/${apiKeyId}/knowledge/sources/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      setSources((prev) => (prev ?? []).filter((s) => s.id !== id));
+      toast("Website removed.");
+    } catch {
+      toast("Couldn't remove it.", "error");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const statusLabel: Record<WebsiteSource["status"], string> = {
+    pending: "Not synced yet",
+    syncing: "Syncing…",
+    ok: "Synced",
+    partial: "Synced with some errors",
+    failed: "Last sync failed",
+  };
+
+  return (
+    <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+        <Globe size={15} style={{ color: "var(--text)" }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>Train from your website</span>
+      </div>
+      <p style={{ fontSize: 12.5, color: "var(--muted-2)", margin: "0 0 12px" }}>
+        Paste a page URL or your sitemap.xml. We read up to 50 pages on the same site, skip anything robots.txt blocks,
+        and ignore menus, footers and scripts. It takes up to a minute.
+      </p>
+
+      {(sources ?? []).map((src) => (
+        <div key={src.id} style={{ padding: 12, borderRadius: 2, border: "1px solid var(--border)", background: "var(--surface)", marginBottom: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{src.url}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--muted)", marginTop: 3 }}>
+                {src.status === "ok" && <CheckCircle size={12} weight="fill" style={{ color: "var(--success)" }} />}
+                {(src.status === "partial" || src.status === "failed") && (
+                  <WarningCircle size={12} weight="fill" style={{ color: src.status === "failed" ? "#f0a08f" : "var(--accent)" }} />
+                )}
+                {busyId === src.id ? "Syncing…" : statusLabel[src.status]}
+                {src.status !== "pending" && busyId !== src.id && (
+                  <>
+                    {" · "}
+                    {src.pagesIngested} of {src.pagesFound} pages indexed · {src.chunkCount} chunks
+                    {src.lastSyncedAt && ` · ${new Date(src.lastSyncedAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}`}
+                  </>
+                )}
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={() => resync(src.id)} disabled={busyId !== null} className="dash-btn" style={btnStyle("outline")}>
+                <ArrowsClockwise size={13} weight="bold" /> Re-sync
+              </button>
+              <button onClick={() => remove(src.id)} disabled={busyId !== null} className="dash-btn" style={{ ...btnStyle("outline"), color: "#f0a08f" }} aria-label="Remove website">
+                <Trash size={13} weight="bold" />
+              </button>
+            </div>
+          </div>
+          {src.errors.length > 0 && (
+            <div style={{ marginTop: 8 }}>
+              <button
+                onClick={() => setOpenErrors(openErrors === src.id ? null : src.id)}
+                style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontSize: 12, color: "var(--muted)", textDecoration: "underline", textUnderlineOffset: 3 }}
+              >
+                {openErrors === src.id ? "Hide" : "Show"} {src.errors.length} issue{src.errors.length === 1 ? "" : "s"}
+              </button>
+              {openErrors === src.id && (
+                <ul style={{ margin: "8px 0 0", padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 4 }}>
+                  {src.errors.map((e, i) => (
+                    <li key={i} style={{ fontSize: 11.5, color: "var(--muted-2)", fontFamily: "var(--font-mono)", wordBreak: "break-all" }}>
+                      {e.url} — {e.error}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </div>
+      ))}
+
+      {(sources?.length ?? 0) < maxSources && (
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <input
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && busyId === null) add();
+            }}
+            placeholder="https://yourbusiness.com or https://yourbusiness.com/sitemap.xml"
+            style={{ ...inputStyle, flex: 1, minWidth: 220 }}
+            inputMode="url"
+          />
+          <button onClick={add} disabled={busyId !== null} className="dash-btn" style={btnStyle("solid")}>
+            {busyId === "new" ? "Crawling… (up to a minute)" : "Crawl & index"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // The feature that makes an agent actually know something about the
 // customer's business instead of giving everyone the same generic prompt.
-// Deliberately simple: one knowledge base per install (upload/replace, not
-// document management), plain text only — paste, or read a .txt/.md file
-// client-side and paste its contents in for you. No PDF parsing, no URL
-// scraping, no per-document list. See app/lib/knowledge.ts for the "why".
+// Two kinds of knowledge per install: the pasted/uploaded text box below
+// (saved as a whole — upload/replace) and websites (WebsiteSourcesSection),
+// which are crawled and re-synced independently. See app/lib/knowledge.ts.
 function KnowledgeBaseSection({ apiKeyId }: { apiKeyId: string }) {
   const { toast } = useToast();
   const [status, setStatus] = useState<KnowledgeStatus | null>(null);
@@ -108,13 +298,13 @@ function KnowledgeBaseSection({ apiKeyId }: { apiKeyId: string }) {
   };
 
   const clear = async () => {
-    if (!confirm("Clear this agent's knowledge base? It'll go back to answering generically.")) return;
+    if (!confirm("Clear the pasted text? Websites you've added stay indexed.")) return;
     setBusy(true);
     try {
       const res = await fetch(`/api/keys/${apiKeyId}/knowledge`, { method: "DELETE" });
       if (!res.ok) throw new Error();
       setStatus({ chunkCount: 0, source: null, updatedAt: null });
-      toast("Knowledge base cleared.");
+      toast("Pasted text cleared.");
     } catch {
       toast("Couldn't clear the knowledge base.", "error");
     } finally {
@@ -136,7 +326,7 @@ function KnowledgeBaseSection({ apiKeyId }: { apiKeyId: string }) {
         </div>
       ) : (
         <p style={{ fontSize: 12.5, color: "var(--muted-2)", margin: "0 0 12px" }}>
-          No knowledge base yet — this agent answers generically until you add one.
+          No pasted text yet. Add some below, or train it from your website.
         </p>
       )}
 
@@ -173,6 +363,8 @@ function KnowledgeBaseSection({ apiKeyId }: { apiKeyId: string }) {
           </button>
         )}
       </div>
+
+      <WebsiteSourcesSection apiKeyId={apiKeyId} />
     </div>
   );
 }

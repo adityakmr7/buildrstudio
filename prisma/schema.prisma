@@ -95,9 +95,10 @@ model ApiKey {
   color    String @default("#2563EB")
   position String @default("bottom-right") // "bottom-right" | "bottom-left"
 
-  chatSessions   ChatSession[]
-  documentChunks DocumentChunk[]
-  trial          Trial?
+  chatSessions     ChatSession[]
+  documentChunks   DocumentChunk[]
+  knowledgeSources KnowledgeSource[]
+  trial            Trial?
 
   @@index([userId, agentId])
 }
@@ -136,14 +137,45 @@ model Trial {
 /// nowhere near a performance concern at this scale. See
 /// app/lib/knowledge.ts for the retrieval logic.
 model DocumentChunk {
-  id        String   @id @default(cuid())
+  id        String           @id @default(cuid())
   apiKeyId  String
-  apiKey    ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
-  source    String // filename, or "Pasted text"
-  content   String   @db.Text
+  apiKey    ApiKey           @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  source    String // filename, "Pasted text", or the page URL for crawled chunks
+  content   String           @db.Text
   embedding Float[]
-  createdAt DateTime @default(now())
+  createdAt DateTime         @default(now())
+  // null = the pasted/uploaded text knowledge base (replaced as a whole on
+  // save, as before). Set = chunks owned by one KnowledgeSource (a crawled
+  // website), replaced only when that source is re-synced.
+  sourceId  String?
+  sourceRef KnowledgeSource? @relation(fields: [sourceId], references: [id], onDelete: Cascade)
 
+  @@index([apiKeyId])
+  @@index([sourceId])
+}
+
+/// A knowledge source that isn't the pasted-text box — currently a website
+/// crawled from a start URL or sitemap.xml (see app/lib/crawler.ts). Stores
+/// the last sync's result so the dashboard can show pages found/ingested and
+/// errors, and so "Re-sync" can re-crawl and replace just this source's chunks.
+model KnowledgeSource {
+  id            String    @id @default(cuid())
+  apiKeyId      String
+  apiKey        ApiKey    @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  kind          String    @default("website") // "website"
+  url           String
+  status        String    @default("pending") // pending | ok | partial | failed
+  pagesFound    Int       @default(0)
+  pagesIngested Int       @default(0)
+  chunkCount    Int       @default(0)
+  errors        Json? // [{ url, error }] from the last sync, capped
+  lastSyncedAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  chunks DocumentChunk[]
+
+  @@unique([apiKeyId, url])
   @@index([apiKeyId])
 }
 

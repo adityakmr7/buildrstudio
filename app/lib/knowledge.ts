@@ -3,8 +3,9 @@
 // business, instead of giving every subscriber the identical generic
 // system prompt. Deliberately simple for indie/small-business scale:
 //   - One knowledge base per ApiKey (upload/replace, not a document CMS)
-//   - Plain-text input only (paste, or a .txt/.md file read client-side) —
-//     no PDF parsing, no URL scraping, for now
+//   - Plain-text input (paste, or a .txt/.md file read client-side), plus
+//     websites crawled from a URL/sitemap (app/lib/websiteKnowledge.ts) —
+//     no PDF parsing for now
 //   - Embeddings stored as Float[] and compared with in-app cosine
 //     similarity — no pgvector extension to manage. Fine up to a few
 //     hundred chunks per customer; revisit only if that stops being true.
@@ -47,6 +48,27 @@ export async function embedText(text: string): Promise<number[]> {
   const model = getGemini().getGenerativeModel({ model: EMBEDDING_MODEL });
   const result = await model.embedContent(text);
   return result.embedding.values;
+}
+
+// Batch embedding (one request per EMBED_BATCH_SIZE texts) — used by website
+// sync, where a crawl can produce a couple of hundred chunks and one request
+// per chunk wouldn't fit in a single serverless invocation.
+const EMBED_BATCH_SIZE = 50;
+
+export async function embedTexts(texts: string[]): Promise<number[][]> {
+  const model = getGemini().getGenerativeModel({ model: EMBEDDING_MODEL });
+  const out: number[][] = [];
+  for (let i = 0; i < texts.length; i += EMBED_BATCH_SIZE) {
+    const batch = texts.slice(i, i + EMBED_BATCH_SIZE);
+    const result = await model.batchEmbedContents({
+      requests: batch.map((text) => ({ content: { role: "user", parts: [{ text }] } })),
+    });
+    if (result.embeddings.length !== batch.length) {
+      throw new Error("Embedding batch returned the wrong number of vectors.");
+    }
+    out.push(...result.embeddings.map((e) => e.values));
+  }
+  return out;
 }
 
 export function cosineSimilarity(a: number[], b: number[]): number {

@@ -87,8 +87,8 @@ export interface AgentProduct {
   // general-purpose agents, not vertical-specific builds.
   businessTypes: BusinessType[];
   // Real, currently-supported knowledge sources only — see
-  // app/lib/knowledge.ts. Do not list PDF/Notion/website-crawl; none of
-  // those exist yet.
+  // app/lib/knowledge.ts and app/lib/websiteKnowledge.ts. Do not list
+  // PDF/Notion; neither exists yet.
   connectsTo: string[];
   // Realistic prompts shown as clickable chips in the live demo.
   suggestedQuestions: string[];
@@ -146,7 +146,7 @@ export const AGENT_CATALOG: AgentProduct[] = [
     ],
     outcomes: ["customer-support", "website-assistant"],
     businessTypes: ["SaaS", "E-commerce", "Agency", "Startup", "Local business"],
-    connectsTo: ["Pasted text", ".txt files", ".md files"],
+    connectsTo: ["Pasted text", ".txt files", ".md files", "Your website (URL or sitemap)"],
     suggestedQuestions: [
       "What does this product do?",
       "How much does it cost?",
@@ -204,7 +204,7 @@ export const AGENT_CATALOG: AgentProduct[] = [
     ],
     outcomes: ["knowledge"],
     businessTypes: ["SaaS", "Startup", "Agency", "Developer tool"],
-    connectsTo: ["Pasted text", ".txt files", ".md files"],
+    connectsTo: ["Pasted text", ".txt files", ".md files", "Your website (URL or sitemap)"],
     suggestedQuestions: [
       "What documentation do you have access to?",
       "Summarize the key points from our docs",
