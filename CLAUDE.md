@@ -117,7 +117,7 @@ app/
   sitemap.ts, robots.ts
 
 public/
-  widget.js                     # The embeddable chat widget — vanilla JS IIFE, Shadow DOM (no iframe), <15KB. This is what site owners paste as a <script> tag.
+  widget.js                     # The embeddable chat widget — vanilla JS IIFE, Shadow DOM (no iframe), ~18KB unminified. This is what site owners paste as a <script> tag.
 
 prisma/
   schema.prisma                 # Operational data model — see "Database" below
@@ -242,6 +242,13 @@ iframe) so host-page CSS can't leak in or out, persists a session id in `localSt
 `/api/v1/chat`. Keep it dependency-free and small — there's no bundler step for this file, it ships
 as-is from `public/`.
 
+Appearance (greeting / brand color / position) resolves as `window.BuildrAgentConfig` (per-page
+override) > the install's saved dashboard config from `GET /api/v1/config?key=&agent=` (public,
+CORS-open, CDN-cached 5 min + stale-while-revalidate) > built-in defaults. The last fetched config is
+cached in `localStorage` (`buildr_agent_config_<agent>`) so repeat views render instantly; on a
+first view the widget waits up to 1.5s for the config before rendering with defaults. It sends the
+host `page_url` on a session's first message.
+
 `app/api/v1/chat/route.ts` is what it talks to: validates the `Authorization: Bearer pk_live_...`
 key against `ApiKey`, rate-limits per key (in-memory — see `app/lib/rateLimit.ts`, acceptable for
 MVP per the plan's constraints), checks the caller's monthly quota (falls back to a small
@@ -289,6 +296,17 @@ email via Resend only when `RESEND_API_KEY` + `LEADS_FROM_EMAIL` are set, and a 
 `X-BuildrStudio-Signature: sha256=HMAC(secret, "<timestamp>.<body>")`). WhatsApp is a wa.me
 click-to-chat link returned to the visitor when the owner set `ApiKey.whatsappNumber`. Dashboard:
 `/dashboard/leads` + CSV export (`/api/leads/export`), settings modal "Lead handoff".
+
+### Conversation log + unanswered questions
+
+The chat route stores every exchange (`ChatSession` with `pageUrl`, `messageCount`,
+`lastMessageAt`; `Message` rows). When an answer is flagged by `app/lib/handoff.ts#unansweredReason`
+(model emitted the handoff token, or best RAG score under `LOW_CONFIDENCE_SCORE`) it also writes an
+`UnansweredQuestion`. Dashboard: `/dashboard/conversations` (7d/30d counts, list, detail at
+`/dashboard/conversations/[id]`) and `/dashboard/unanswered`, where "Add answer to knowledge"
+(`POST /api/unanswered/[id]`) embeds a Q&A chunk into a per-install `KnowledgeSource` of kind `qa`
+(`app/lib/qaKnowledge.ts`). Pasted-text saves only replace `sourceId = null` chunks, so Q&A and
+website chunks survive.
 
 ### Knowledge base / retrieval-augmented generation
 

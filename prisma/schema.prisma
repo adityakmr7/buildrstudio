@@ -108,6 +108,7 @@ model ApiKey {
   documentChunks   DocumentChunk[]
   knowledgeSources KnowledgeSource[]
   leads            Lead[]
+  unanswered       UnansweredQuestion[]
   trial            Trial?
 
   @@index([userId, agentId])
@@ -172,7 +173,7 @@ model KnowledgeSource {
   id            String    @id @default(cuid())
   apiKeyId      String
   apiKey        ApiKey    @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
-  kind          String    @default("website") // "website"
+  kind          String    @default("website") // "website" | "qa" (answers added from Unanswered questions)
   url           String
   status        String    @default("pending") // pending | ok | partial | failed
   pagesFound    Int       @default(0)
@@ -197,12 +198,20 @@ model ChatSession {
   id        String    @id @default(cuid())
   agentId   String
   agent     Agent     @relation(fields: [agentId], references: [id])
-  apiKeyId  String
-  apiKey    ApiKey    @relation(fields: [apiKeyId], references: [id])
-  messages  Message[]
-  leads     Lead[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  apiKeyId      String
+  apiKey        ApiKey                @relation(fields: [apiKeyId], references: [id])
+  messages      Message[]
+  leads         Lead[]
+  unanswered    UnansweredQuestion[]
+  // Conversation-log bookkeeping (dashboard → Conversations). pageUrl is the
+  // page the widget was opened on when the conversation started.
+  pageUrl       String?
+  messageCount  Int                   @default(0)
+  lastMessageAt DateTime?
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  @@index([apiKeyId, lastMessageAt])
 }
 
 model Message {
@@ -279,4 +288,25 @@ model Lead {
 
   @@index([apiKeyId, createdAt])
   @@index([userId, createdAt])
+}
+
+/// A visitor question the agent couldn't answer well — the model flagged it
+/// ([[HANDOFF]]) or retrieval found nothing close (see app/lib/handoff.ts).
+/// Listed in dashboard → Unanswered so the owner can add an answer to the
+/// knowledge base ("qa" KnowledgeSource) or dismiss it.
+model UnansweredQuestion {
+  id            String       @id @default(cuid())
+  apiKeyId      String
+  apiKey        ApiKey       @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  chatSessionId String?
+  chatSession   ChatSession? @relation(fields: [chatSessionId], references: [id], onDelete: SetNull)
+  question      String       @db.Text
+  reply         String?      @db.Text // what the agent said at the time
+  reason        String // "model_unsure" | "low_score"
+  topScore      Float?
+  status        String       @default("open") // open | answered | dismissed
+  resolvedAt    DateTime?
+  createdAt     DateTime     @default(now())
+
+  @@index([apiKeyId, status, createdAt])
 }

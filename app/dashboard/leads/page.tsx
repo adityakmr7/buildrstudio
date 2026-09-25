@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { auth } from "../../../auth";
 import { db } from "../../lib/db";
-import SiteNav from "../../components/SiteNav";
-import SiteFooter from "../../components/SiteFooter";
-import DashboardTabs from "../DashboardTabs";
+import DashboardShell, { ErrorBox, formatIst } from "../DashboardShell";
 
 export const metadata: Metadata = {
   title: "Leads — Buildr Studio",
@@ -40,21 +38,8 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
   const exportHref = `/api/leads/export${agentSlug ? `?agent=${encodeURIComponent(agentSlug)}` : ""}`;
 
   return (
-    <div style={{ background: "var(--bg)", minHeight: "100svh" }}>
-      <SiteNav />
-      <section style={{ padding: "48px 24px 80px" }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-          <h1 style={{ fontSize: "clamp(26px, 3.5vw, 36px)", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--text)", margin: "0 0 8px" }}>Leads</h1>
-          <p style={{ fontSize: 14.5, color: "var(--muted)", margin: "0 0 24px" }}>
-            Visitors who left their details when your agent couldn&apos;t help, or when they asked for a person.
-          </p>
-          <DashboardTabs />
-
-          {loadError && (
-            <div style={{ padding: 20, borderRadius: 2, background: "rgba(240,128,110,0.08)", border: "1px solid rgba(240,128,110,0.32)", color: "#f0a08f", fontSize: 13.5, marginBottom: 24 }}>
-              Couldn&apos;t load your leads right now. Try refreshing the page.
-            </div>
-          )}
+    <DashboardShell title="Leads" intro="Visitors who left their details when your agent couldn't help, or when they asked for a person.">
+          {loadError && <ErrorBox>Couldn&apos;t load your leads right now. Try refreshing the page.</ErrorBox>}
 
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -107,10 +92,19 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
                     <tr key={l.id} style={{ verticalAlign: "top" }}>
                       <td style={cell}>
                         <span style={{ whiteSpace: "nowrap" }}>
-                          {l.createdAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                          {formatIst(l.createdAt)}
                         </span>
                       </td>
-                      <td style={{ ...cell, color: "var(--text)", fontWeight: 600 }}>{l.name}</td>
+                      <td style={{ ...cell, color: "var(--text)", fontWeight: 600 }}>
+                        {l.name}
+                        {l.chatSessionId && (
+                          <div style={{ marginTop: 2, fontWeight: 400 }}>
+                            <Link href={`/dashboard/conversations/${l.chatSessionId}`} style={{ fontSize: 11.5, color: "var(--muted)", textDecoration: "underline", textUnderlineOffset: 3 }}>
+                              Conversation
+                            </Link>
+                          </div>
+                        )}
+                      </td>
                       <td style={cell}>
                         <a href={`mailto:${l.email}`} style={{ color: "var(--text)", textDecoration: "underline", textUnderlineOffset: 3 }}>{l.email}</a>
                         {l.phone && <div style={{ marginTop: 2 }}><a href={`tel:${l.phone.replace(/[^\d+]/g, "")}`} style={{ color: "var(--muted)" }}>{l.phone}</a></div>}
@@ -136,10 +130,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
               Showing the latest {leads.length} of {total}. Export CSV for all of them.
             </p>
           )}
-        </div>
-      </section>
-      <SiteFooter />
-    </div>
+    </DashboardShell>
   );
 }
 

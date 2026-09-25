@@ -7,8 +7,8 @@ import { TRIAL_DAYS, TRIAL_MESSAGE_LIMIT } from "../../lib/trial";
 //   - knowledge: app/lib/knowledge.ts + /api/keys/[id]/knowledge (plain text,
 //     .txt/.md, chunked + embedded, stored per API key in the app database)
 //     and app/lib/websiteKnowledge.ts (crawl a URL/sitemap, up to 50 pages)
-//   - brand color / greeting / position: window.BuildrAgentConfig in
-//     public/widget.js (also editable in the dashboard's Widget config)
+//   - brand color / greeting / position: dashboard Widget config, served by
+//     /api/v1/config to public/widget.js; window.BuildrAgentConfig overrides
 //   - stacks: plain <script> tag appended to <body>, Shadow DOM isolated
 //   - free trial: app/lib/trial.ts limits, enforced in /api/v1/chat
 //   - leads: app/lib/leads.ts (dashboard, optional email via Resend, webhook)
@@ -27,7 +27,7 @@ export const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Can I match my brand color?",
-    a: "Yes. The widget takes a brand color, a greeting, and a position (bottom-right or bottom-left). Set them with a small window.BuildrAgentConfig object placed before the script tag.",
+    a: "Yes. The widget takes a brand color, a greeting, and a position (bottom-right or bottom-left). Set them in your dashboard and the widget picks them up, no code change. You can also override them per page with a small window.BuildrAgentConfig object placed before the script tag.",
   },
   {
     q: "What stacks does it work on?",

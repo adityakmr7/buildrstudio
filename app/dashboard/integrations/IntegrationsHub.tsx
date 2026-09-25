@@ -825,6 +825,11 @@ function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: In
               <option value="bottom-left">Bottom left</option>
             </select>
 
+            <p style={{ fontSize: 11.5, color: "var(--muted-2)", margin: "12px 0 0" }}>
+              Your embed picks these up automatically (allow up to ~5 minutes for caches). Anything set in{" "}
+              <code>window.BuildrAgentConfig</code> on your page overrides them.
+            </p>
+
             <button onClick={saveConfig} disabled={busy} className="dash-btn" style={{ ...btnStyle("solid"), width: "100%", justifyContent: "center", marginTop: 16 }}>
               Save changes
             </button>
