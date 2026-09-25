@@ -107,14 +107,14 @@ export const AGENT_CATALOG: AgentProduct[] = [
     precedent: "Distilled from our highest-performing support-deflection build.",
     whoFor: "Support/CX teams drowning in repetitive tickets.",
     prebuilt: "Conversational engine, escalation logic, retrieval pipeline, embeddable widget.",
-    configurable: "Your knowledge base, tone/greeting, brand color, and helpdesk handoff.",
+    configurable: "Your knowledge base, greeting, brand color, and where leads go (email, webhook, or WhatsApp).",
     description:
       "A conversational agent trained on your docs and tuned to your product's tone, with clear escalation rules — subscribe, drop in a script tag, and it starts handling repeatable questions immediately.",
     whatsIncluded: [
       "Embeddable chat widget — one script tag, works on any website",
       "Retrieval pipeline over documents you upload",
       "Configurable greeting, brand color, and widget position",
-      "Escalation logic to flag conversations for a human",
+      "Hands off to a person: when it can't answer or a visitor asks, it collects their name, email and phone and notifies you",
       "Usage dashboard with message counts and conversation history",
     ],
     installTime: "Live in minutes — copy one script tag, no code required",

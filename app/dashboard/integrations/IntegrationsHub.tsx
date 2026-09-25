@@ -3,10 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Copy, ArrowsClockwise, Gear, X, CreditCard, Sparkle, BookOpenText, UploadSimple, Trash, CheckCircle, Timer, Globe, WarningCircle } from "@phosphor-icons/react";
+import { Copy, ArrowsClockwise, Gear, X, CreditCard, Sparkle, BookOpenText, UploadSimple, Trash, CheckCircle, Timer, Globe, WarningCircle, UserSound } from "@phosphor-icons/react";
 import SiteNav from "../../components/SiteNav";
 import SiteFooter from "../../components/SiteFooter";
 import PaddleCheckoutButton from "../../components/PaddleCheckoutButton";
+import RazorpayCheckoutButton from "../../components/RazorpayCheckoutButton";
+import DashboardTabs from "../DashboardTabs";
 import { useToast } from "../../components/Toast";
 import { TRIAL_DAYS, TRIAL_MESSAGE_LIMIT, type TrialStatus } from "../../lib/trial";
 
@@ -15,6 +17,8 @@ export interface UpgradeTier {
   name: string; // "standard" | "pro"
   paddlePriceId: string | null;
   priceLabel: string | null; // from agentCatalog.ts, e.g. "$19/mo"
+  // From the Razorpay plan when INR payments are configured for this tier; else null.
+  inrPriceLabel: string | null;
 }
 
 export interface TrialOption {
@@ -38,6 +42,10 @@ export interface IntegrationRow {
   // null when there's no active paid subscription (trial-only) — the
   // "Manage subscription" button only makes sense once one exists.
   subscriptionId: string | null;
+  subscriptionProvider: "paddle" | "razorpay" | null;
+  // Razorpay: renewal cancelled, access runs until currentPeriodEnd.
+  cancelAtPeriodEnd: boolean;
+  currentPeriodEnd: string | null;
   agentId: string;
   // Set only while on an unconverted no-card free trial.
   trial: TrialStatus | null;
@@ -369,6 +377,141 @@ function KnowledgeBaseSection({ apiKeyId }: { apiKeyId: string }) {
   );
 }
 
+interface HandoffSettings {
+  emailEnabled: boolean;
+  emailConfigured: boolean;
+  webhookUrl: string | null;
+  webhookSecret: string | null;
+  whatsappNumber: string | null;
+}
+
+// Where leads go for one install: owner email (if the platform has email
+// configured), a signed webhook, and a WhatsApp number the visitor can
+// message. See app/lib/leads.ts.
+function HandoffModal({ apiKeyId, onClose }: { apiKeyId: string; onClose: () => void }) {
+  const { toast } = useToast();
+  const [settings, setSettings] = useState<HandoffSettings | null>(null);
+  const [webhookUrl, setWebhookUrl] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [emailEnabled, setEmailEnabled] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [showSecret, setShowSecret] = useState(false);
+
+  useEffect(() => {
+    fetch(`/api/keys/${apiKeyId}/handoff`)
+      .then((r) => r.json())
+      .then((d: HandoffSettings) => {
+        setSettings(d);
+        setWebhookUrl(d.webhookUrl ?? "");
+        setWhatsapp(d.whatsappNumber ?? "");
+        setEmailEnabled(d.emailEnabled);
+      })
+      .catch(() => toast("Couldn't load handoff settings.", "error"));
+  }, [apiKeyId, toast]);
+
+  const save = async (extra: Record<string, unknown> = {}) => {
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/keys/${apiKeyId}/handoff`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ webhookUrl, whatsappNumber: whatsapp, emailEnabled, ...extra }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setSettings(data);
+      setWebhookUrl(data.webhookUrl ?? "");
+      setWhatsapp(data.whatsappNumber ?? "");
+      toast(extra.rotateSecret ? "New signing secret generated — update your receiver." : "Handoff settings saved.");
+    } catch (err) {
+      toast(err instanceof Error && err.message ? err.message : "Couldn't save.", "error");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const test = async () => {
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/keys/${apiKeyId}/handoff/test`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || "Webhook didn't return 2xx.");
+      toast(`Test lead delivered (HTTP ${data.status}).`);
+    } catch (err) {
+      toast(err instanceof Error ? `Test failed: ${err.message}` : "Test failed.", "error");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div
+      style={{ position: "fixed", inset: 0, background: "rgba(12,11,9,0.72)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 20 }}
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{ background: "var(--surface)", borderRadius: 2, padding: 24, width: "100%", maxWidth: 480, border: "1px solid var(--border)", maxHeight: "90vh", overflowY: "auto" }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+          <h4 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", margin: 0 }}>Lead handoff</h4>
+          <button onClick={onClose} aria-label="Close" style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)" }}>
+            <X size={16} />
+          </button>
+        </div>
+        <p style={{ fontSize: 12.5, color: "var(--muted)", margin: "0 0 8px" }}>
+          When a visitor asks for a person, or the agent can&apos;t answer, the widget asks for their name, email and phone.
+          Every lead shows up on the Leads page. You can also get them here:
+        </p>
+
+        {!settings ? (
+          <p style={{ fontSize: 13, color: "var(--muted-2)" }}>Loading…</p>
+        ) : (
+          <>
+            <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 8, cursor: settings.emailConfigured ? "pointer" : "default" }}>
+              <input type="checkbox" checked={emailEnabled} disabled={!settings.emailConfigured} onChange={(e) => setEmailEnabled(e.target.checked)} />
+              Email me each new lead
+            </label>
+            {!settings.emailConfigured && (
+              <p style={{ fontSize: 11.5, color: "var(--muted-2)", margin: "-2px 0 0" }}>Email notifications aren&apos;t switched on for BuildrStudio yet. Use the webhook or check the Leads page.</p>
+            )}
+
+            <label style={labelStyle}>WhatsApp number (with country code)</label>
+            <input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="919876543210" style={inputStyle} inputMode="tel" />
+            <p style={{ fontSize: 11.5, color: "var(--muted-2)", margin: "4px 0 0" }}>
+              After they submit the form, visitors get a &ldquo;Chat on WhatsApp&rdquo; button that opens a chat with this number.
+            </p>
+
+            <label style={labelStyle}>Webhook URL (https)</label>
+            <input value={webhookUrl} onChange={(e) => setWebhookUrl(e.target.value)} placeholder="https://hooks.zapier.com/…" style={inputStyle} inputMode="url" />
+            <p style={{ fontSize: 11.5, color: "var(--muted-2)", margin: "4px 0 0" }}>
+              We POST JSON (<code>lead.created</code>) with <code>X-BuildrStudio-Timestamp</code> and{" "}
+              <code>X-BuildrStudio-Signature: sha256=HMAC(secret, timestamp + &quot;.&quot; + body)</code>.
+            </p>
+            {settings.webhookSecret && (
+              <div style={{ marginTop: 10, padding: 10, borderRadius: 2, background: "var(--bg)", border: "1px solid var(--border)" }}>
+                <div style={{ fontSize: 11.5, color: "var(--muted-2)", marginBottom: 4 }}>Signing secret</div>
+                <code style={{ fontSize: 12, color: "var(--text)", wordBreak: "break-all" }}>
+                  {showSecret ? settings.webhookSecret : `${settings.webhookSecret.slice(0, 10)}${"•".repeat(20)}`}
+                </code>
+                <div style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
+                  <button onClick={() => setShowSecret((v) => !v)} className="dash-btn" style={btnStyle("outline")}>{showSecret ? "Hide" : "Reveal"}</button>
+                  <button onClick={() => save({ rotateSecret: true })} disabled={busy} className="dash-btn" style={btnStyle("outline")}>Rotate</button>
+                  <button onClick={test} disabled={busy || !settings.webhookUrl} className="dash-btn" style={btnStyle("outline")}>Send test lead</button>
+                </div>
+              </div>
+            )}
+
+            <button onClick={() => save()} disabled={busy} className="dash-btn" style={{ ...btnStyle("solid"), width: "100%", justifyContent: "center", marginTop: 18 }}>
+              Save handoff settings
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
@@ -420,6 +563,17 @@ function TrialPanel({ row }: { row: IntegrationRow }) {
             style={tier.name === "standard" ? btnStyle("solid") : btnStyle("outline")}
           />
         ))}
+        {row.upgradeTiers
+          .filter((tier) => tier.inrPriceLabel)
+          .map((tier) => (
+            <RazorpayCheckoutButton
+              key={`inr-${tier.id}`}
+              tierId={tier.id}
+              label={`${capitalize(tier.name)} in ₹ (UPI) — ${tier.inrPriceLabel}`}
+              className="dash-btn"
+              style={btnStyle("outline")}
+            />
+          ))}
       </div>
     </div>
   );
@@ -500,6 +654,7 @@ function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: In
   const { toast } = useToast();
   const [busy, setBusy] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [handoffOpen, setHandoffOpen] = useState(false);
   const [greeting, setGreeting] = useState(row.greeting);
   const [color, setColor] = useState(row.color);
   const [position, setPosition] = useState(row.position);
@@ -531,6 +686,7 @@ function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: In
 
   const manageSubscription = async () => {
     if (!row.subscriptionId) return;
+    if (row.subscriptionProvider === "razorpay") return cancelRazorpayRenewal();
     setBusy(true);
     try {
       const res = await fetch(`/api/portal?subscriptionId=${row.subscriptionId}`);
@@ -539,6 +695,28 @@ function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: In
       window.open(data.url, "_blank", "noopener,noreferrer");
     } catch {
       toast("Couldn't open the billing portal. Try again.", "error");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // Razorpay has no hosted portal like Paddle's: offer cancel-at-period-end.
+  const cancelRazorpayRenewal = async () => {
+    if (row.cancelAtPeriodEnd) return;
+    if (!confirm("Cancel renewal? Your agent keeps working until the end of the current billing period, then stops.")) return;
+    setBusy(true);
+    try {
+      const res = await fetch("/api/razorpay/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subscriptionId: row.subscriptionId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      onUpdated({ ...row, cancelAtPeriodEnd: true, currentPeriodEnd: data.currentPeriodEnd ?? row.currentPeriodEnd });
+      toast("Renewal cancelled. Your agent stays live until the end of this billing period.");
+    } catch (err) {
+      toast(err instanceof Error && err.message ? err.message : "Couldn't cancel. Try again.", "error");
     } finally {
       setBusy(false);
     }
@@ -627,6 +805,14 @@ function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: In
         </pre>
       </div>
 
+      <p style={{ fontSize: 12.5, color: "var(--muted)", margin: "-4px 0 14px" }}>
+        On WordPress?{" "}
+        <a href="/downloads/buildrstudio-wordpress.zip" download style={{ color: "var(--accent)", textDecoration: "underline", textUnderlineOffset: 3 }}>
+          Download the plugin
+        </a>
+        , then paste agent ID <code>{row.agentSlug}</code> and your API key in Settings → BuildrStudio.
+      </p>
+
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
         <button onClick={copyEmbed} className="dash-btn" style={btnStyle("solid")}>
           <Copy size={14} weight="bold" /> Copy embed code
@@ -634,17 +820,35 @@ function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: In
         <button onClick={() => setModalOpen(true)} className="dash-btn" style={btnStyle("outline")}>
           <Gear size={14} weight="bold" /> Edit config
         </button>
+        <button onClick={() => setHandoffOpen(true)} className="dash-btn" style={btnStyle("outline")}>
+          <UserSound size={14} weight="bold" /> Lead handoff
+        </button>
         <button onClick={regenerate} disabled={busy} className="dash-btn" style={btnStyle("outline")}>
           <ArrowsClockwise size={14} weight="bold" /> Regenerate API key
         </button>
-        {row.subscriptionId && (
+        {row.subscriptionId && row.subscriptionProvider !== "razorpay" && (
           <button onClick={manageSubscription} disabled={busy} className="dash-btn" style={btnStyle("outline")}>
             <CreditCard size={14} weight="bold" /> Manage subscription
           </button>
         )}
+        {row.subscriptionId && row.subscriptionProvider === "razorpay" && !row.cancelAtPeriodEnd && (
+          <button onClick={manageSubscription} disabled={busy} className="dash-btn" style={btnStyle("outline")}>
+            <CreditCard size={14} weight="bold" /> Cancel renewal (Razorpay)
+          </button>
+        )}
+        {row.subscriptionId && row.subscriptionProvider === "razorpay" && row.cancelAtPeriodEnd && (
+          <span style={{ alignSelf: "center", fontSize: 12.5, color: "var(--muted)" }}>
+            Renewal cancelled
+            {row.currentPeriodEnd
+              ? ` · live until ${new Date(row.currentPeriodEnd).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}`
+              : ""}
+          </span>
+        )}
       </div>
 
       <KnowledgeBaseSection apiKeyId={row.id} />
+
+      {handoffOpen && <HandoffModal apiKeyId={row.id} onClose={() => setHandoffOpen(false)} />}
 
       {modalOpen && (
         <div
@@ -682,6 +886,11 @@ function AgentRow({ row, onUpdated }: { row: IntegrationRow; onUpdated: (row: In
               <option value="bottom-right">Bottom right</option>
               <option value="bottom-left">Bottom left</option>
             </select>
+
+            <p style={{ fontSize: 11.5, color: "var(--muted-2)", margin: "12px 0 0" }}>
+              Your embed picks these up automatically (allow up to ~5 minutes for caches). Anything set in{" "}
+              <code>window.BuildrAgentConfig</code> on your page overrides them.
+            </p>
 
             <button onClick={saveConfig} disabled={busy} className="dash-btn" style={{ ...btnStyle("solid"), width: "100%", justifyContent: "center", marginTop: 16 }}>
               Save changes
@@ -767,9 +976,10 @@ export default function IntegrationsHub({
           <h1 style={{ fontSize: "clamp(26px, 3.5vw, 36px)", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--text)", margin: "0 0 8px" }}>
             {userName ? `${userName.split(" ")[0]}'s agents` : "Your agents"}
           </h1>
-          <p style={{ fontSize: 14.5, color: "var(--muted)", margin: "0 0 32px" }}>
+          <p style={{ fontSize: 14.5, color: "var(--muted)", margin: "0 0 24px" }}>
             Embed codes, usage, and widget config for everything you&apos;ve subscribed to.
           </p>
+          <DashboardTabs />
 
           {showWelcome && (
             <div

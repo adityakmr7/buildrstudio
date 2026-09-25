@@ -23,7 +23,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const key = await getOwnedKey(id, session.user.id);
   if (!key) return NextResponse.json({ error: "Not found." }, { status: 404 });
 
-  const sources = await db.knowledgeSource.findMany({ where: { apiKeyId: id }, orderBy: { createdAt: "asc" } });
+  const sources = await db.knowledgeSource.findMany({ where: { apiKeyId: id, kind: "website" }, orderBy: { createdAt: "asc" } });
   return NextResponse.json({ sources: sources.map(serializeSource), maxSources: MAX_WEBSITE_SOURCES_PER_KEY });
 }
 
@@ -60,7 +60,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
   let source = await db.knowledgeSource.findUnique({ where: { apiKeyId_url: { apiKeyId: id, url: normalized } } });
   if (!source) {
-    const count = await db.knowledgeSource.count({ where: { apiKeyId: id } });
+    const count = await db.knowledgeSource.count({ where: { apiKeyId: id, kind: "website" } });
     if (count >= MAX_WEBSITE_SOURCES_PER_KEY) {
       return NextResponse.json(
         { error: `You can add up to ${MAX_WEBSITE_SOURCES_PER_KEY} websites per agent. Remove one first.` },

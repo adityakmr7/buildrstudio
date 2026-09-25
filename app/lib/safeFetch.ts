@@ -143,18 +143,23 @@ export interface SafeGetOptions {
   maxRedirects?: number;
 }
 
-function requestOnce(url: URL, opts: Required<SafeGetOptions>): Promise<{ status: number; headers: http.IncomingHttpHeaders; body: Buffer }> {
+function requestOnce(
+  url: URL,
+  opts: Required<SafeGetOptions>,
+  post?: { body: string; headers: Record<string, string> },
+): Promise<{ status: number; headers: http.IncomingHttpHeaders; body: Buffer }> {
   return new Promise((resolve, reject) => {
     const mod = url.protocol === "https:" ? https : http;
     const req = mod.request(
       url,
       {
-        method: "GET",
+        method: post ? "POST" : "GET",
         lookup: safeLookup,
         headers: {
           "User-Agent": opts.userAgent,
           Accept: opts.accept,
           "Accept-Encoding": "gzip, deflate, br",
+          ...(post ? { ...post.headers, "Content-Length": String(Buffer.byteLength(post.body)) } : {}),
         },
         timeout: opts.timeoutMs,
       },
@@ -191,8 +196,34 @@ function requestOnce(url: URL, opts: Required<SafeGetOptions>): Promise<{ status
       reject(e);
     });
     req.on("close", () => clearTimeout(hardTimer));
+    if (post) req.write(post.body);
     req.end();
   });
+}
+
+/**
+ * SSRF-safe POST (used for customer-configured lead webhooks). Same address
+ * rules as safeGet; redirects are NOT followed (a 3xx counts as a failure).
+ */
+export async function safePost(
+  raw: string,
+  body: string,
+  headers: Record<string, string>,
+  options: { timeoutMs?: number; userAgent?: string } = {},
+): Promise<{ status: number; body: string }> {
+  const url = assertSafeUrl(raw);
+  const res = await requestOnce(
+    url,
+    {
+      timeoutMs: options.timeoutMs ?? 5_000,
+      maxBytes: 64_000,
+      userAgent: options.userAgent ?? "BuildrStudio-Webhooks/1.0 (+https://buildrstudio.in)",
+      accept: "*/*",
+      maxRedirects: 0,
+    },
+    { body, headers },
+  );
+  return { status: res.status, body: res.body.toString("utf8").slice(0, 500) };
 }
 
 export async function safeGet(raw: string | URL, options: SafeGetOptions = {}): Promise<SafeResponse> {

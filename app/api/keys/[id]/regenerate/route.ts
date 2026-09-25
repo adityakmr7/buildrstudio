@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
-import { randomBytes } from "crypto";
 import { auth } from "../../../../../auth";
 import { db } from "../../../../lib/db";
-
-function generateApiKey() {
-  return `pk_live_${randomBytes(18).toString("hex")}`;
-}
+import { generateApiKey } from "../../../../lib/apiKeys";
 
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
