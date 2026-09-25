@@ -20,10 +20,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ error: "Not found." }, { status: 404 });
   }
 
+  // The pasted/uploaded text knowledge base only (sourceId null) — websites
+  // are listed separately via ./sources.
   const [chunkCount, latest] = await Promise.all([
-    db.documentChunk.count({ where: { apiKeyId: id } }),
+    db.documentChunk.count({ where: { apiKeyId: id, sourceId: null } }),
     db.documentChunk.findFirst({
-      where: { apiKeyId: id },
+      where: { apiKeyId: id, sourceId: null },
       orderBy: { createdAt: "desc" },
       select: { source: true, createdAt: true },
     }),
@@ -65,9 +67,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     );
   }
 
-  const chunks = chunkText(text).slice(0, MAX_CHUNKS_PER_KEY);
+  // Website sources share the per-install chunk cap.
+  const websiteChunks = await db.documentChunk.count({ where: { apiKeyId: id, sourceId: { not: null } } });
+  const budget = Math.max(0, MAX_CHUNKS_PER_KEY - websiteChunks);
+  const chunks = chunkText(text).slice(0, budget);
   if (chunks.length === 0) {
-    return NextResponse.json({ error: "No usable text found." }, { status: 400 });
+    return NextResponse.json(
+      { error: budget === 0 ? "Your website sources already use the whole knowledge limit. Remove one first." : "No usable text found." },
+      { status: 400 },
+    );
   }
 
   const source = (body.source ?? "Pasted text").slice(0, 200);
@@ -81,7 +89,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
 
     await db.$transaction([
-      db.documentChunk.deleteMany({ where: { apiKeyId: id } }),
+      // Replaces the pasted-text knowledge base only; website sources keep
+      // their own chunks.
+      db.documentChunk.deleteMany({ where: { apiKeyId: id, sourceId: null } }),
       ...chunks.map((content, i) =>
         db.documentChunk.create({
           data: { apiKeyId: id, source, content, embedding: embeddings[i] },
@@ -107,6 +117,6 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: "Not found." }, { status: 404 });
   }
 
-  await db.documentChunk.deleteMany({ where: { apiKeyId: id } });
+  await db.documentChunk.deleteMany({ where: { apiKeyId: id, sourceId: null } });
   return NextResponse.json({ ok: true });
 }

@@ -4,6 +4,7 @@ import { auth } from "../../../auth";
 import { db } from "../../lib/db";
 import { AGENT_CATALOG } from "../../lib/agentCatalog";
 import { computeTrialStatus } from "../../lib/trial";
+import { getInrTierOptions, type InrTierOption } from "../../lib/razorpayServer";
 import IntegrationsHub, { type IntegrationRow, type TrialOption, type UpgradeTier } from "./IntegrationsHub";
 
 export const metadata: Metadata = {
@@ -25,6 +26,15 @@ async function getIntegrations(userId: string): Promise<IntegrationRow[]> {
     orderBy: { createdAt: "asc" },
   });
 
+  // INR (Razorpay) prices per agent, read from the Razorpay plans. Empty
+  // when Razorpay isn't configured.
+  const inrBySlug = new Map<string, InrTierOption[]>();
+  await Promise.all(
+    [...new Set(keys.map((k) => k.agent.slug))].map(async (slug) => {
+      inrBySlug.set(slug, await getInrTierOptions(slug).catch(() => []));
+    }),
+  );
+
   return Promise.all(
     keys.map(async (key) => {
       const [usage, subscription] = await Promise.all([
@@ -45,6 +55,7 @@ async function getIntegrations(userId: string): Promise<IntegrationRow[]> {
           name: t.name,
           paddlePriceId: t.paddlePriceId,
           priceLabel: product?.tiers.find((pt) => pt.name.toLowerCase() === t.name)?.price ?? null,
+          inrPriceLabel: inrBySlug.get(key.agent.slug)?.find((o) => o.tierId === t.id)?.priceLabel ?? null,
         }))
         .sort((a, b) => (a.name === "standard" ? -1 : b.name === "standard" ? 1 : 0));
       const trial = key.trial ? computeTrialStatus(key.trial) : null;
@@ -64,6 +75,9 @@ async function getIntegrations(userId: string): Promise<IntegrationRow[]> {
         monthlyLimit: subscription?.tier.monthlyLimit ?? 20,
         tierName: subscription?.tier.name ?? (onTrial ? "trial" : "no plan"),
         subscriptionId: subscription?.id ?? null,
+        subscriptionProvider: subscription ? (subscription.provider === "razorpay" ? "razorpay" : "paddle") : null,
+        cancelAtPeriodEnd: subscription?.cancelAtPeriodEnd ?? false,
+        currentPeriodEnd: subscription?.currentPeriodEnd?.toISOString() ?? null,
         trial: onTrial ? trial : null,
         upgradeTiers,
       };

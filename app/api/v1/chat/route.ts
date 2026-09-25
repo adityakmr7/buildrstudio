@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "../../../lib/db";
 import { generateReply } from "../../../lib/gemini";
 import { rateLimit } from "../../../lib/rateLimit";
-import { retrieveRelevantChunks } from "../../../lib/knowledge";
+import { retrieveContext } from "../../../lib/knowledge";
+import { HANDOFF_INSTRUCTION, decideHandoff, extractHandoffToken, unansweredReason } from "../../../lib/handoff";
 import { computeTrialStatus } from "../../../lib/trial";
 
 export const runtime = "nodejs";
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
     }
     const key = match[1];
 
-    let body: { agent_id?: string; message?: string; session_id?: string };
+    let body: { agent_id?: string; message?: string; session_id?: string; page_url?: string };
     try {
       body = await req.json();
     } catch {
@@ -147,8 +148,10 @@ export async function POST(req: NextRequest) {
     // history into this reply).
     if (chatSession && chatSession.apiKeyId !== apiKey.id) chatSession = null;
     if (!chatSession) {
+      const pageUrl =
+        typeof body.page_url === "string" && /^https?:\/\//i.test(body.page_url) ? body.page_url.slice(0, 500) : null;
       chatSession = await db.chatSession.create({
-        data: { agentId: agent.id, apiKeyId: apiKey.id },
+        data: { agentId: agent.id, apiKeyId: apiKey.id, pageUrl },
       });
     }
 
@@ -163,12 +166,15 @@ export async function POST(req: NextRequest) {
     // ── Retrieval-augmented context, if this customer has a knowledge base ──
     // Empty for anyone who hasn't uploaded one yet — agent just answers
     // generically in that case, same as before this existed.
-    const relevantChunks = await retrieveRelevantChunks(apiKey.id, message);
-    const systemPrompt = relevantChunks.length
-      ? `${agent.systemPrompt}\n\nUse the following context from the business's knowledge base to answer, where relevant:\n\n${relevantChunks.join("\n\n---\n\n")}`
+    const context = await retrieveContext(apiKey.id, message);
+    const basePrompt = context.chunks.length
+      ? `${agent.systemPrompt}\n\nUse the following context from the business's knowledge base to answer, where relevant:\n\n${context.chunks.join("\n\n---\n\n")}`
       : agent.systemPrompt;
+    // The handoff instruction lets the model tell us when it can't answer,
+    // so the widget can offer the lead form (see app/lib/handoff.ts).
+    const systemPrompt = basePrompt + HANDOFF_INSTRUCTION;
 
-    const { reply, totalTokens } = await generateReply({
+    const { reply: rawReply, totalTokens } = await generateReply({
       systemPrompt,
       model: agent.model,
       maxTokens: agent.maxTokens,
@@ -176,11 +182,22 @@ export async function POST(req: NextRequest) {
       history: history.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
       message,
     });
+    const { reply, flagged: modelFlagged } = extractHandoffToken(rawReply);
+    const handoff = decideHandoff({
+      message,
+      modelFlagged,
+      hasKnowledge: context.hasKnowledge,
+      topScore: context.topScore,
+    });
+    const unanswered = unansweredReason({ modelFlagged, hasKnowledge: context.hasKnowledge, topScore: context.topScore });
+    const now = new Date();
 
     // ── Persist messages + usage ───────────────────────────────────────
     await db.$transaction([
       db.message.create({
-        data: { chatSessionId: chatSession.id, agentId: agent.id, role: "user", content: message },
+        // Explicit timestamps (+1ms for the reply) so a transcript always
+        // orders question before answer even though both are written at once.
+        data: { chatSessionId: chatSession.id, agentId: agent.id, role: "user", content: message, createdAt: now },
       }),
       db.message.create({
         data: {
@@ -189,6 +206,7 @@ export async function POST(req: NextRequest) {
           role: "assistant",
           content: reply,
           tokens: totalTokens,
+          createdAt: new Date(now.getTime() + 1),
         },
       }),
       db.usage.upsert({
@@ -196,13 +214,32 @@ export async function POST(req: NextRequest) {
         update: { messageCount: { increment: 1 }, tokenCount: { increment: totalTokens } },
         create: { userId: apiKey.userId, agentId: agent.id, month, messageCount: 1, tokenCount: totalTokens },
       }),
-      db.apiKey.update({ where: { id: apiKey.id }, data: { lastUsedAt: new Date() } }),
+      db.apiKey.update({ where: { id: apiKey.id }, data: { lastUsedAt: now } }),
+      db.chatSession.update({
+        where: { id: chatSession.id },
+        data: { messageCount: { increment: 2 }, lastMessageAt: now },
+      }),
+      ...(unanswered
+        ? [
+            db.unansweredQuestion.create({
+              data: {
+                apiKeyId: apiKey.id,
+                chatSessionId: chatSession.id,
+                question: message,
+                reply,
+                reason: unanswered,
+                topScore: context.topScore,
+              },
+            }),
+          ]
+        : []),
       ...(onTrial && trial
         ? [db.trial.update({ where: { id: trial.id }, data: { messagesUsed: { increment: 1 } } })]
         : []),
     ]);
 
-    return json({ reply, session_id: chatSession.id });
+    // `handoff` is additive — older widget builds simply ignore it.
+    return json({ reply, session_id: chatSession.id, handoff: handoff ? { reason: handoff } : null });
   } catch (err) {
     console.error("[api/v1/chat] error:", err);
     return json({ error: "Something went wrong. Please try again." }, { status: 500 });

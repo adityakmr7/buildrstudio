@@ -117,7 +117,7 @@ app/
   sitemap.ts, robots.ts
 
 public/
-  widget.js                     # The embeddable chat widget — vanilla JS IIFE, Shadow DOM (no iframe), <15KB. This is what site owners paste as a <script> tag.
+  widget.js                     # The embeddable chat widget — vanilla JS IIFE, Shadow DOM (no iframe), ~18KB unminified. This is what site owners paste as a <script> tag.
 
 prisma/
   schema.prisma                 # Operational data model — see "Database" below
@@ -242,6 +242,13 @@ iframe) so host-page CSS can't leak in or out, persists a session id in `localSt
 `/api/v1/chat`. Keep it dependency-free and small — there's no bundler step for this file, it ships
 as-is from `public/`.
 
+Appearance (greeting / brand color / position) resolves as `window.BuildrAgentConfig` (per-page
+override) > the install's saved dashboard config from `GET /api/v1/config?key=&agent=` (public,
+CORS-open, CDN-cached 5 min + stale-while-revalidate) > built-in defaults. The last fetched config is
+cached in `localStorage` (`buildr_agent_config_<agent>`) so repeat views render instantly; on a
+first view the widget waits up to 1.5s for the config before rendering with defaults. It sends the
+host `page_url` on a session's first message.
+
 `app/api/v1/chat/route.ts` is what it talks to: validates the `Authorization: Bearer pk_live_...`
 key against `ApiKey`, rate-limits per key (in-memory — see `app/lib/rateLimit.ts`, acceptable for
 MVP per the plan's constraints), checks the caller's monthly quota (falls back to a small
@@ -263,6 +270,78 @@ route enforces the trial window + message count when there's no active subscript
 the Paddle webhook reuses the trial key (its existing "reuse a key for user+agent" behaviour) and
 calls `markTrialConverted()`, so the customer's embed keeps working after upgrading.
 
+### Website knowledge sources ("Train from a website URL")
+
+`app/lib/crawler.ts` crawls a start URL (BFS over same-site links) or a sitemap.xml (one level of
+sitemap index): max 50 pages, 8s per page, ~35s total budget, 4 concurrent fetches, robots.txt
+honoured (`BuildrStudioBot` group, else `*`), nav/header/footer/script/style stripped with
+`node-html-parser`, content-hash dedupe. All network access goes through `app/lib/safeFetch.ts`
+(SSRF guard: http/https + ports 80/443 only, private/loopback/link-local/CGNAT/metadata IPs refused
+at *connect time* via a custom DNS lookup, redirects re-validated). `app/lib/websiteKnowledge.ts`
+chunks per page, embeds with `batchEmbedContents`, and replaces only that `KnowledgeSource`'s chunks
+(`DocumentChunk.sourceId`). Pasted text is `sourceId = null` and is still replaced as a whole on save.
+All sources share `MAX_CHUNKS_PER_KEY`. Runs synchronously in the request (`maxDuration = 60`).
+
+### Lead capture + handoff
+
+`app/lib/handoff.ts` decides when the chat API returns `handoff: { reason }`: the visitor asked for a
+person / callback / pricing (regex), the model ended its reply with `[[HANDOFF]]` (instruction
+appended to every system prompt, token stripped before returning), or the install has knowledge
+but the best chunk scored under `LOW_CONFIDENCE_SCORE`. `public/widget.js` then shows a lead form
+(also reachable via "Talk to a person" in the header) that posts to `POST /api/v1/leads`
+(CORS-open, key-authenticated, honeypot + per-IP/per-key rate limits). Leads are stored in `Lead`
+(tied to ApiKey/Agent/User and the ChatSession). `app/lib/leads.ts#notifyLead` runs in `after()`:
+email via Resend only when `RESEND_API_KEY` + `LEADS_FROM_EMAIL` are set, and a per-install webhook
+(`ApiKey.leadWebhookUrl`, https only, sent via `safePost` for SSRF safety, signed
+`X-BuildrStudio-Signature: sha256=HMAC(secret, "<timestamp>.<body>")`). WhatsApp is a wa.me
+click-to-chat link returned to the visitor when the owner set `ApiKey.whatsappNumber`. Dashboard:
+`/dashboard/leads` + CSV export (`/api/leads/export`), settings modal "Lead handoff".
+
+### INR payments (Razorpay), alongside Paddle
+
+Feature-flagged. Everything is off (Paddle only) unless `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`
+and `RAZORPAY_WEBHOOK_SECRET` are set. Each tier also needs `RAZORPAY_PLAN_<AGENT_SLUG>_<TIER>`,
+e.g. `RAZORPAY_PLAN_SUPPORT_AGENT_STARTER_STANDARD`. INR prices are never in code: they're read
+from the Razorpay plan (`GET /v1/plans/:id`, cached 10 min), and non-INR plans are ignored.
+
+- `app/lib/razorpay.ts`: fetch-based API client, signature checks, status mapping.
+- `app/lib/razorpayServer.ts`: `applyRazorpaySubscription` (upserts AgentSubscription with
+  `provider = "razorpay"`) and `getInrTierOptions`.
+- Flow:
+  - `/api/razorpay/plans?agent=` (public; enabled flag, INR labels, `suggestInr` from
+    `x-vercel-ip-country` / Accept-Language)
+  - `POST /api/razorpay/subscribe` (creates the subscription and a `status: "created"` row)
+  - checkout.js (`RazorpayCheckoutButton`)
+  - `POST /api/razorpay/verify` (HMAC of `payment_id|subscription_id`, then re-reads the status
+    from Razorpay)
+  - `POST /api/webhooks/razorpay` (HMAC of the raw body; idempotent via `ProcessedWebhookEvent`
+    keyed on `x-razorpay-event-id`; the entity's status is the source of truth)
+  - `POST /api/razorpay/cancel` (cancel at cycle end; Razorpay has no customer portal)
+- Access is granted by `app/lib/subscriptionAccess.ts#grantAgentAccess`, which is shared with the
+  Paddle webhook: create a key if the user has none for the agent (trial keys are kept), then mark
+  the trial converted.
+- Only `status: "active"` grants access anywhere.
+- `bun run test:razorpay` checks signatures with fake secrets.
+
+### WordPress plugin
+
+`integrations/wordpress/buildrstudio/` is a standalone GPL WordPress plugin: a settings page and a
+footer enqueue of `widget.js`, with `data-*` attributes added via `script_loader_tag`. It isn't
+part of the Next build. `npm run zip:wordpress` builds `public/downloads/buildrstudio-wordpress.zip`
+(committed, deterministic). Re-run it after any plugin edit. `npm run check:wordpress-zip` detects
+drift. See `integrations/wordpress/README.md`.
+
+### Conversation log + unanswered questions
+
+The chat route stores every exchange (`ChatSession` with `pageUrl`, `messageCount`,
+`lastMessageAt`; `Message` rows). When an answer is flagged by `app/lib/handoff.ts#unansweredReason`
+(model emitted the handoff token, or best RAG score under `LOW_CONFIDENCE_SCORE`) it also writes an
+`UnansweredQuestion`. Dashboard: `/dashboard/conversations` (7d/30d counts, list, detail at
+`/dashboard/conversations/[id]`) and `/dashboard/unanswered`, where "Add answer to knowledge"
+(`POST /api/unanswered/[id]`) embeds a Q&A chunk into a per-install `KnowledgeSource` of kind `qa`
+(`app/lib/qaKnowledge.ts`). Pasted-text saves only replace `sourceId = null` chunks, so Q&A and
+website chunks survive.
+
 ### Knowledge base / retrieval-augmented generation
 
 **This is what makes an agent actually useful, not just a demo** — without it, every subscriber to
@@ -274,9 +353,9 @@ that gap, deliberately kept simple for indie/small-business scale rather than en
 - **One knowledge base per `ApiKey`** (one install = one knowledge base), not a multi-document CMS.
   Uploading replaces the previous one entirely (`DocumentChunk.deleteMany` then re-create in a
   `$transaction`) — there's no per-document add/remove.
-- **Plain text only.** Paste text directly, or pick a `.txt`/`.md` file — the browser reads it with
+- **Plain text + websites.** Paste text directly, or pick a `.txt`/`.md` file — the browser reads it with
   `file.text()` client-side and appends it into the same textarea; there's no server-side file
-  upload endpoint, no PDF parsing, no URL scraping. Deliberately deferred, not forgotten — see the
+  upload endpoint and no PDF parsing. Websites are crawled separately (see above). Deliberately deferred, not forgotten — see the
   plan doc if reviving this decision.
 - **Chunking is naive**: fixed-size character windows (800 chars, 100 overlap) in `chunkText()` —
   no sentence-aware or semantic chunking. Fine at this scale; revisit only if quality actually

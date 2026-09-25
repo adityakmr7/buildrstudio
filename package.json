@@ -6,7 +6,13 @@
     "dev": "next dev -p 3005",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:crawler": "tsx scripts/test-crawler.ts",
+    "test:leads": "tsx scripts/test-leads.ts",
+    "zip:wordpress": "node scripts/zip-wordpress-plugin.mjs",
+    "check:wordpress-zip": "node scripts/zip-wordpress-plugin.mjs --check",
+    "test:razorpay": "tsx scripts/test-razorpay-signature.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@auth/core": "^0.34.3",
@@ -24,6 +30,7 @@
     "modern-screenshot": "^4.7.0",
     "next": "16.1.6",
     "next-auth": "^5.0.0-beta.31",
+    "node-html-parser": "^9.0.4",
     "postcss-import": "^16.1.1",
     "prisma": "^7.9.1",
     "react": "19.2.3",
