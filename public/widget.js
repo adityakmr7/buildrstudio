@@ -36,7 +36,14 @@
   // never shifts the host page's layout either way.
   var userConfig = window.BuildrAgentConfig || {};
   var DEFAULTS = { greeting: "Hi! How can I help you today?", color: "#2563EB", position: "bottom-right" };
-  var apiUrl = userConfig.apiUrl || apiUrlAttr || "https://buildrstudio.in/api/v1/chat";
+  // Default to the canonical www host: the apex (buildrstudio.in) answers
+  // with a 307 to www, and browsers refuse to follow a redirect on a CORS
+  // preflight ("Redirect is not allowed for a preflight request"), which
+  // broke chat + lead POSTs (and the redirect response has no
+  // Access-Control-Allow-Origin, so the config GET failed too) on every
+  // customer site. Loading this script via the apex URL is fine — plain
+  // <script> loads follow redirects — only fetch() needs the direct host.
+  var apiUrl = userConfig.apiUrl || apiUrlAttr || "https://www.buildrstudio.in/api/v1/chat";
   var configUrl =
     userConfig.configUrl ||
     apiUrl.replace(/\/chat\/?$/, "/config") + "?key=" + encodeURIComponent(apiKey) + "&agent=" + encodeURIComponent(agentId);
