@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Play } from "@phosphor-icons/react/dist/ssr";
 import ProductFrame from "./ProductFrame";
 import { DEMO_AGENT } from "./homeData";
+import { TRIAL_DAYS } from "../../lib/trial";
 
 export default function Hero() {
   return (
@@ -22,7 +23,7 @@ export default function Hero() {
         <div className="flex flex-col gap-10 lg:col-span-5 lg:pt-6">
           <p className="body-copy text-[17px] leading-[1.6] sm:text-lg">
             Deploy a pre-built agent for customer support or internal knowledge in minutes. One script tag.
-            No AI team required.
+            No AI team required. Try any live agent free for {TRIAL_DAYS} days, no card.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link href="/agents" className="btn-primary">

@@ -3,8 +3,9 @@
 // business, instead of giving every subscriber the identical generic
 // system prompt. Deliberately simple for indie/small-business scale:
 //   - One knowledge base per ApiKey (upload/replace, not a document CMS)
-//   - Plain-text input only (paste, or a .txt/.md file read client-side) —
-//     no PDF parsing, no URL scraping, for now
+//   - Plain-text input (paste, or a .txt/.md file read client-side), plus
+//     websites crawled from a URL/sitemap (app/lib/websiteKnowledge.ts) —
+//     no PDF parsing for now
 //   - Embeddings stored as Float[] and compared with in-app cosine
 //     similarity — no pgvector extension to manage. Fine up to a few
 //     hundred chunks per customer; revisit only if that stops being true.
@@ -49,6 +50,27 @@ export async function embedText(text: string): Promise<number[]> {
   return result.embedding.values;
 }
 
+// Batch embedding (one request per EMBED_BATCH_SIZE texts) — used by website
+// sync, where a crawl can produce a couple of hundred chunks and one request
+// per chunk wouldn't fit in a single serverless invocation.
+const EMBED_BATCH_SIZE = 50;
+
+export async function embedTexts(texts: string[]): Promise<number[][]> {
+  const model = getGemini().getGenerativeModel({ model: EMBEDDING_MODEL });
+  const out: number[][] = [];
+  for (let i = 0; i < texts.length; i += EMBED_BATCH_SIZE) {
+    const batch = texts.slice(i, i + EMBED_BATCH_SIZE);
+    const result = await model.batchEmbedContents({
+      requests: batch.map((text) => ({ content: { role: "user", parts: [{ text }] } })),
+    });
+    if (result.embeddings.length !== batch.length) {
+      throw new Error("Embedding batch returned the wrong number of vectors.");
+    }
+    out.push(...result.embeddings.map((e) => e.values));
+  }
+  return out;
+}
+
 export function cosineSimilarity(a: number[], b: number[]): number {
   let dot = 0;
   let normA = 0;
@@ -62,22 +84,40 @@ export function cosineSimilarity(a: number[], b: number[]): number {
   return denom === 0 ? 0 : dot / denom;
 }
 
+export interface RetrievedContext {
+  chunks: string[];
+  hasKnowledge: boolean; // does this install have any knowledge at all?
+  topScore: number | null; // best cosine similarity, null if no knowledge
+}
+
 /**
  * Returns the most relevant chunks of a customer's knowledge base for a
- * given query, or an empty array if they haven't uploaded one. Caller
- * decides what to do with an empty result (agent just answers generically).
+ * given query plus how confident the match was (used by app/lib/handoff.ts
+ * to spot questions the knowledge base doesn't cover).
  */
-export async function retrieveRelevantChunks(apiKeyId: string, query: string): Promise<string[]> {
+export async function retrieveContext(apiKeyId: string, query: string): Promise<RetrievedContext> {
   const chunks = await db.documentChunk.findMany({
     where: { apiKeyId },
     select: { content: true, embedding: true },
   });
-  if (chunks.length === 0) return [];
+  if (chunks.length === 0) return { chunks: [], hasKnowledge: false, topScore: null };
 
   const queryEmbedding = await embedText(query);
   const scored = chunks
     .map((c) => ({ content: c.content, score: cosineSimilarity(queryEmbedding, c.embedding) }))
     .sort((a, b) => b.score - a.score);
 
-  return scored.slice(0, RETRIEVAL_TOP_K).map((s) => s.content);
+  return {
+    chunks: scored.slice(0, RETRIEVAL_TOP_K).map((s) => s.content),
+    hasKnowledge: true,
+    topScore: scored[0]?.score ?? null,
+  };
+}
+
+/**
+ * Returns the most relevant chunks of a customer's knowledge base for a
+ * given query, or an empty array if they haven't uploaded one.
+ */
+export async function retrieveRelevantChunks(apiKeyId: string, query: string): Promise<string[]> {
+  return (await retrieveContext(apiKeyId, query)).chunks;
 }

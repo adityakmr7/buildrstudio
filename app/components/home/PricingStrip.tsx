@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { LIVE_AGENTS, COMING_SOON_AGENTS } from "./homeData";
 import SectionHeading from "./SectionHeading";
+import { TRIAL_SUMMARY } from "../../lib/trial";
+import { isRazorpayEnabled } from "../../lib/razorpay";
 
 // Prices come straight from app/lib/agentCatalog.ts — nothing is restated here.
 export default function PricingStrip() {
@@ -10,7 +12,13 @@ export default function PricingStrip() {
       <div className="mx-auto grid max-w-[1200px] gap-10 px-4 py-16 sm:px-6 md:py-24 grid-cols-1 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-4">
           <SectionHeading index="04" kicker="Pricing" id="pricing-title" title="Priced per agent.">
-            <p>Monthly, per agent, billed through Paddle. Full tier details live on each agent&apos;s page.</p>
+            <p>
+              Monthly, per agent, billed through Paddle
+              {/* Evaluated at build time (this page is static): only mentions INR when Razorpay is configured. */}
+              {isRazorpayEnabled() ? ", or in rupees via Razorpay (UPI AutoPay) if you're in India" : ""}. Full tier
+              details live on each agent&apos;s page.
+            </p>
+            <p className="mt-3">Every live agent starts with a {TRIAL_SUMMARY}.</p>
           </SectionHeading>
         </div>
 

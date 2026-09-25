@@ -32,6 +32,8 @@ model User {
   apiKeys       ApiKey[]
   subscriptions AgentSubscription[]
   usage         Usage[]
+  trials        Trial[]
+  leads         Lead[]
 }
 
 /// One row per catalog product (see app/lib/agentCatalog.ts). Not user-owned —
@@ -55,6 +57,8 @@ model Agent {
   chatSessions  ChatSession[]
   messages      Message[]
   usage         Usage[]
+  trials        Trial[]
+  leads         Lead[]
 }
 
 /// Standard / Pro packaging per agent. `paddlePriceId` is null until real
@@ -93,10 +97,47 @@ model ApiKey {
   color    String @default("#2563EB")
   position String @default("bottom-right") // "bottom-right" | "bottom-left"
 
-  chatSessions   ChatSession[]
-  documentChunks DocumentChunk[]
+  // Lead handoff (see app/lib/leads.ts). All optional — with none set, leads
+  // still land in the dashboard (and by email if RESEND_API_KEY is set).
+  leadEmailEnabled  Boolean @default(true)
+  leadWebhookUrl    String?
+  leadWebhookSecret String? // HMAC-SHA256 signing secret for leadWebhookUrl
+  whatsappNumber    String? // digits incl. country code, e.g. 919876543210
+
+  chatSessions     ChatSession[]
+  documentChunks   DocumentChunk[]
+  knowledgeSources KnowledgeSource[]
+  leads            Lead[]
+  unanswered       UnansweredQuestion[]
+  trial            Trial?
 
   @@index([userId, agentId])
+}
+
+/// A no-card free trial of one live agent (see app/lib/trial.ts for the
+/// limits and app/lib/trialServer.ts for issuance). One row per user per
+/// agent, ever — the unique constraint is the "one trial per agent" rule.
+/// The trial's ApiKey is the same key a paid subscription later keeps using
+/// (the Paddle webhook reuses an existing key for user+agent), so upgrading
+/// never breaks an embed that's already live. `convertedAt` is set when a
+/// paid subscription activates; after that the subscription's tier limits
+/// apply and the trial limits are ignored.
+model Trial {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  agentId      String
+  agent        Agent     @relation(fields: [agentId], references: [id])
+  apiKeyId     String    @unique
+  apiKey       ApiKey    @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  messageLimit Int
+  messagesUsed Int       @default(0)
+  startedAt    DateTime  @default(now())
+  endsAt       DateTime
+  convertedAt  DateTime?
+
+  @@unique([userId, agentId])
+  @@index([userId])
 }
 
 /// One customer's knowledge base, scoped to their ApiKey (one install = one
@@ -107,14 +148,45 @@ model ApiKey {
 /// nowhere near a performance concern at this scale. See
 /// app/lib/knowledge.ts for the retrieval logic.
 model DocumentChunk {
-  id        String   @id @default(cuid())
+  id        String           @id @default(cuid())
   apiKeyId  String
-  apiKey    ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
-  source    String // filename, or "Pasted text"
-  content   String   @db.Text
+  apiKey    ApiKey           @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  source    String // filename, "Pasted text", or the page URL for crawled chunks
+  content   String           @db.Text
   embedding Float[]
-  createdAt DateTime @default(now())
+  createdAt DateTime         @default(now())
+  // null = the pasted/uploaded text knowledge base (replaced as a whole on
+  // save, as before). Set = chunks owned by one KnowledgeSource (a crawled
+  // website), replaced only when that source is re-synced.
+  sourceId  String?
+  sourceRef KnowledgeSource? @relation(fields: [sourceId], references: [id], onDelete: Cascade)
 
+  @@index([apiKeyId])
+  @@index([sourceId])
+}
+
+/// A knowledge source that isn't the pasted-text box — currently a website
+/// crawled from a start URL or sitemap.xml (see app/lib/crawler.ts). Stores
+/// the last sync's result so the dashboard can show pages found/ingested and
+/// errors, and so "Re-sync" can re-crawl and replace just this source's chunks.
+model KnowledgeSource {
+  id            String    @id @default(cuid())
+  apiKeyId      String
+  apiKey        ApiKey    @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  kind          String    @default("website") // "website" | "qa" (answers added from Unanswered questions)
+  url           String
+  status        String    @default("pending") // pending | ok | partial | failed
+  pagesFound    Int       @default(0)
+  pagesIngested Int       @default(0)
+  chunkCount    Int       @default(0)
+  errors        Json? // [{ url, error }] from the last sync, capped
+  lastSyncedAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  chunks DocumentChunk[]
+
+  @@unique([apiKeyId, url])
   @@index([apiKeyId])
 }
 
@@ -123,14 +195,23 @@ model DocumentChunk {
 /// codebase — auth uses JWT sessions, no Prisma adapter, no DB-backed auth
 /// session table).
 model ChatSession {
-  id        String    @id @default(cuid())
-  agentId   String
-  agent     Agent     @relation(fields: [agentId], references: [id])
-  apiKeyId  String
-  apiKey    ApiKey    @relation(fields: [apiKeyId], references: [id])
-  messages  Message[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id            String               @id @default(cuid())
+  agentId       String
+  agent         Agent                @relation(fields: [agentId], references: [id])
+  apiKeyId      String
+  apiKey        ApiKey               @relation(fields: [apiKeyId], references: [id])
+  messages      Message[]
+  leads         Lead[]
+  unanswered    UnansweredQuestion[]
+  // Conversation-log bookkeeping (dashboard → Conversations). pageUrl is the
+  // page the widget was opened on when the conversation started.
+  pageUrl       String?
+  messageCount  Int                  @default(0)
+  lastMessageAt DateTime?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  @@index([apiKeyId, lastMessageAt])
 }
 
 model Message {
@@ -163,19 +244,87 @@ model Usage {
 }
 
 model AgentSubscription {
-  id                   String    @id @default(cuid())
-  userId               String
-  user                 User      @relation(fields: [userId], references: [id])
-  agentId              String
-  agent                Agent     @relation(fields: [agentId], references: [id])
-  tierId               String
-  tier                 AgentTier @relation(fields: [tierId], references: [id])
-  paddleCustomerId     String?
-  paddleSubscriptionId String?   @unique
-  status               String    @default("active") // active | canceled | past_due | paused
-  currentPeriodEnd     DateTime?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  id                     String    @id @default(cuid())
+  userId                 String
+  user                   User      @relation(fields: [userId], references: [id])
+  agentId                String
+  agent                  Agent     @relation(fields: [agentId], references: [id])
+  tierId                 String
+  tier                   AgentTier @relation(fields: [tierId], references: [id])
+  // "paddle" (default, all pre-existing rows) or "razorpay" (INR / UPI path)
+  provider               String    @default("paddle")
+  paddleCustomerId       String?
+  paddleSubscriptionId   String?   @unique
+  razorpaySubscriptionId String?   @unique
+  razorpayCustomerId     String?
+  // Razorpay only: owner asked to cancel; access continues until currentPeriodEnd.
+  cancelAtPeriodEnd      Boolean   @default(false)
+  // active | canceled | past_due | paused, plus "created" for a Razorpay
+  // subscription whose checkout hasn't completed yet (never grants access).
+  status                 String    @default("active")
+  currentPeriodEnd       DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
   @@index([userId, agentId])
+}
+
+/// Webhook deliveries already handled, keyed by provider + the provider's
+/// event id (Razorpay: x-razorpay-event-id). Makes retried/duplicated
+/// deliveries a no-op.
+model ProcessedWebhookEvent {
+  id        String   @id // "<provider>:<event id>"
+  provider  String
+  eventType String
+  createdAt DateTime @default(now())
+}
+
+/// A visitor who left their details in the widget's lead form — either
+/// because the agent couldn't answer / they asked for a person (the chat API
+/// returns a `handoff` signal) or via the widget's "Talk to a person" link.
+/// Owned by the install (ApiKey) and its owner (User); linked to the
+/// conversation it came from when there is one.
+model Lead {
+  id            String       @id @default(cuid())
+  apiKeyId      String
+  apiKey        ApiKey       @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  agentId       String
+  agent         Agent        @relation(fields: [agentId], references: [id])
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  chatSessionId String?
+  chatSession   ChatSession? @relation(fields: [chatSessionId], references: [id], onDelete: SetNull)
+  name          String
+  email         String
+  phone         String?
+  message       String?      @db.Text
+  trigger       String // "no_answer" | "asked_human" | "manual"
+  pageUrl       String?
+  emailStatus   String? // "sent" | "skipped" | "failed"
+  webhookStatus String? // "sent" | "skipped" | "failed"
+  createdAt     DateTime     @default(now())
+
+  @@index([apiKeyId, createdAt])
+  @@index([userId, createdAt])
+}
+
+/// A visitor question the agent couldn't answer well — the model flagged it
+/// ([[HANDOFF]]) or retrieval found nothing close (see app/lib/handoff.ts).
+/// Listed in dashboard → Unanswered so the owner can add an answer to the
+/// knowledge base ("qa" KnowledgeSource) or dismiss it.
+model UnansweredQuestion {
+  id            String       @id @default(cuid())
+  apiKeyId      String
+  apiKey        ApiKey       @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  chatSessionId String?
+  chatSession   ChatSession? @relation(fields: [chatSessionId], references: [id], onDelete: SetNull)
+  question      String       @db.Text
+  reply         String?      @db.Text // what the agent said at the time
+  reason        String // "model_unsure" | "low_score"
+  topScore      Float?
+  status        String       @default("open") // open | answered | dismissed
+  resolvedAt    DateTime?
+  createdAt     DateTime     @default(now())
+
+  @@index([apiKeyId, status, createdAt])
 }

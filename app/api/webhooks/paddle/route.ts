@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { randomBytes } from "crypto";
 import { getPaddle } from "../../../lib/paddle";
 import { db } from "../../../lib/db";
+import { grantAgentAccess } from "../../../lib/subscriptionAccess";
 
 export const runtime = "nodejs";
 
@@ -12,10 +12,6 @@ interface CheckoutCustomData {
   userId?: string;
   agentId?: string;
   tierId?: string;
-}
-
-function generateApiKey() {
-  return `pk_live_${randomBytes(18).toString("hex")}`;
 }
 
 export async function POST(req: NextRequest) {
@@ -73,20 +69,9 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        // Auto-provision an API key for this user+agent if they don't have
-        // one yet, so the dashboard has something to show immediately.
-        const existingKey = await db.apiKey.findFirst({
-          where: { userId: customData.userId, agentId: customData.agentId },
-        });
-        if (!existingKey) {
-          await db.apiKey.create({
-            data: {
-              key: generateApiKey(),
-              userId: customData.userId,
-              agentId: customData.agentId,
-            },
-          });
-        }
+        // Auto-provision an API key if the user has none for this agent (a
+        // free-trial key is reused as-is) and mark the trial converted.
+        await grantAgentAccess(customData.userId, customData.agentId);
         break;
       }
 

@@ -87,8 +87,8 @@ export interface AgentProduct {
   // general-purpose agents, not vertical-specific builds.
   businessTypes: BusinessType[];
   // Real, currently-supported knowledge sources only — see
-  // app/lib/knowledge.ts. Do not list PDF/Notion/website-crawl; none of
-  // those exist yet.
+  // app/lib/knowledge.ts and app/lib/websiteKnowledge.ts. Do not list
+  // PDF/Notion; neither exists yet.
   connectsTo: string[];
   // Realistic prompts shown as clickable chips in the live demo.
   suggestedQuestions: string[];
@@ -107,14 +107,14 @@ export const AGENT_CATALOG: AgentProduct[] = [
     precedent: "Distilled from our highest-performing support-deflection build.",
     whoFor: "Support/CX teams drowning in repetitive tickets.",
     prebuilt: "Conversational engine, escalation logic, retrieval pipeline, embeddable widget.",
-    configurable: "Your knowledge base, tone/greeting, brand color, and helpdesk handoff.",
+    configurable: "Your knowledge base, greeting, brand color, and where leads go (email, webhook, or WhatsApp).",
     description:
       "A conversational agent trained on your docs and tuned to your product's tone, with clear escalation rules — subscribe, drop in a script tag, and it starts handling repeatable questions immediately.",
     whatsIncluded: [
       "Embeddable chat widget — one script tag, works on any website",
       "Retrieval pipeline over documents you upload",
       "Configurable greeting, brand color, and widget position",
-      "Escalation logic to flag conversations for a human",
+      "Hands off to a person: when it can't answer or a visitor asks, it collects their name, email and phone and notifies you",
       "Usage dashboard with message counts and conversation history",
     ],
     installTime: "Live in minutes — copy one script tag, no code required",
@@ -146,7 +146,7 @@ export const AGENT_CATALOG: AgentProduct[] = [
     ],
     outcomes: ["customer-support", "website-assistant"],
     businessTypes: ["SaaS", "E-commerce", "Agency", "Startup", "Local business"],
-    connectsTo: ["Pasted text", ".txt files", ".md files"],
+    connectsTo: ["Pasted text", ".txt files", ".md files", "Your website (URL or sitemap)"],
     suggestedQuestions: [
       "What does this product do?",
       "How much does it cost?",
@@ -204,7 +204,7 @@ export const AGENT_CATALOG: AgentProduct[] = [
     ],
     outcomes: ["knowledge"],
     businessTypes: ["SaaS", "Startup", "Agency", "Developer tool"],
-    connectsTo: ["Pasted text", ".txt files", ".md files"],
+    connectsTo: ["Pasted text", ".txt files", ".md files", "Your website (URL or sitemap)"],
     suggestedQuestions: [
       "What documentation do you have access to?",
       "Summarize the key points from our docs",
