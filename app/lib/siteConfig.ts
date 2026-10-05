@@ -1,9 +1,9 @@
 export const siteConfig = {
-  name: "Buildr Studio",
+  name: "BuildrStudio",
   url: "https://buildrstudio.in",
-  tagline: "AI employees for your small business",
+  tagline: "Thoughtfully built. Human at heart.",
   description:
-    "Deploy pre-built AI agents for customer support, knowledge, and business automation in minutes — no AI expertise required. Pick one, connect your business info, and it's live on your site.",
+    "BuildrStudio is an independent product company building thoughtful digital experiences for everyday life. Meet Numa, our pregnancy and baby companion in Android internal testing.",
 
   contact: {
     email: "hello@buildrstudio.in",

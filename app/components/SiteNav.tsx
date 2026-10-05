@@ -8,9 +8,9 @@ import { isDevAuthBypassEnabled, DEV_BYPASS_PROVIDER_ID } from "../lib/devAuth";
 import Wordmark from "./Wordmark";
 
 const NAV_LINKS = [
-  { label: "Agents", href: "/agents" },
-  { label: "Solutions", href: "/#jobs" },
-  { label: "Pricing", href: "/#pricing" },
+  { label: "Products", href: "/#products" },
+  { label: "About", href: "/#about" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export default function SiteNav() {

@@ -2,7 +2,7 @@ import Link from "next/link";
 import Wordmark from "./Wordmark";
 
 const FOOTER_LINKS = [
-  { label: "Agents", href: "/agents" },
+  { label: "Products", href: "/#products" },
   { label: "Privacy", href: "/privacy" },
   { label: "Terms", href: "/terms" },
   { label: "hello@buildrstudio.in", href: "mailto:hello@buildrstudio.in" },
@@ -14,7 +14,7 @@ export default function SiteFooter() {
       <div className="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-2">
           <Wordmark />
-          <p className="text-[13px] text-faint">AI employees for your business. A BuildrStudio product.</p>
+          <p className="text-[13px] text-faint">Independent products. Thoughtfully built.</p>
         </div>
 
         <nav aria-label="Footer">
