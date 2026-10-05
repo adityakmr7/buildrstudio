@@ -1,22 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
 
-/** Square brass "B" mark + BuildrStudio lockup. */
 export default function Wordmark({ className = "" }: { className?: string }) {
-  return (
-    <Link
-      href="/"
-      aria-label="BuildrStudio home"
-      className={`group inline-flex items-center gap-2 rounded-[2px] text-cream ${className}`}
-    >
-      <span
-        aria-hidden="true"
-        className="grid size-6 place-items-center rounded-[2px] bg-brass font-mono text-[13px] font-bold leading-none text-ink"
-      >
-        B
-      </span>
-      <span className="text-[15px] font-semibold tracking-[-0.02em] transition-colors group-hover:text-white">
-        BuildrStudio
-      </span>
-    </Link>
-  );
+  return <Link href="/" aria-label="BuildrStudio home" className={className} style={{ display: "inline-flex", alignItems: "center", gap: 9, color: "var(--text)", fontSize: 21, fontWeight: 650, letterSpacing: -0.8 }}><Image src="/brand/assets/buildrstudio-mark.svg" alt="" width={30} height={30} />buildrstudio</Link>;
 }

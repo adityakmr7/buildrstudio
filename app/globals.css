@@ -2,24 +2,24 @@
 
 /* ═══════════════════════════════════════════════════════════════════
    BuildrStudio — design tokens
-   Dark workshop palette. Geist. One accent (brass), one signal (green).
-   Brass is reserved for: the wordmark mark, the nav rule, one underline,
-   and primary buttons. Green is reserved for "live" / "available".
+   Porcelain and evergreen company palette. Geist with editorial serif headings.
+   Legacy Tailwind token names are retained for existing customer pages.
+   New company surfaces use the CSS variable aliases below.
 ═══════════════════════════════════════════════════════════════════ */
 
 @theme {
   /* Palette */
-  --color-ink: #0c0b09;
-  --color-raised: #16140f;
-  --color-raised-2: #1d1a14;
-  --color-line: rgba(255, 244, 214, 0.12);
-  --color-line-strong: rgba(255, 244, 214, 0.24);
-  --color-cream: #f4efe4;
-  --color-muted: #a39a88; /* 7.0:1 on ink */
-  --color-faint: #8c8474; /* 5.3:1 on ink */
-  --color-brass: #e4b15a;
-  --color-brass-hover: #edc47e;
-  --color-live: #7dcea0;
+  --color-ink: #F7F9F6;
+  --color-raised: #FFFFFF;
+  --color-raised-2: #ECF1EB;
+  --color-line: #D8E0D8;
+  --color-line-strong: #8B9F92;
+  --color-cream: #153E35;
+  --color-muted: #536A62; /* Secondary text on porcelain */
+  --color-faint: #536A62; /* Accessible secondary text */
+  --color-brass: #153E35;
+  --color-brass-hover: #28594A;
+  --color-live: #38775F;
 
   /* Type */
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -29,7 +29,7 @@
   --text-hero--line-height: 0.96;
 
   /* Shape */
-  --radius-card: 2px;
+  --radius-card: 20px;
   --radius-btn: 8px;
 
   /* Motion */
@@ -51,8 +51,8 @@
   --border-strong: var(--color-line-strong);
   --accent: var(--color-brass);
   --accent-mid: var(--color-brass-hover);
-  --accent-soft: rgba(228, 177, 90, 0.1);
-  --accent-ink: var(--color-ink); /* text on brass */
+  --accent-soft: #D7E9DB;
+  --accent-ink: #FFFFFF; /* text on evergreen */
   --text: var(--color-cream);
   --text-1: var(--color-cream);
   --muted: var(--color-muted);
@@ -72,7 +72,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    color-scheme: dark;
+    color-scheme: light;
     background: var(--color-ink);
   }
 
@@ -92,7 +92,7 @@
   }
 
   ::selection {
-    background: rgba(228, 177, 90, 0.28);
+    background: #D7E9DB;
     color: var(--color-cream);
   }
 

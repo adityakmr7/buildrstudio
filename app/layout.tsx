@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import Script from "next/script";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
@@ -8,15 +8,15 @@ import { AuthProvider } from "./components/AuthProvider";
 import { siteConfig } from "./lib/siteConfig";
 import "./globals.css";
 
-const geistSans = Geist({
-  subsets: ["latin"],
+const geistSans = localFont({
+  src: "../public/brand/assets/geist.woff2",
   variable: "--font-geist-sans",
   display: "swap",
   preload: true,
 });
 
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
+const geistMono = localFont({
+  src: "../public/brand/assets/geist-mono.woff2",
   variable: "--font-geist-mono",
   display: "swap",
   preload: false,
@@ -25,25 +25,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: "BuildrStudio — AI employees for your business",
+    default: "BuildrStudio | Thoughtfully built. Human at heart.",
     template: "%s — BuildrStudio",
   },
-  description:
-    "Skip the build. Keep the control. Deploy a pre-built AI agent for customer support or internal knowledge in minutes. One script tag, no AI team required.",
-  authors: [{ name: "Buildr Studio", url: siteConfig.url }],
-  keywords: [
-    "AI employees for small business",
-    "AI customer support agent",
-    "embeddable AI chat widget",
-    "RAG knowledge assistant",
-    "AI chatbot for website",
-    "no-code AI agent",
-    "business automation",
-    "Buildr Studio",
-  ],
+  description: siteConfig.description,
+  authors: [{ name: "BuildrStudio", url: siteConfig.url }],
+  keywords: ["BuildrStudio", "independent product company", "Numa", "pregnancy companion"],
   openGraph: {
     type: "website",
-    siteName: "Buildr Studio",
+    siteName: "BuildrStudio",
   },
   twitter: {
     card: "summary_large_image",
@@ -69,7 +59,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
-      <body className="bg-ink font-sans text-cream" suppressHydrationWarning>
+      <body  suppressHydrationWarning>
         <AuthProvider>
           <ToastProvider>
             {children}

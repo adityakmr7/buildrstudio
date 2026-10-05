@@ -20,6 +20,7 @@ export async function generateMetadata({
 
   const title = `${product.name} — Buildr Studio`;
   return {
+    robots: { index: false, follow: false },
     title,
     description: product.description,
     alternates: {

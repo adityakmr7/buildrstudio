@@ -9,7 +9,17 @@ Section 10 is what actually happened.)
 
 ---
 
-## 0. Current status (read this first — updated 2026-08-27)
+## 0. Current status (read this first — updated 2026-10-05)
+
+**Company pivot:** BuildrStudio is now positioned as an independent product company, with Numa
+(a pregnancy and baby companion, in Android internal testing) as its first featured product. The homepage and
+`/products/numa` implement the approved evergreen/porcelain brand direction. Add future products
+in `app/lib/products.ts`. The original marketplace is no longer promoted or included in the sitemap;
+agent pages are noindex. Existing agent APIs, billing webhooks, dashboard, database and service legal
+terms remain intact for continuity. The Numa detail page links to the owner-provided Google Play internal test. Tester eligibility
+is managed by Google Play. No Firebase setup or Numa app implementation was added in this repository.
+No deployment has been performed as part of this pivot. The status below describes the legacy service.
+
 
 Positioning is settled: a **small, indie/small-business-scale version of Kore.ai's core loop**
 (browse → subscribe → deploy a working agent), explicitly *not* matching Kore.ai's enterprise depth

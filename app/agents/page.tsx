@@ -5,6 +5,7 @@ import AgentsCatalogHub from "./AgentsCatalogHub";
 import { AGENT_CATALOG } from "../lib/agentCatalog";
 
 export const metadata: Metadata = {
+  robots: { index: false, follow: false },
   title: "AI Agents — Buildr Studio",
   description:
     "Find an AI employee for your business — customer support, knowledge, and automation agents you can try live and install with one script tag. No code required.",
