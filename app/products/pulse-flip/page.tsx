@@ -1,0 +1,10 @@
+import Image from "next/image";
+import Link from "next/link";
+import Script from "next/script";
+import { pulseMetadata, pulseJsonLd } from "./metadata";
+const title = "Pulseflip | One tap. A whole new gravity.";
+const description = "Flip gravity, dodge neon hazards, and chase your best run. Pulseflip is a one-tap arcade endless runner for iPhone and iPad.";
+export const metadata = pulseMetadata("", title, description);
+export default function PulsePage() {
+ return <main className="pulse-main"><Script id="pulse-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: pulseJsonLd("", title, description) }} /><section className="pulse-hero"><div><Image className="pulse-icon" src="/pulse-flip/icon.png" alt="Pulseflip app icon" width={80} height={80} /><p className="pulse-label">Pulseflip · Coming to iPhone & iPad</p><h1>One tap.<br />A whole new gravity.</h1><p>Floor to ceiling. Back again. Flip through a neon tunnel, dodge the next hazard, and turn one more try into your best run.</p><Link className="pulse-button" href="/products/pulse-flip/support">Get in touch</Link><p>Built for landscape play · iOS 16 and later</p></div><div className="pulse-art"><Image src="/pulse-flip/game.png" alt="Pulseflip’s neon arcade interface captured from the app" width={1320} height={608} sizes="(max-width: 720px) 100vw, 50vw" priority /></div></section><section className="pulse-features" aria-label="Game features"><div><h2>Easy to start. Hard to put down.</h2><p>Tap anywhere to flip gravity. Avoid spikes, lasers, moving platforms, and gaps as the tunnel gets faster.</p></div><div><h2>Find your rhythm.</h2><p>Collect Pulse Orbs, build a combo up to 10×, and earn near-miss bonuses on the way to a new personal best.</p></div><div><h2>A fresh course every day.</h2><p>Take on the Daily Challenge or chase distance in Classic. Complete daily missions to earn Sparks and unlock colors and trails.</p></div><div><h2>Play your way.</h2><p>Learn with an interactive tutorial, revisit your run statistics, and adjust music, sound, haptics, and reduced effects in Settings.</p></div></section></main>;
+}
