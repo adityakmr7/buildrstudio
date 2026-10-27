@@ -1,216 +1,156 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
-import SiteNav from "../components/SiteNav";
-import SiteFooter from "../components/SiteFooter";
+import Image from "next/image";
+import { siteConfig } from "../lib/siteConfig";
 
 export const metadata: Metadata = {
-  title: "Terms and Conditions",
-  description:
-    "Terms and conditions for Buildr Studio's AI agents. Subscription terms, acceptable use, and liability.",
-  alternates: { canonical: "https://buildrstudio.in/terms" },
+  title: "Terms and Conditions | BuildrStudio",
+  description: "Terms and conditions for using the BuildrStudio website and overview of our independent product terms.",
+  alternates: { canonical: `${siteConfig.url}/terms` },
   openGraph: {
-    title: "Terms and Conditions — Buildr Studio",
-    description: "Terms and conditions for using Buildr Studio.",
+    title: "Terms and Conditions — BuildrStudio",
+    description: "Terms and conditions for BuildrStudio and our products.",
     type: "website",
-    url: "https://buildrstudio.in/terms",
+    url: `${siteConfig.url}/terms`,
   },
 };
 
-const CONTACT_EMAIL = "hello@buildrstudio.in";
+const wrap = { maxWidth: 1240, margin: "0 auto", padding: "0 32px" };
 
 export default function TermsPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://buildrstudio.in" },
-      { "@type": "ListItem", position: 2, name: "Terms and Conditions", item: "https://buildrstudio.in/terms" },
+      { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
+      { "@type": "ListItem", position: 2, name: "Terms and Conditions", item: `${siteConfig.url}/terms` },
     ],
   };
 
   return (
-    <>
+    <div className="company-site" style={{ background: "var(--bg)", color: "var(--text)", minHeight: "100dvh" }}>
       <Script
         id="terms-jsonld"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <style>{`
-        .legal-wrap {
-          max-width: 760px;
-          margin: 0 auto;
-          padding: 64px 16px 96px;
-          font-family: var(--font-sans);
-          color: var(--text);
-        }
-        .legal-back {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 13px;
-          color: var(--muted-2);
-          text-decoration: none;
-          margin-bottom: 40px;
-          border-radius: 2px;
-          transition: color .2s;
-        }
-        .legal-back:hover { color: var(--text); }
-        .legal-wrap h1 {
-          font-size: clamp(36px, 5vw, 56px);
-          font-weight: 600;
-          line-height: 1.02;
-          letter-spacing: -0.04em;
-          color: var(--text);
-          margin-bottom: 8px;
-        }
-        .legal-date {
-          font-size: 13px;
-          color: var(--muted-2);
-          margin-bottom: 40px;
-          font-family: var(--font-mono);
-          font-size: 12px;
-          letter-spacing: 0.04em;
-        }
-        .legal-wrap h2 {
-          font-size: 20px;
-          font-weight: 600;
-          color: var(--text);
-          margin-top: 40px;
-          margin-bottom: 12px;
-          padding-top: 24px;
-          border-top: 1px solid var(--border);
-          letter-spacing: -0.02em;
-        }
-        .legal-wrap p, .legal-wrap li {
-          max-width: 68ch;
-          font-size: 16px;
-          line-height: 1.75;
-          color: var(--muted);
-        }
-        .legal-wrap strong { color: var(--text); font-weight: 600; }
-        .legal-wrap ul {
-          padding-left: 24px;
-          margin: 12px 0;
-          list-style: disc;
-        }
-        .legal-wrap li { margin-bottom: 5px; }
-        .legal-wrap a {
-          color: var(--text);
-          text-decoration: underline;
-          text-decoration-color: var(--border-strong);
-          text-underline-offset: 4px;
-          border-radius: 2px;
-        }
-        .legal-wrap a:hover { text-decoration-color: var(--text); }
-        .legal-footer {
-          margin-top: 64px;
-          padding-top: 24px;
-          border-top: 1px solid var(--border);
-          display: flex;
-          flex-wrap: wrap;
-          gap: 20px;
-          font-size: 13px;
-        }
-        .legal-footer a {
-          color: var(--muted-2);
-          text-decoration: none;
-          transition: color .2s;
-        }
-        .legal-footer a:hover { color: var(--text); }
-      `}</style>
-
-      <SiteNav />
-      <main className="legal-wrap">
-        <Link href="/" className="legal-back">← Back to Buildr Studio</Link>
-
-        <h1>Terms and Conditions</h1>
-        <p className="legal-date">Last updated: August 20, 2026</p>
-
-        <h2>1. Acceptance of Terms</h2>
-        <p>
-          By accessing or using the Buildr Studio website and marketplace at buildrstudio.in
-          (&quot;the Service&quot;), operated by Aditya Kumar (&quot;we&quot;, &quot;us&quot;,
-          &quot;our&quot;), you agree to be bound by these Terms and Conditions. If you do not
-          agree, do not use the Service.
-        </p>
-
-        <h2>2. Description of Service</h2>
-        <p>
-          Buildr Studio is a marketplace of pre-built AI agents that you can subscribe to and embed
-          on your own website via a JavaScript snippet. Each agent has a monthly message quota tied
-          to your subscription tier, described on that agent&apos;s product page.
-        </p>
-
-        <h2>3. Subscriptions and Billing</h2>
-        <ul>
-          <li>Subscriptions are billed monthly through Paddle, our merchant of record.</li>
-          <li>Paddle handles applicable tax/VAT as part of the checkout process.</li>
-          <li>You can cancel a subscription at any time from your dashboard; access continues until the end of the current billing period.</li>
-          <li>Exceeding your monthly message quota may pause the agent until the next billing cycle or until you upgrade your tier.</li>
-        </ul>
-
-        <h2>4. Your Responsibilities When Embedding an Agent</h2>
-        <ul>
-          <li>You are responsible for how you present an embedded agent to your own visitors, including any disclosures required by applicable law.</li>
-          <li>You must not use an agent to generate unlawful, deceptive, or harmful content.</li>
-          <li>API keys are tied to your account — do not share them publicly or embed them in a way that exposes them to unrelated parties.</li>
-        </ul>
-
-        <h2>5. Intellectual Property</h2>
-        <ul>
-          <li>Buildr Studio retains ownership of the agent templates, orchestration logic, and platform code.</li>
-          <li>You retain ownership of any content, documents, or data you upload to configure an agent (e.g. a knowledge base).</li>
-          <li>The Buildr Studio brand, logo, and website content remain our intellectual property.</li>
-        </ul>
-
-        <h2>6. Acceptable Use</h2>
-        <p>You agree not to:</p>
-        <ul>
-          <li>Use the Service for any unlawful purpose.</li>
-          <li>Attempt to reverse-engineer, scrape, or abuse rate limits on the Service.</li>
-          <li>Resell or sublicense access to an agent beyond your own website(s) without our consent.</li>
-        </ul>
-
-        <h2>7. Limitation of Liability</h2>
-        <p>
-          The Service is provided &quot;as is&quot; without warranties of any kind. AI-generated
-          responses may be inaccurate — you are responsible for reviewing agent behavior before
-          relying on it for anything business-critical. We are not liable for any indirect,
-          incidental, or consequential damages arising from your use of the Service.
-        </p>
-
-        <h2>8. Custom Engagements</h2>
-        <p>
-          For requirements outside the catalog, we also take on custom-built agent engagements under
-          a separate agreement — these terms apply to marketplace subscriptions only.
-        </p>
-
-        <h2>9. Changes to Terms</h2>
-        <p>
-          We may update these terms from time to time. Continued use of the Service after changes
-          constitutes acceptance of the updated terms.
-        </p>
-
-        <h2>10. Governing Law</h2>
-        <p>
-          These terms are governed by the laws of India. Any disputes shall be subject to the
-          exclusive jurisdiction of the courts in India.
-        </p>
-
-        <h2>11. Contact</h2>
-        <p>
-          For questions about these terms, contact us at{" "}
-          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
-        </p>
-
-        <div className="legal-footer">
-          <Link href="/privacy">Privacy Policy</Link>
-          <Link href="/">Home</Link>
+      <header style={{ borderBottom: "1px solid var(--border)" }}>
+        <div className="company-nav" style={wrap}>
+          <Link href="/" className="company-wordmark" aria-label="BuildrStudio home">
+            <Image src="/brand/assets/buildrstudio-mark.svg" alt="" width={34} height={34} />
+            buildrstudio
+          </Link>
+          <nav aria-label="Primary" style={{ display: "flex", gap: 28 }}>
+            <Link href="/#products">Products</Link>
+            <Link href="/#about">About</Link>
+            <a href={`mailto:${siteConfig.contact.email}`}>Say hello <span aria-hidden="true">↗</span></a>
+          </nav>
         </div>
+      </header>
+
+      <main style={{ maxWidth: 800, margin: "0 auto", padding: "56px 24px 80px" }}>
+        <Link className="company-back" href="/" style={{ display: "inline-block", fontSize: 13, marginBottom: 32 }}>
+          ← Back to BuildrStudio
+        </Link>
+
+        <h1 style={{ fontFamily: "Georgia, serif", fontWeight: 400, fontSize: "clamp(40px, 6vw, 56px)", letterSpacing: "-2px", margin: "0 0 12px" }}>
+          Terms & Conditions
+        </h1>
+        <p style={{ fontSize: 13, color: "var(--muted)", margin: "0 0 40px" }}>
+          Last updated: October 2026
+        </p>
+
+        <section style={{ lineHeight: 1.8, color: "var(--muted)", fontSize: 16 }}>
+          <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 400, fontSize: 24, letterSpacing: "-0.5px", color: "var(--text)", margin: "40px 0 12px" }}>
+            1. Overview
+          </h2>
+          <p>
+            Welcome to BuildrStudio (buildrstudio.in). BuildrStudio is an independent product studio founded by Aditya Kumar. By accessing or using this website, you agree to comply with and be bound by these Terms and Conditions.
+          </p>
+
+          <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 400, fontSize: 24, letterSpacing: "-0.5px", color: "var(--text)", margin: "40px 0 12px" }}>
+            2. Intellectual Property
+          </h2>
+          <p>
+            All original content, visual design, brand marks, and software on this website and within our products are the intellectual property of BuildrStudio and Aditya Kumar, protected by applicable copyright, trademark, and other intellectual property laws.
+          </p>
+
+          <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 400, fontSize: 24, letterSpacing: "-0.5px", color: "var(--text)", margin: "40px 0 12px" }}>
+            3. Product Terms & Disclaimers
+          </h2>
+          <p>
+            Individual products published by BuildrStudio (such as Numa, ArrowOut, and Pulseflip) have their own terms of use and platform end user license agreements (EULAs):
+          </p>
+          <ul style={{ paddingLeft: 24, margin: "16px 0" }}>
+            <li style={{ marginBottom: 8 }}>
+              <strong>ArrowOut:</strong> Governed by Apple&apos;s Standard EULA and the{" "}
+              <Link href="/products/arrow-out/terms" style={{ textDecoration: "underline", color: "var(--text)" }}>
+                ArrowOut Terms of Use
+              </Link>.
+            </li>
+            <li style={{ marginBottom: 8 }}>
+              <strong>Pulseflip:</strong> Governed by Apple&apos;s Standard EULA and the{" "}
+              <Link href="/products/pulse-flip/terms" style={{ textDecoration: "underline", color: "var(--text)" }}>
+                Pulseflip Terms of Use
+              </Link>.
+            </li>
+            <li style={{ marginBottom: 8 }}>
+              <strong>Numa:</strong> Distributed as an Android internal beta via Google Play under Google Play terms.
+            </li>
+          </ul>
+
+          <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 400, fontSize: 24, letterSpacing: "-0.5px", color: "var(--text)", margin: "40px 0 12px" }}>
+            4. Limitation of Liability
+          </h2>
+          <p>
+            This website and information are provided on an &quot;as is&quot; and &quot;as available&quot; basis without warranties of any kind. BuildrStudio shall not be liable for any indirect, incidental, or consequential damages arising from your access to or use of this website.
+          </p>
+
+          <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 400, fontSize: 24, letterSpacing: "-0.5px", color: "var(--text)", margin: "40px 0 12px" }}>
+            5. Contact Information
+          </h2>
+          <p>
+            For questions or concerns regarding these terms, please contact us at{" "}
+            <a href={`mailto:${siteConfig.contact.email}`} style={{ textDecoration: "underline", color: "var(--text)" }}>
+              {siteConfig.contact.email}
+            </a>.
+          </p>
+        </section>
       </main>
-      <SiteFooter />
-    </>
+
+      <footer style={{ borderTop: "1px solid var(--border)" }}>
+        <div className="company-footer" style={wrap}>
+          <Link className="company-wordmark" href="/">
+            <Image src="/brand/assets/buildrstudio-mark.svg" alt="" width={28} height={28} />
+            buildrstudio
+          </Link>
+          <span>Independent products. Thoughtfully built.</span>
+          <div>
+            <Link href="/privacy">Privacy</Link>
+            <Link href="/terms">Terms</Link>
+          </div>
+        </div>
+      </footer>
+
+      <style>{`
+        .company-site { font-family: var(--font-sans); }
+        .company-site a { color: inherit; text-decoration: none; }
+        .company-site a:focus-visible { outline: 3px solid var(--accent); outline-offset: 6px; }
+        .company-nav { height: 80px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+        .company-wordmark { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 650; letter-spacing: -1px; }
+        .company-nav nav { font-size: 13px; }
+        .company-footer { display: flex; align-items: center; justify-content: space-between; gap: 25px; min-height: 100px; font-size: 12px; color: var(--muted); }
+        .company-footer > div { display: flex; gap: 24px; }
+        .company-footer .company-wordmark { font-size: 20px; color: var(--text); }
+        @media(max-width: 760px) {
+          .company-nav { height: 72px; }
+          .company-wordmark { font-size: 20px; }
+          .company-nav nav { gap: 16px !important; font-size: 12px; }
+          .company-footer { flex-wrap: wrap; padding-top: 24px !important; padding-bottom: 24px !important; }
+        }
+      `}</style>
+    </div>
   );
 }

@@ -1,253 +1,159 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
-import SiteNav from "../components/SiteNav";
-import SiteFooter from "../components/SiteFooter";
+import Image from "next/image";
+import { siteConfig } from "../lib/siteConfig";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description:
-    "Privacy policy for Buildr Studio's AI agents. Learn how we collect, use, and protect your data.",
-  alternates: { canonical: "https://buildrstudio.in/privacy" },
+  title: "Privacy Policy | BuildrStudio",
+  description: "Privacy policy for BuildrStudio. How we handle information across our company website and independent products.",
+  alternates: { canonical: `${siteConfig.url}/privacy` },
   openGraph: {
-    title: "Privacy Policy — Buildr Studio",
-    description: "How Buildr Studio collects, uses, and protects your data.",
+    title: "Privacy Policy — BuildrStudio",
+    description: "Privacy policy for BuildrStudio and our independent products.",
     type: "website",
-    url: "https://buildrstudio.in/privacy",
+    url: `${siteConfig.url}/privacy`,
   },
 };
 
-const CONTACT_EMAIL = "hello@buildrstudio.in";
+const wrap = { maxWidth: 1240, margin: "0 auto", padding: "0 32px" };
 
 export default function PrivacyPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://buildrstudio.in" },
-      { "@type": "ListItem", position: 2, name: "Privacy Policy", item: "https://buildrstudio.in/privacy" },
+      { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
+      { "@type": "ListItem", position: 2, name: "Privacy Policy", item: `${siteConfig.url}/privacy` },
     ],
   };
 
   return (
-    <>
+    <div className="company-site" style={{ background: "var(--bg)", color: "var(--text)", minHeight: "100dvh" }}>
       <Script
         id="privacy-jsonld"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <style>{`
-        .legal-wrap {
-          max-width: 760px;
-          margin: 0 auto;
-          padding: 64px 16px 96px;
-          font-family: var(--font-sans);
-          color: var(--text);
-        }
-        .legal-back {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 13px;
-          color: var(--muted-2);
-          text-decoration: none;
-          margin-bottom: 40px;
-          border-radius: 2px;
-          transition: color .2s;
-        }
-        .legal-back:hover { color: var(--text); }
-        .legal-wrap h1 {
-          font-size: clamp(36px, 5vw, 56px);
-          font-weight: 600;
-          line-height: 1.02;
-          letter-spacing: -0.04em;
-          color: var(--text);
-          margin-bottom: 8px;
-        }
-        .legal-date {
-          font-size: 13px;
-          color: var(--muted-2);
-          margin-bottom: 40px;
-          font-family: var(--font-mono);
-          font-size: 12px;
-          letter-spacing: 0.04em;
-        }
-        .legal-wrap h2 {
-          font-size: 20px;
-          font-weight: 600;
-          color: var(--text);
-          margin-top: 40px;
-          margin-bottom: 12px;
-          padding-top: 24px;
-          border-top: 1px solid var(--border);
-          letter-spacing: -0.02em;
-        }
-        .legal-wrap p, .legal-wrap li {
-          max-width: 68ch;
-          font-size: 16px;
-          line-height: 1.75;
-          color: var(--muted);
-        }
-        .legal-wrap strong { color: var(--text); font-weight: 600; }
-        .legal-wrap ul {
-          padding-left: 24px;
-          margin: 12px 0;
-          list-style: disc;
-        }
-        .legal-wrap li { margin-bottom: 5px; }
-        .legal-wrap a {
-          color: var(--text);
-          text-decoration: underline;
-          text-decoration-color: var(--border-strong);
-          text-underline-offset: 4px;
-          border-radius: 2px;
-        }
-        .legal-wrap a:hover { text-decoration-color: var(--text); }
-        .legal-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 16px 0;
-          font-size: 14px;
-        }
-        .legal-scroll { overflow-x: auto; }
-        .legal-table th, .legal-table td {
-          text-align: left;
-          padding: 10px 14px;
-          border: 1px solid var(--border);
-        }
-        .legal-table th {
-          background: var(--surface-alt);
-          font-weight: 600;
-          color: var(--text);
-        }
-        .legal-table td { color: var(--muted); }
-        .legal-footer {
-          margin-top: 64px;
-          padding-top: 24px;
-          border-top: 1px solid var(--border);
-          display: flex;
-          flex-wrap: wrap;
-          gap: 20px;
-          font-size: 13px;
-        }
-        .legal-footer a {
-          color: var(--muted-2);
-          text-decoration: none;
-          transition: color .2s;
-        }
-        .legal-footer a:hover { color: var(--text); }
-      `}</style>
-
-      <SiteNav />
-      <main className="legal-wrap">
-        <Link href="/" className="legal-back">← Back to Buildr Studio</Link>
-
-        <h1>Privacy Policy</h1>
-        <p className="legal-date">Last updated: August 20, 2026</p>
-
-        <h2>1. Introduction</h2>
-        <p>
-          Buildr Studio (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) provides pre-built AI
-          agents at buildrstudio.in that you can subscribe to and embed on your own website. This
-          policy explains what data we collect — both from you as a subscriber and, where
-          applicable, from visitors to sites where you&apos;ve embedded an agent — and how we
-          protect it. Buildr Studio is operated by Aditya Kumar from India.
-        </p>
-
-        <h2>2. Data We Collect</h2>
-        <div className="legal-scroll">
-        <table className="legal-table">
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>When</th>
-              <th>Why</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Name, email, profile image</td>
-              <td>Signing in with Google</td>
-              <td>To create your account and associate your agents/subscriptions with it</td>
-            </tr>
-            <tr>
-              <td>Billing details</td>
-              <td>Subscribing to an agent</td>
-              <td>Processed by Paddle (our merchant of record) — we don&apos;t store card details ourselves</td>
-            </tr>
-            <tr>
-              <td>Chat messages</td>
-              <td>A visitor uses an embedded agent</td>
-              <td>Sent to Google Gemini to generate a reply, and stored so the agent has conversation context</td>
-            </tr>
-            <tr>
-              <td>Usage analytics</td>
-              <td>Page visits</td>
-              <td>Improving the site (via Vercel Analytics &amp; Umami — no personal data)</td>
-            </tr>
-          </tbody>
-        </table>
+      <header style={{ borderBottom: "1px solid var(--border)" }}>
+        <div className="company-nav" style={wrap}>
+          <Link href="/" className="company-wordmark" aria-label="BuildrStudio home">
+            <Image src="/brand/assets/buildrstudio-mark.svg" alt="" width={34} height={34} />
+            buildrstudio
+          </Link>
+          <nav aria-label="Primary" style={{ display: "flex", gap: 28 }}>
+            <Link href="/#products">Products</Link>
+            <Link href="/#about">About</Link>
+            <a href={`mailto:${siteConfig.contact.email}`}>Say hello <span aria-hidden="true">↗</span></a>
+          </nav>
         </div>
+      </header>
 
-        <h2>3. Chat Data From Embedded Agents</h2>
-        <p>
-          When a visitor uses an agent embedded on your website, their messages are sent to our
-          API, forwarded to Google Gemini to generate a response, and stored so the agent can
-          maintain conversation context. If you embed an agent, you&apos;re responsible for
-          disclosing this to your own visitors (e.g. in your own privacy policy) where required by
-          law.
+      <main style={{ maxWidth: 800, margin: "0 auto", padding: "56px 24px 80px" }}>
+        <Link className="company-back" href="/" style={{ display: "inline-block", fontSize: 13, marginBottom: 32 }}>
+          ← Back to BuildrStudio
+        </Link>
+
+        <h1 style={{ fontFamily: "Georgia, serif", fontWeight: 400, fontSize: "clamp(40px, 6vw, 56px)", letterSpacing: "-2px", margin: "0 0 12px" }}>
+          Privacy Policy
+        </h1>
+        <p style={{ fontSize: 13, color: "var(--muted)", margin: "0 0 40px" }}>
+          Last updated: October 2026
         </p>
 
-        <h2>4. Data We Do NOT Collect</h2>
-        <ul>
-          <li>Payment card details — these are handled entirely by Paddle, our merchant of record.</li>
-          <li>Advertising cookies or tracking pixels.</li>
-          <li>Any data from third-party account logins beyond what Google provides for sign-in.</li>
-        </ul>
+        <section style={{ lineHeight: 1.8, color: "var(--muted)", fontSize: 16 }}>
+          <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 400, fontSize: 24, letterSpacing: "-0.5px", color: "var(--text)", margin: "40px 0 12px" }}>
+            1. Who We Are
+          </h2>
+          <p>
+            BuildrStudio is an independent digital product company founded by Aditya Kumar, based in India. We design and build independent applications and digital experiences, including Numa, ArrowOut, and Pulseflip.
+          </p>
 
-        <h2>5. Third-Party Services</h2>
-        <ul>
-          <li><strong>Google Gemini</strong> — processes chat messages to generate agent replies</li>
-          <li><strong>Paddle</strong> — payment processing and billing (acts as merchant of record)</li>
-          <li><strong>Google</strong> — authentication (sign-in)</li>
-          <li><strong>Neon</strong> — database hosting for account, subscription, and chat data</li>
-          <li><strong>Vercel</strong> — hosting and anonymous analytics</li>
-          <li><strong>Umami</strong> — privacy-focused analytics (no personal data, no cookies)</li>
-        </ul>
+          <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 400, fontSize: 24, letterSpacing: "-0.5px", color: "var(--text)", margin: "40px 0 12px" }}>
+            2. Website Usage & Analytics
+          </h2>
+          <p>
+            This marketing website (buildrstudio.in) uses privacy-respecting analytics tools (Vercel Analytics and Umami) to collect anonymous usage and performance metrics (such as aggregate page views and browser device categories). These tools do not use tracking cookies and do not collect personally identifiable information.
+          </p>
 
-        <h2>6. Cookies</h2>
-        <p>
-          We use a session cookie to keep you signed in. We do not use advertising or third-party
-          tracking cookies. Umami analytics is fully cookie-free.
-        </p>
+          <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 400, fontSize: 24, letterSpacing: "-0.5px", color: "var(--text)", margin: "40px 0 12px" }}>
+            3. Product-Specific Privacy Policies
+          </h2>
+          <p>
+            Each of our independent products has its own privacy practices tailored to its functionality, device permissions, and platform requirements. Please consult the dedicated privacy policies for specific products:
+          </p>
+          <ul style={{ paddingLeft: 24, margin: "16px 0" }}>
+            <li style={{ marginBottom: 8 }}>
+              <strong>Numa:</strong>{" "}
+              <Link href="/products/numa/privacy" style={{ textDecoration: "underline", color: "var(--text)" }}>
+                Numa Privacy Policy
+              </Link>
+            </li>
+            <li style={{ marginBottom: 8 }}>
+              <strong>ArrowOut:</strong>{" "}
+              <Link href="/products/arrow-out/privacy" style={{ textDecoration: "underline", color: "var(--text)" }}>
+                ArrowOut Privacy Policy
+              </Link>
+            </li>
+            <li style={{ marginBottom: 8 }}>
+              <strong>Pulseflip:</strong>{" "}
+              <Link href="/products/pulse-flip/privacy" style={{ textDecoration: "underline", color: "var(--text)" }}>
+                Pulseflip Privacy Policy
+              </Link>
+            </li>
+          </ul>
 
-        <h2>7. Data Retention</h2>
-        <p>
-          Account and subscription data is retained as long as your account is active. Chat message
-          history is retained to provide conversation context for the agent and can be deleted on
-          request.
-        </p>
+          <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 400, fontSize: 24, letterSpacing: "-0.5px", color: "var(--text)", margin: "40px 0 12px" }}>
+            4. Communications & Support
+          </h2>
+          <p>
+            If you contact us via email, we use the information you provide (such as your email address and message content) solely to respond to your inquiry and provide assistance. We do not sell or share your contact information with third parties for marketing purposes.
+          </p>
 
-        <h2>8. Your Rights</h2>
-        <ul>
-          <li>Access the personal data we hold about you.</li>
-          <li>Request correction of inaccurate data.</li>
-          <li>Request deletion of your account and associated data at any time.</li>
-        </ul>
-
-        <h2>9. Contact</h2>
-        <p>
-          For privacy-related questions or data requests, contact us at{" "}
-          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
-        </p>
-
-        <div className="legal-footer">
-          <Link href="/terms">Terms &amp; Conditions</Link>
-          <Link href="/">Home</Link>
-        </div>
+          <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 400, fontSize: 24, letterSpacing: "-0.5px", color: "var(--text)", margin: "40px 0 12px" }}>
+            5. Your Rights & Inquiries
+          </h2>
+          <p>
+            You have the right to request access to or deletion of any personal communications you have sent to us. If you have questions regarding this privacy policy or wish to exercise your rights, please reach out to us at{" "}
+            <a href={`mailto:${siteConfig.contact.email}`} style={{ textDecoration: "underline", color: "var(--text)" }}>
+              {siteConfig.contact.email}
+            </a>.
+          </p>
+        </section>
       </main>
-      <SiteFooter />
-    </>
+
+      <footer style={{ borderTop: "1px solid var(--border)" }}>
+        <div className="company-footer" style={wrap}>
+          <Link className="company-wordmark" href="/">
+            <Image src="/brand/assets/buildrstudio-mark.svg" alt="" width={28} height={28} />
+            buildrstudio
+          </Link>
+          <span>Independent products. Thoughtfully built.</span>
+          <div>
+            <Link href="/privacy">Privacy</Link>
+            <Link href="/terms">Terms</Link>
+          </div>
+        </div>
+      </footer>
+
+      <style>{`
+        .company-site { font-family: var(--font-sans); }
+        .company-site a { color: inherit; text-decoration: none; }
+        .company-site a:focus-visible { outline: 3px solid var(--accent); outline-offset: 6px; }
+        .company-nav { height: 80px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+        .company-wordmark { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 650; letter-spacing: -1px; }
+        .company-nav nav { font-size: 13px; }
+        .company-footer { display: flex; align-items: center; justify-content: space-between; gap: 25px; min-height: 100px; font-size: 12px; color: var(--muted); }
+        .company-footer > div { display: flex; gap: 24px; }
+        .company-footer .company-wordmark { font-size: 20px; color: var(--text); }
+        @media(max-width: 760px) {
+          .company-nav { height: 72px; }
+          .company-wordmark { font-size: 20px; }
+          .company-nav nav { gap: 16px !important; font-size: 12px; }
+          .company-footer { flex-wrap: wrap; padding-top: 24px !important; padding-bottom: 24px !important; }
+        }
+      `}</style>
+    </div>
   );
 }
