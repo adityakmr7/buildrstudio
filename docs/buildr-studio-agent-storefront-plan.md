@@ -11,7 +11,7 @@ Section 10 is what actually happened.)
 
 ## 0. Current status (read this first — updated 2026-10-05)
 
-**ArrowOut URL update (2026-10-13):** Marketing lives at `/products/arrow-out`; `/arrow-out` permanently redirects there. Privacy, terms, and help keep their existing `/arrow-out/*` URLs for app links.
+**ArrowOut URL update (2026-10-27):** Marketing lives at `/products/arrow-out`; `/arrow-out` permanently redirects there. Privacy, terms, and help now live at `/products/arrow-out/privacy`, `/products/arrow-out/terms`, and `/products/arrow-out/help`; the legacy `/arrow-out/*` URLs permanently redirect there.
 
 **ArrowOut added (2026-10-08):** `/arrow-out` is the game marketing page, linked from the company portfolio. `/arrow-out/help` provides support; `/arrow-out/privacy` and `/arrow-out/terms` are clearly labeled release-review drafts and noindex until the final operator and release data inventory are confirmed. Real game icon and screenshot are copied from the arrow-puzzle submission pack. No App Store URL has been supplied; availability reads “Coming to iPhone & iPad.” Published to production on 2026-10-08 (deployment `dpl_5kWigHDBx57NwV18M7oqRKxUAj76`). All four ArrowOut routes, the company homepage, and sitemap verified on the public domain.
 
