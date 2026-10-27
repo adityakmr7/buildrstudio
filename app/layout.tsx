@@ -3,8 +3,6 @@ import localFont from "next/font/local";
 import Script from "next/script";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
-import { ToastProvider } from "./components/Toast";
-import { AuthProvider } from "./components/AuthProvider";
 import { siteConfig } from "./lib/siteConfig";
 import "./globals.css";
 
@@ -59,12 +57,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
-      <body  suppressHydrationWarning>
-        <AuthProvider>
-          <ToastProvider>
-            {children}
-          </ToastProvider>
-        </AuthProvider>
+      <body suppressHydrationWarning>
+        {children}
         <SpeedInsights />
         <Analytics />
         <Script

@@ -1,1 +1,36 @@
-export { default } from "../../arrow-out/layout";
+import Image from "next/image";
+import Link from "next/link";
+import type { ReactNode } from "react";
+
+export default function ArrowOutLayout({ children }: { children: ReactNode }) {
+  return (
+    <div className="arrow-site">
+      <a className="arrow-skip" href="#arrow-content">Skip to content</a>
+      <header className="arrow-header">
+        <Link href="/products/arrow-out" className="arrow-brand">
+          <Image src="/arrow-out/icon.png" alt="" width={38} height={38} />ArrowOut
+        </Link>
+        <nav aria-label="ArrowOut navigation">
+          <Link href="/">BuildrStudio</Link>
+          <Link href="/products/arrow-out/help">Help</Link>
+        </nav>
+      </header>
+      <main id="arrow-content">{children}</main>
+      <footer className="arrow-footer">
+        <div>
+          <Link href="/products/arrow-out" className="arrow-brand">ArrowOut</Link>
+          <p>A game by <Link href="/">BuildrStudio</Link></p>
+        </div>
+        <nav aria-label="ArrowOut footer">
+          <Link href="/products/arrow-out/privacy">Privacy</Link>
+          <Link href="/products/arrow-out/terms">Terms</Link>
+          <Link href="/products/arrow-out/help">Help</Link>
+        </nav>
+      </footer>
+      <style>{`
+        .arrow-site{background:var(--bg);color:var(--text);min-height:100dvh;font-family:var(--font-sans)}.arrow-site *{box-sizing:border-box}.arrow-site a{color:inherit;text-underline-offset:4px}.arrow-site a:focus-visible,.arrow-site summary:focus-visible{outline:3px solid var(--accent);outline-offset:5px}.arrow-header,.arrow-footer,.arrow-site main{max-width:1160px;margin:auto;padding:0 28px}.arrow-header{min-height:84px;display:flex;justify-content:space-between;align-items:center;gap:24px;border-bottom:1px solid var(--border)}.arrow-brand{display:inline-flex;align-items:center;gap:12px;font-weight:650;font-size:23px;letter-spacing:-.8px;text-decoration:none}.arrow-brand img{border-radius:10px}.arrow-header nav,.arrow-footer nav{display:flex;gap:26px;font-size:14px}.arrow-header nav a,.arrow-footer nav a{text-decoration:none}.arrow-footer{padding-top:32px;padding-bottom:32px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:24px}.arrow-footer p{font-size:12px;color:var(--muted)}.arrow-skip{position:absolute;top:-100px;background:var(--surface);padding:12px;z-index:10}.arrow-skip:focus{top:10px;left:10px}.arrow-hero{display:grid;grid-template-columns:1.2fr 1fr;align-items:center;gap:60px;padding:60px 0}.arrow-eyebrow{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}.arrow-site h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(44px,6vw,76px);line-height:1.06;letter-spacing:-2.8px;margin:24px 0}.arrow-site h1 em{color:var(--accent-mid)}.arrow-site p{line-height:1.8;color:var(--muted)}.arrow-hero p{max-width:380px;font-size:18px}.arrow-actions{display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-top:30px}.arrow-button{display:inline-flex;background:var(--accent);color:var(--accent-ink)!important;padding:14px 22px;border-radius:8px;text-decoration:none;font-size:14px}.arrow-availability{font-size:13px;color:var(--muted);display:block;margin-top:28px}.arrow-stage{background:var(--surface-alt);border-radius:24px;padding:28px;display:flex;align-items:center;justify-content:center}.arrow-phone{width:220px;height:auto;border:6px solid var(--text);border-radius:32px;box-shadow:0 18px 40px #153e3512}.arrow-strip{display:flex;justify-content:space-between;gap:20px;padding:24px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:14px;color:var(--muted)}.arrow-section{padding:64px 0}.arrow-section h2{font-family:Georgia,serif;font-weight:400;font-size:clamp(32px,4vw,46px);letter-spacing:-1.5px;line-height:1.15;margin:0 0 24px}.arrow-steps{display:grid;grid-template-columns:1fr 1fr;gap:64px}.arrow-steps ol{padding-left:24px;margin:0}.arrow-steps li{padding:0 0 24px 12px;line-height:1.8;color:var(--muted)}.arrow-steps strong{display:block;color:var(--text)}.arrow-faq{max-width:760px}.arrow-site details{border-bottom:1px solid var(--border);padding:20px 0}.arrow-site summary{cursor:pointer;line-height:1.6;font-weight:550}.arrow-site details p{margin-bottom:0}.arrow-document{max-width:760px;margin:0 auto;padding:56px 0 72px}.arrow-document h1{font-size:clamp(40px,6vw,56px)}.arrow-document h2{font-size:23px;letter-spacing:-.6px;margin:36px 0 12px}.arrow-document p,.arrow-document li{font-size:16px;line-height:1.8;color:var(--muted)}.arrow-document ul{list-style:disc;padding-left:24px}.arrow-review{background:var(--surface-alt);border-left:3px solid var(--accent);padding:16px 20px;margin:28px 0}.arrow-review p{margin:0;font-size:14px}.arrow-back{font-size:13px}.arrow-contact{padding:24px;background:var(--surface-alt);border-radius:12px}.arrow-contact a{overflow-wrap:anywhere}
+        @media(max-width:760px){.arrow-header,.arrow-footer,.arrow-site main{padding-left:20px;padding-right:20px}.arrow-header nav,.arrow-footer nav{gap:16px}.arrow-hero{grid-template-columns:1fr;gap:32px;padding:40px 0}.arrow-site h1{letter-spacing:-1.8px}.arrow-phone{width:200px}.arrow-strip{flex-wrap:wrap;justify-content:flex-start;gap:12px 24px}.arrow-steps{grid-template-columns:1fr;gap:24px}.arrow-section{padding:44px 0}.arrow-footer{flex-wrap:wrap}.arrow-document{padding-top:36px}}
+      `}</style>
+    </div>
+  );
+}
