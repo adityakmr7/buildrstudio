@@ -27,4 +27,17 @@ export const PRODUCTS = [
     imageAlt: "ArrowOut gameplay with directional arrows, three hearts, and a tutorial",
     color: "#ECF1EB",
   },
+  {
+    slug: "pulse-flip",
+    name: "Pulseflip",
+    category: "One-tap arcade endless runner",
+    tagline: "One tap. A whole new gravity.",
+    description: "Flip gravity, dodge neon hazards, and chase your best run. Complete daily missions and unlock colors and trails.",
+    status: "Coming to iPhone & iPad",
+    href: "/products/pulse-flip",
+    mark: "/pulse-flip/icon.png",
+    image: "/pulse-flip/game.png",
+    imageAlt: "Pulseflip’s neon arcade interface in landscape orientation",
+    color: "#E9EDF8",
+  },
 ] as const;
