@@ -2,7 +2,7 @@ import Link from "next/link";
 import Script from "next/script";
 import { arrowMetadata, arrowJsonLd } from "../metadata";
 
-const title = "ArrowOut Terms | Release review draft";
+const title = "ArrowOut Terms";
 const description = "ArrowOut terms covering the app license, optional purchases, availability, saved progress, and support.";
 export const metadata = arrowMetadata("/terms", title, description, true);
 
@@ -12,10 +12,7 @@ export default function TermsPage() {
       <Script id="arrow-terms-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: arrowJsonLd("/terms", title, description) }} />
       <Link className="arrow-back" href="/products/arrow-out">Back to ArrowOut</Link>
       <h1>Terms of use</h1>
-      <p>ArrowOut: Clear & Escape · Prepared 8 October 2026</p>
-      <aside className="arrow-review">
-        <p>Release review draft. These product terms need final owner review before App Store submission, including the legal operator details and any additional terms required for the release.</p>
-      </aside>
+      <p>ArrowOut: Clear & Escape · Updated 28 October 2026</p>
       <h2>About ArrowOut</h2>
       <p>ArrowOut is a puzzle game developed by BuildrStudio, founded by Aditya Kumar, for personal entertainment. Questions can be sent to <a href="mailto:hello@buildrstudio.in?subject=ArrowOut%20terms">hello@buildrstudio.in</a>.</p>
       <h2>Your app license</h2>
