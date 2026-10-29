@@ -1,0 +1,81 @@
+.cs-site { --cs-muted:#a4b0c2; --cs-line:#263041; --cs-blue:#8ab8ff; }
+.cs-site section[id] { scroll-margin-top:32px; }
+.cs-site a:focus-visible,.cs-site summary:focus-visible { outline:3px solid #93c5fd; outline-offset:5px; }
+.cs-hero { text-align:center; max-width:880px; margin:auto; padding:80px 0 40px; }
+.cs-eyebrow { display:block; color:var(--cs-blue); font-size:12px; font-weight:650; letter-spacing:1.5px; text-transform:uppercase; margin:0 0 20px; }
+.cs-hero h1 { font-size:clamp(48px,7vw,84px); line-height:1.03; letter-spacing:-3.5px; font-weight:750; margin:0 0 24px; }
+.cs-hero h1 em { color:#93baff; font-style:normal; }
+.cs-hero-lead { max-width:650px; margin:0 auto 28px; font-size:19px; line-height:1.75; color:var(--cs-muted); }
+.cs-cta-group { display:flex; justify-content:center; align-items:center; gap:16px; flex-wrap:wrap; }
+.cs-primary-button,.cs-secondary-button { display:inline-flex; align-items:center; justify-content:center; gap:24px; min-height:50px; padding:13px 22px; font-size:15px; font-weight:650; text-decoration:none; border-radius:9px; }
+.cs-primary-button { background:#3979f5; color:white!important; box-shadow:0 6px 24px #2563eb25; }
+.cs-primary-button:hover { background:#2868e7; }
+.cs-secondary-button { border:1px solid var(--cs-line); color:#d6dfec; background:#ffffff04; }
+.cs-secondary-button:hover { background:#ffffff0a; }
+.cs-checkout-note { color:var(--cs-muted); font-size:12px; margin:15px 0 24px; }
+.cs-trust { list-style:none; padding:0; margin:0; display:flex; justify-content:center; flex-wrap:wrap; gap:12px 22px; font-size:12px; color:#c3d0e2; }
+.cs-trust li { display:flex; align-items:center; gap:8px; }
+.cs-trust li::before { content:""; width:5px; height:5px; background:#7fb59c; border-radius:50%; }
+.cs-product-preview { margin:14px 0 0; }
+.cs-product-preview>a { display:block; border:1px solid #364052; border-radius:15px; overflow:hidden; background:#15191f; box-shadow:0 25px 80px #0005; }
+.cs-product-preview img { display:block; width:100%; height:auto; }
+.cs-product-preview figcaption { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:14px; color:var(--cs-muted); font-size:11px; }
+.cs-principles { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border-bottom:1px solid var(--cs-line); gap:32px; padding:30px 0 38px; }
+.cs-principles p { margin:0; font-size:13px; line-height:1.7; }
+.cs-principles strong,.cs-principles span { display:block; }
+.cs-principles strong { font-weight:550; color:#e2eaf5; }
+.cs-principles span { color:var(--cs-muted); margin-top:4px; }
+.cs-section { padding:76px 0; }
+.cs-section+.cs-section { border-top:1px solid var(--cs-line); }
+.cs-section-header { max-width:700px; margin:0 auto 38px; text-align:center; }
+.cs-section-header h2 { font-size:clamp(28px,4vw,42px); line-height:1.15; letter-spacing:-1.3px; margin:0 0 15px; font-weight:650; }
+.cs-section-header p { color:var(--cs-muted); font-size:16px; line-height:1.75; margin:0; }
+.cs-steps { padding:0; margin:0; list-style:none; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; }
+.cs-steps li { border-top:2px solid #416eac; padding:24px 0 0; }
+.cs-step-number { font-size:13px; font-family:monospace; color:var(--cs-blue); }
+.cs-steps h3 { font-size:26px; margin:14px 0 10px; font-weight:600; }
+.cs-steps p,.cs-feature p { color:var(--cs-muted); font-size:14px; line-height:1.8; margin:0; }
+.cs-steps small { display:block; color:#c0d4ee; font-size:12px; margin-top:18px; }
+.cs-feature-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+.cs-feature { border:1px solid var(--cs-line); border-radius:12px; padding:28px; background:#ffffff02; }
+.cs-feature-top { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; font-size:12px; color:#c6d1e0; }
+.cs-tag { border:1px solid #374253; color:#acbbce; font-size:10px; border-radius:5px; padding:3px 7px; }
+.cs-tag-pro { color:#b7d0ff; background:#3979f514; border-color:#3979f550; }
+.cs-feature h3 { margin:24px 0 12px; font-size:22px; line-height:1.3; font-weight:550; letter-spacing:-.4px; }
+.cs-plan-layout { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr); gap:28px; align-items:start; }
+.cs-table-container { overflow-x:auto; border:1px solid var(--cs-line); border-radius:12px; }
+.cs-table { width:100%; border-collapse:collapse; text-align:left; font-size:13px; }
+.cs-table th,.cs-table td { padding:17px 16px; border-bottom:1px solid var(--cs-line); line-height:1.6; }
+.cs-table thead { background:#ffffff04; color:#dbe6f5; }
+.cs-table th { font-weight:500; }
+.cs-table tbody th { color:#bdcadc; }
+.cs-table td { color:var(--cs-muted); }
+.cs-table .cs-pro-cell { color:#bed4ff; }
+.cs-table tr:last-child>* { border-bottom:0; }
+.cs-pricing-box { padding:30px; border:1px solid #4277bd; border-radius:12px; background:linear-gradient(160deg,#3979f514,#ffffff02); }
+.cs-pricing-box h3 { font-size:58px; line-height:1; letter-spacing:-2px; margin:0 0 18px; }
+.cs-pricing-box h3 span { font-size:15px; letter-spacing:0; font-weight:400; color:var(--cs-muted); margin-left:10px; }
+.cs-pricing-box p { color:#c6d1e0; font-size:14px; line-height:1.7; }
+.cs-pricing-box ul { padding-left:18px; color:#c6d1e0; font-size:13px; line-height:2; margin:20px 0 24px; }
+.cs-pricing-box .cs-primary-button { width:100%; gap:12px; }
+.cs-pricing-box small { display:block; font-size:11px; color:var(--cs-muted); line-height:1.8; margin-top:16px; }
+.cs-purchase-help { text-align:center; font-size:12px; color:var(--cs-muted); margin:24px 0 0; }
+.cs-faq { max-width:800px; margin:auto; }
+.cs-faq details { border-bottom:1px solid var(--cs-line); }
+.cs-faq summary { display:flex; justify-content:space-between; gap:20px; list-style:none; cursor:pointer; font-size:16px; font-weight:500; padding:23px 0; }
+.cs-faq summary::-webkit-details-marker { display:none; }
+.cs-faq summary span { color:var(--cs-blue); }
+.cs-faq details[open] summary span { transform:rotate(45deg); }
+.cs-faq details p { margin:0 0 24px; font-size:14px; line-height:1.85; color:var(--cs-muted); }
+.cs-faq a { color:#bdd4ff; }
+.cs-support { margin-top:28px; font-size:13px; color:var(--cs-muted); }
+.cs-visually-hidden { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+@media(max-width:760px) { .cs-hero { padding-top:48px; } .cs-hero h1 { letter-spacing:-2px; } .cs-hero-lead { font-size:17px; } .cs-section { padding:52px 0; } .cs-steps,.cs-principles,.cs-plan-layout { grid-template-columns:1fr; } .cs-feature-grid { grid-template-columns:1fr; } .cs-principles { gap:20px; } .cs-steps { gap:32px; } .cs-table th,.cs-table td { padding:13px 10px; font-size:12px; } .cs-product-preview>a { border-radius:8px; } .cs-cta-group { gap:10px; } .cs-primary-button,.cs-secondary-button { width:100%; } .cs-feature { padding:22px; } }
+
+@media(max-width:360px) {
+  .cs-hero h1 { font-size:38px; letter-spacing:-1.7px; }
+  .cs-primary-button,.cs-secondary-button { font-size:13px; gap:12px; padding:13px 14px; }
+  .cs-site .cs-header { gap:8px; }
+  .cs-site .cs-brand { font-size:18px; gap:8px; }
+  .cs-site .cs-nav-button { font-size:12px; padding:10px 12px; white-space:nowrap; }
+}

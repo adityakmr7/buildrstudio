@@ -14,6 +14,7 @@ export default function ClearStackLayout({ children }: { children: ReactNode }) 
         </Link>
         <nav aria-label="ClearStack navigation" className="cs-nav">
           <Link href="/">BuildrStudio</Link>
+          <a href="#how-it-works">How it works</a>
           <a href="#features">Features</a>
           <a href="#pricing">Pricing</a>
           <a
@@ -23,7 +24,7 @@ export default function ClearStackLayout({ children }: { children: ReactNode }) 
             target="_blank"
             rel="noopener noreferrer"
           >
-            Buy for $5
+            Get Pro — $5 once
           </a>
         </nav>
       </header>
@@ -91,10 +92,11 @@ export default function ClearStackLayout({ children }: { children: ReactNode }) 
           transition: color 0.2s;
         }
         .cs-nav a:hover { color: #ffffff; }
+        .cs-site a:focus-visible { outline: 3px solid #93c5fd; outline-offset: 5px; }
         .cs-nav-button {
           background: linear-gradient(135deg, #3b82f6, #6366f1);
           color: #ffffff !important;
-          padding: 8px 18px;
+          padding: 12px 18px;
           border-radius: 8px;
           font-weight: 600;
           box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
