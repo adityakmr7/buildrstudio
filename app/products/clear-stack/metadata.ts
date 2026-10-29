@@ -17,9 +17,9 @@ export function clearStackMetadata(
       type: "website",
       images: [
         {
-          url: "https://buildrstudio.in/clear-stack/preview.png",
-          width: 1200,
-          height: 780,
+          url: "https://buildrstudio.in/clear-stack/current-release.png",
+          width: 2880,
+          height: 1572,
           alt: "ClearStack macOS Storage Optimizer",
         },
       ],
@@ -28,7 +28,7 @@ export function clearStackMetadata(
       card: "summary_large_image",
       title,
       description,
-      images: ["https://buildrstudio.in/clear-stack/preview.png"],
+      images: ["https://buildrstudio.in/clear-stack/current-release.png"],
     },
   };
 }
@@ -54,7 +54,7 @@ export function clearStackJsonLd(
     },
     description,
     url,
-    image: "https://buildrstudio.in/clear-stack/preview.png",
+    image: "https://buildrstudio.in/clear-stack/current-release.png",
     author: {
       "@type": "Organization",
       name: "BuildrStudio",

@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "minOSVersion": "14.0",
   "downloadUrl": "https://buildrstudio.in/downloads/ClearStack.dmg",
-  "releaseNotes": "Initial public release of ClearStack. One-click Safe Sweep, Project Dependencies Hunter, Docker virtual disk cleaner, and menu bar monitor."
+  "releaseNotes": "Cleanup safety update: category-scoped selection, project validation, accurate Trash and failure reporting, secure license verification, and universal Mac support. Simulator resets and Docker deletion are disabled."
 }
