@@ -33,7 +33,7 @@ export const PRODUCTS = [
     category: "Arrow escape puzzle game",
     tagline: "A clear path. A thoughtful tap.",
     description: "Untangle the arrows and find your flow in 90 original puzzles for iPhone and iPad.",
-    status: "Coming to iPhone & iPad",
+    status: "Available for iPhone & iPad",
     href: "/products/arrow-out",
     mark: "/arrow-out/icon.png",
     image: "/arrow-out/gameplay.jpg",
