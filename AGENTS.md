@@ -54,3 +54,6 @@ app/
   arrow-out/                    # Legacy 308 permanent redirects to /products/arrow-out/*
   sitemap.ts, robots.ts
 ```
+
+## BothSide
+Creator-focused native iPhone dual camera/teleprompter app. Routes: `/products/both-side`, `/products/both-side/privacy`, `/products/both-side/help`; `/support` permanently redirects to help. Graphite/ivory product theme scoped in `bothside.css`. Local static assets in `public/both-side` derive from staged native SwiftUI renders with fictional sample imagery. Listed as coming soon until an App Store URL is confirmed. App privacy is distinct from website analytics. Contact uses the existing siteConfig address, hello@buildrstudio.in.
