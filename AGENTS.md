@@ -6,7 +6,7 @@ BuildrStudio is an **independent digital product company** founded by Aditya Kum
 
 Featured products:
 - **Numa**: A gentle pregnancy and baby companion designed to bring clarity, comfort, and room for reflections (in Android internal testing on Google Play). Routes: `/products/numa`, `/products/numa/privacy`, `/products/numa/help`.
-- **ArrowOut (Clear & Escape)**: A puzzle game with 90 original puzzles, coming to iPhone and iPad. Routes: `/products/arrow-out`, `/products/arrow-out/privacy`, `/products/arrow-out/help`, `/products/arrow-out/terms` (with legacy `/arrow-out/*` routes permanently redirecting to `/products/arrow-out/*`).
+- **ArrowOut (Clear & Escape)**: An arrow escape puzzle game with 400 bundled campaign puzzles playable offline, available on the App Store for iPhone and iPad. Routes: `/products/arrow-out`, `/products/arrow-out/privacy`, `/products/arrow-out/help`, `/products/arrow-out/terms` (with legacy `/arrow-out/*` routes permanently redirecting to `/products/arrow-out/*`).
 - **Pulseflip**: Mobile game with missions, cosmetic unlocks, and run scoring. Routes: `/products/pulse-flip`, `/products/pulse-flip/privacy`, `/products/pulse-flip/terms`, `/products/pulse-flip/support`.
 
 **Live site:** https://buildrstudio.in  
