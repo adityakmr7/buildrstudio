@@ -53,4 +53,17 @@ export const PRODUCTS = [
     imageAlt: "Pulseflip’s neon arcade interface in landscape orientation",
     color: "#E9EDF8",
   },
+  {
+    slug: "both-side",
+    name: "BothSide",
+    category: "Dual camera & teleprompter",
+    tagline: "Both sides. One story.",
+    description: "Record yourself and your world in one video. Stay on script, shape your frame, and keep every take ready to review and share.",
+    status: "Coming to iPhone",
+    href: "/products/both-side",
+    mark: "/both-side/icon.png",
+    image: "/both-side/social.jpg",
+    imageAlt: "BothSide dual camera and floating teleprompter for iPhone",
+    color: "#EEECE6",
+  },
 ] as const;

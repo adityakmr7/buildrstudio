@@ -35,3 +35,13 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 # buildrstudio
+
+## BothSide product pages
+
+- `/products/both-side`: responsive creator marketing page, graphite/ivory theme and optimized native UI renders.
+- `/products/both-side/privacy`: app-specific local-data/permission policy, with website analytics distinguished.
+- `/products/both-side/help`: FAQs and existing BuildrStudio email support. `/products/both-side/support` redirects here.
+
+Included in the company portfolio and sitemap. No public App Store URL is confirmed: availability reads “Coming to iPhone”. Assets use fictional sample media from the BothSide 1.0.0 marketing kit; the app icon is the current shipping asset. No deployment is implied.
+
+Validation (November 9, 2026): `bun run lint` and `bun run build` passed. Local production preview reviewed at 1280px desktop and 390px mobile; no horizontal overflow observed. Native help accordion expands, privacy navigation works, support redirects to help. Canonical metadata points to buildrstudio.in. No deployment or App Store availability claim.

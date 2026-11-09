@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteConfig.url}/products/arrow-out/help`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${siteConfig.url}/products/numa/help`, changeFrequency: "monthly", priority: 0.5 },
     ...["/privacy", "/terms", "/support"].map(path => ({ url: `${siteConfig.url}/products/pulse-flip${path}`, changeFrequency: "monthly" as const, priority: 0.4 })),
+    ...["privacy", "help"].map(path => ({ url: `${siteConfig.url}/products/both-side/${path}`, changeFrequency: "monthly" as const, priority: 0.5 })),
     ...["privacy", "terms"].map(path => ({ url: `${siteConfig.url}/${path}`, changeFrequency: "yearly" as const, priority: 0.3 })),
   ];
 }
