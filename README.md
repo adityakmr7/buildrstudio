@@ -45,3 +45,5 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 Included in the company portfolio and sitemap. No public App Store URL is confirmed: availability reads “Coming to iPhone”. Assets use fictional sample media from the BothSide 1.0.0 marketing kit; the app icon is the current shipping asset. No deployment is implied.
 
 Validation (November 9, 2026): `bun run lint` and `bun run build` passed. Local production preview reviewed at 1280px desktop and 390px mobile; no horizontal overflow observed. Native help accordion expands, privacy navigation works, support redirects to help. Canonical metadata points to buildrstudio.in. No deployment or App Store availability claim.
+
+BothSide monetization copy now describes three free saved camera takes and a one-time unlimited-recording Full Unlock. No subscription, watermark or existing-video access gate. Availability remains coming soon; App Store Connect product setup and sandbox verification are pending.
