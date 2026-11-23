@@ -57,3 +57,6 @@ app/
 
 ## BothSide
 Creator-focused native iPhone dual camera/teleprompter app. Routes: `/products/both-side`, `/products/both-side/privacy`, `/products/both-side/help`; `/support` permanently redirects to help. Graphite/ivory product theme scoped in `bothside.css`. Local static assets in `public/both-side` derive from staged native SwiftUI renders with fictional sample imagery. Listed as coming soon until an App Store URL is confirmed. App privacy is distinct from website analytics. Contact uses the existing siteConfig address, hello@buildrstudio.in.
+
+## Astrell
+Native iPhone focus timer and app blocker. Routes: `/products/astrell`, `/products/astrell/privacy`, `/products/astrell/help`. Scoped dark product styles and bundled artwork live in `app/products/astrell` and `public/astrell`. Optional accounts use Firebase Authentication; Apple and email are the current entry methods. Focus history and private Screen Time reports stay on-device. The app policy is separate from website analytics.
