@@ -59,7 +59,7 @@ export const PRODUCTS = [
     category: "Dual camera & teleprompter",
     tagline: "Both sides. One story.",
     description: "Record yourself and your world in one video. Stay on script, shape your frame, and keep every take ready to review and share.",
-    status: "Coming to iPhone",
+    status: "Available for iPhone",
     href: "/products/both-side",
     mark: "/both-side/icon.png",
     image: "/both-side/social.jpg",
