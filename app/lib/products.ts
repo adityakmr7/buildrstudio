@@ -1,5 +1,6 @@
 /** Company portfolio. Add future products here; each owns its identity and destination. */
 export const PRODUCTS = [
+
   {
     slug: "numa",
     name: "Numa",
@@ -59,11 +60,24 @@ export const PRODUCTS = [
     category: "Dual camera & teleprompter",
     tagline: "Both sides. One story.",
     description: "Record yourself and your world in one video. Stay on script, shape your frame, and keep every take ready to review and share.",
-    status: "Coming to iPhone",
+    status: "Available for iPhone",
     href: "/products/both-side",
     mark: "/both-side/icon.png",
     image: "/both-side/social.jpg",
     imageAlt: "BothSide dual camera and floating teleprompter for iPhone",
     color: "#EEECE6",
+  },
+  {
+    slug: "astrell",
+    name: "Astrell",
+    category: "Focus timer & app blocking",
+    tagline: "Make space for focus.",
+    description: "Block distractions, settle into a soundscape, and grow a solar system from your completed focus sessions.",
+    status: "Preparing for the App Store",
+    href: "/products/astrell",
+    mark: "/astrell/icon.png",
+    image: "/astrell/first-light.jpg",
+    imageAlt: "Astrell’s golden First Light sun against a dark cosmic background",
+    color: "#ECF1EB",
   },
 ] as const;
