@@ -1,5 +1,6 @@
 /** Company portfolio. Add future products here; each owns its identity and destination. */
 export const PRODUCTS = [
+
   {
     slug: "numa",
     name: "Numa",

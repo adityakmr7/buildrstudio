@@ -1,6 +1,6 @@
 {
-  "version": "1.0.1",
+  "version": "1.1.0",
   "minOSVersion": "14.0",
   "downloadUrl": "https://buildrstudio.in/downloads/ClearStack.dmg",
-  "releaseNotes": "Cleanup safety update: category-scoped selection, project validation, accurate Trash and failure reporting, secure license verification, and universal Mac support. Simulator resets and Docker deletion are disabled."
+  "releaseNotes": "Project Storage groups dependency folders by project with totals and toolchain labels. Cancel scans while preserving completed results. Review exact paths and removal consequences before cleanup, with an extra acknowledgement for permanent deletion."
 }
